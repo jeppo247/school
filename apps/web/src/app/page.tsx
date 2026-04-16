@@ -229,7 +229,7 @@ export default function HomePage() {
             >
               Upwise uses adaptive AI to diagnose your child&apos;s knowledge gaps in
               minutes, then builds a personalised learning path to close them.
-              <span className="text-gray-700 font-medium"> For Prep to Year 6.</span>
+              <span className="text-gray-700 font-medium"> For Prep to Year 7.</span>
             </motion.p>
 
             <motion.div
@@ -319,8 +319,8 @@ export default function HomePage() {
             {[
               { value: "150+", label: "Skill nodes mapped" },
               { value: "ACARA", label: "Curriculum aligned" },
-              { value: "81%", label: "Target win rate" },
-              { value: "Y1–Y4", label: "Year levels" },
+              { value: "30 min", label: "Daily sessions" },
+              { value: "Prep–Y7", label: "Year levels" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -573,8 +573,8 @@ export default function HomePage() {
               },
               {
                 icon: "🎯",
-                title: "80–82% Win Rate",
-                desc: "Questions stay in the optimal difficulty zone — hard enough to learn, easy enough to feel confident",
+                title: "Adaptive Difficulty",
+                desc: "Questions automatically adjust to your child's level — challenging enough to grow, easy enough to stay confident",
               },
               {
                 icon: "🔥",
@@ -897,7 +897,7 @@ export default function HomePage() {
               &copy; {new Date().getFullYear()} Techne AI Pty Ltd. All rights reserved.
             </p>
             <p className="text-xs">
-              Made with ❤️ in Adelaide, Australia
+              Australian owned and operated
             </p>
           </div>
         </div>

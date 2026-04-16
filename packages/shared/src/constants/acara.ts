@@ -1,5 +1,5 @@
-/** ACARA year levels supported in MVP */
-export const SUPPORTED_YEAR_LEVELS = [1, 2, 3, 4] as const;
+/** ACARA year levels supported (Prep = 0, Year 1–7) */
+export const SUPPORTED_YEAR_LEVELS = [0, 1, 2, 3, 4, 5, 6, 7] as const;
 export type SupportedYearLevel = (typeof SUPPORTED_YEAR_LEVELS)[number];
 
 /** Strands within the Mathematics learning area */
