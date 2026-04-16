@@ -768,7 +768,7 @@ export default function HomePage() {
               <ul className="space-y-2 text-sm">
                 <li><Link href="#how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
                 <li><Link href="#" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">For Schools</Link></li>
+                <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
               </ul>
             </div>
             <div>
