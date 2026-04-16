@@ -3,6 +3,10 @@ import { db } from "../client.js";
 import { themes, shopItems, skillNodes, skillPrerequisites } from "../schema.js";
 import { eq } from "drizzle-orm";
 import { allSkillNodes, prerequisites } from "./skill-nodes.js";
+import {
+  readingNodes, spellingNodes,
+  readingPrerequisites, spellingPrerequisites,
+} from "./english-skill-nodes.js";
 import { logger } from "../../lib/logger.js";
 
 async function seed() {
@@ -372,7 +376,29 @@ async function seed() {
       .onConflictDoNothing();
   }
 
-  logger.info(`Skill nodes seeded: ${allSkillNodes.length} nodes`);
+  // Seed English skill nodes (Reading + Spelling)
+  const englishNodes = [...readingNodes, ...spellingNodes];
+  for (const node of englishNodes) {
+    await db
+      .insert(skillNodes)
+      .values({
+        code: node.code,
+        name: node.name,
+        description: node.description,
+        yearLevel: node.yearLevel,
+        domain: node.domain,
+        learningArea: node.learningArea,
+        strand: node.strand,
+        subStrand: node.subStrand,
+        acaraCode: node.acaraCode,
+        dokLevel: node.dokLevel,
+        difficultyBand: node.difficultyBand,
+        displayOrder: node.displayOrder,
+      })
+      .onConflictDoNothing();
+  }
+
+  logger.info(`Skill nodes seeded: ${allSkillNodes.length} maths + ${englishNodes.length} english nodes`);
 
   // Seed prerequisites
   for (const prereq of prerequisites) {
@@ -397,7 +423,31 @@ async function seed() {
     }
   }
 
-  logger.info(`Prerequisites seeded: ${prerequisites.length} edges`);
+  // Seed English prerequisites (Reading + Spelling)
+  const englishPrereqs = [...readingPrerequisites, ...spellingPrerequisites];
+  for (const prereq of englishPrereqs) {
+    const [skill] = await db
+      .select({ id: skillNodes.id })
+      .from(skillNodes)
+      .where(eq(skillNodes.code, prereq.skillCode));
+    const [prerequisite] = await db
+      .select({ id: skillNodes.id })
+      .from(skillNodes)
+      .where(eq(skillNodes.code, prereq.prerequisiteCode));
+
+    if (skill && prerequisite) {
+      await db
+        .insert(skillPrerequisites)
+        .values({
+          skillId: skill.id,
+          prerequisiteId: prerequisite.id,
+          strength: prereq.strength,
+        })
+        .onConflictDoNothing();
+    }
+  }
+
+  logger.info(`Prerequisites seeded: ${prerequisites.length} maths + ${englishPrereqs.length} english edges`);
   logger.info("Database seeding complete");
   process.exit(0);
 }
