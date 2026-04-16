@@ -37,8 +37,12 @@ export default function StartPage() {
 
   async function handleStartDiagnostic() {
     setLoading(true);
+    // Always store child name first so diagnostic page can use it
+    sessionStorage.setItem("upwise_child_name", childName);
+    sessionStorage.setItem("upwise_year_level", String(yearLevel ?? 3));
+    sessionStorage.setItem("upwise_theme", selectedTheme);
+
     try {
-      // Create family, parent, child, and start diagnostic in one go
       const family = await api.post<{ id: string }>("/families", {
         name: parentName,
         email: parentEmail,
@@ -59,16 +63,12 @@ export default function StartPage() {
 
       sessionStorage.setItem("upwise_student_id", child.id);
       sessionStorage.setItem("upwise_session_id", session.sessionId);
-      sessionStorage.setItem("upwise_child_name", childName);
-      router.push("/diagnostic");
     } catch (err) {
-      console.error("Failed to start diagnostic:", err);
-      // Still navigate to diagnostic with demo mode
-      sessionStorage.setItem("upwise_child_name", childName);
-      router.push("/diagnostic");
-    } finally {
-      setLoading(false);
+      console.error("API not available — running diagnostic in demo mode:", err);
     }
+
+    setLoading(false);
+    router.push("/diagnostic");
   }
 
   return (
