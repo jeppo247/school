@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Default theme (Upwise Blue) */
+  --theme-primary: #4F8CF7;
+  --theme-secondary: #A78BFA;
+  --theme-accent: #34D399;
+  --theme-bg: #F8FAFC;
+  --theme-surface: #FFFFFF;
+
+  /* Spacing & layout */
+  --content-max-width: 1200px;
+  --sidebar-width: 280px;
+}
+
+/* Theme: AFL */
+[data-theme="afl"] {
+  --theme-primary: #002B5C;
+  --theme-secondary: #E31937;
+  --theme-accent: #FFD700;
+  --theme-bg: #F0F4F8;
+  --theme-surface: #FFFFFF;
+}
+
+/* Theme: Bluey */
+[data-theme="bluey"] {
+  --theme-primary: #5B9BD5;
+  --theme-secondary: #FF8C42;
+  --theme-accent: #7EC8E3;
+  --theme-bg: #EDF6FF;
+  --theme-surface: #FFFFFF;
+}
+
+/* Theme: Superheroes */
+[data-theme="superheroes"] {
+  --theme-primary: #DC2626;
+  --theme-secondary: #1D4ED8;
+  --theme-accent: #FACC15;
+  --theme-bg: #FEF2F2;
+  --theme-surface: #FFFFFF;
+}
+
+/* Theme: Space */
+[data-theme="space"] {
+  --theme-primary: #6366F1;
+  --theme-secondary: #06B6D4;
+  --theme-accent: #F59E0B;
+  --theme-bg: #F0F0FF;
+  --theme-surface: #FFFFFF;
+}
+
+/* Theme: Animals */
+[data-theme="animals"] {
+  --theme-primary: #16A34A;
+  --theme-secondary: #92400E;
+  --theme-accent: #F97316;
+  --theme-bg: #F0FDF4;
+  --theme-surface: #FFFFFF;
+}
+
+/* Theme: Golf */
+[data-theme="golf"] {
+  --theme-primary: #15803D;
+  --theme-secondary: #FBBF24;
+  --theme-accent: #ECFDF5;
+  --theme-bg: #F7FEE7;
+  --theme-surface: #FFFFFF;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--theme-bg)] text-gray-900 antialiased;
+    font-family: var(--font-body), system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display), system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-[var(--theme-surface)] rounded-2xl shadow-sm border border-gray-100 p-6;
+  }
+
+  .btn-primary {
+    @apply bg-[var(--theme-primary)] text-white font-semibold py-3 px-6 rounded-xl
+           hover:opacity-90 transition-all duration-200 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-[var(--theme-surface)] text-[var(--theme-primary)] font-semibold py-3 px-6 rounded-xl
+           border-2 border-[var(--theme-primary)] hover:bg-[var(--theme-primary)] hover:text-white
+           transition-all duration-200 active:scale-95;
+  }
+}
