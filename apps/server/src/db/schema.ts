@@ -82,6 +82,8 @@ export const skillNodes = pgTable(
     name: text("name").notNull(),
     description: text("description"),
     yearLevel: integer("year_level").notNull(),
+    domain: text("domain").default("numeracy").notNull(), // reading | writing | spelling | grammar_punctuation | numeracy
+    learningArea: text("learning_area").default("mathematics").notNull(), // english | mathematics
     strand: text("strand").notNull(),
     subStrand: text("sub_strand"),
     acaraCode: text("acara_code"),
@@ -96,6 +98,7 @@ export const skillNodes = pgTable(
   (table) => [
     index("idx_skill_nodes_year").on(table.yearLevel),
     index("idx_skill_nodes_strand").on(table.strand),
+    index("idx_skill_nodes_domain").on(table.domain),
   ],
 );
 
@@ -169,6 +172,9 @@ export const questionTemplates = pgTable(
     discriminationParam: real("discrimination_param").default(1).notNull(),
     guessingParam: real("guessing_param").default(0.25).notNull(),
     dokLevel: integer("dok_level").default(1).notNull(),
+    naplanYearTarget: integer("naplan_year_target"),
+    cognitiveProcess: text("cognitive_process"),
+    stimulusType: text("stimulus_type"),
     isActive: boolean("is_active").default(true).notNull(),
     usageCount: integer("usage_count").default(0).notNull(),
     avgAccuracy: real("avg_accuracy"),
@@ -193,6 +199,13 @@ export const questions = pgTable(
     content: jsonb("content").notNull(),
     difficultyParam: real("difficulty_param").default(0).notNull(),
     questionType: text("question_type").notNull(),
+    naplanYearTarget: integer("naplan_year_target"),
+    cognitiveProcess: text("cognitive_process"),
+    stimulusType: text("stimulus_type"),
+    misconceptionCode: text("misconception_code"),
+    distractorMap: jsonb("distractor_map"),
+    timeExpectedSec: integer("time_expected_sec"),
+    provenance: jsonb("provenance"),
     isValidated: boolean("is_validated").default(false).notNull(),
     validationNotes: text("validation_notes"),
     timesServed: integer("times_served").default(0).notNull(),
@@ -203,6 +216,7 @@ export const questions = pgTable(
     index("idx_questions_skill").on(table.skillId),
     index("idx_questions_theme").on(table.themeId),
     index("idx_questions_difficulty").on(table.skillId, table.difficultyParam),
+    index("idx_questions_domain").on(table.naplanYearTarget),
   ],
 );
 
@@ -328,6 +342,134 @@ export const weeklyReports = pgTable(
   },
   (table) => [
     unique("uq_weekly_report").on(table.studentId, table.reportWeek),
+  ],
+);
+
+// ============================================================
+// NAPLAN DOMAIN STATES
+// ============================================================
+
+export const domainStates = pgTable(
+  "domain_states",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    domain: text("domain").notNull(), // reading | writing | spelling | grammar_punctuation | numeracy
+    theta: real("theta").default(0).notNull(),
+    thetaSe: real("theta_se").default(1).notNull(),
+    projectedProficiency: text("projected_proficiency").default("developing").notNull(),
+    naplanYearTarget: integer("naplan_year_target").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("uq_student_domain").on(table.studentId, table.domain),
+    index("idx_domain_states_student").on(table.studentId),
+  ],
+);
+
+// ============================================================
+// MISCONCEPTION TRACKING
+// ============================================================
+
+export const misconceptionEvents = pgTable(
+  "misconception_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    skillId: uuid("skill_id")
+      .notNull()
+      .references(() => skillNodes.id),
+    misconceptionCode: text("misconception_code").notNull(),
+    itemId: uuid("item_id").references(() => questions.id),
+    sessionId: uuid("session_id").references(() => learningSessions.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_misconception_student").on(table.studentId),
+    index("idx_misconception_skill").on(table.studentId, table.skillId),
+    index("idx_misconception_code").on(table.studentId, table.misconceptionCode),
+  ],
+);
+
+// ============================================================
+// WRITING ASSESSMENT
+// ============================================================
+
+export const writingPrompts = pgTable("writing_prompts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  genre: text("genre").notNull(), // narrative | persuasive
+  title: text("title").notNull(),
+  promptText: text("prompt_text").notNull(),
+  yearLevelMin: integer("year_level_min").notNull(),
+  yearLevelMax: integer("year_level_max").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const writingScores = pgTable(
+  "writing_scores",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    attemptId: uuid("attempt_id")
+      .notNull()
+      .references(() => questionResponses.id, { onDelete: "cascade" }),
+    criterion: text("criterion").notNull(), // audience | text_structure | ideas | etc.
+    score: integer("score").notNull(),
+    maxScore: integer("max_score").notNull(),
+    raterType: text("rater_type").notNull(), // ai | human
+    raterId: text("rater_id"),
+    confidence: real("confidence"),
+    feedback: text("feedback"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_writing_scores_attempt").on(table.attemptId),
+  ],
+);
+
+// ============================================================
+// CONSENT & AUDIT
+// ============================================================
+
+export const consentRecords = pgTable(
+  "consent_records",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    consentType: text("consent_type").notNull(), // data_collection | ai_processing | sharing_with_school
+    grantedBy: uuid("granted_by")
+      .notNull()
+      .references(() => parents.id),
+    grantedAt: timestamp("granted_at", { withTimezone: true }).defaultNow().notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("idx_consent_student").on(table.studentId),
+  ],
+);
+
+export const auditEvents = pgTable(
+  "audit_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    actorId: text("actor_id"), // user ID or "system"
+    entityType: text("entity_type").notNull(), // student | session | question | report
+    entityId: text("entity_id").notNull(),
+    action: text("action").notNull(), // create | read | update | delete | export
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_audit_actor").on(table.actorId),
+    index("idx_audit_entity").on(table.entityType, table.entityId),
+    index("idx_audit_date").on(table.createdAt),
   ],
 );
 

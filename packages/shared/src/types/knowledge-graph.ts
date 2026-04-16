@@ -1,6 +1,37 @@
 export type MasteryStatus = "unknown" | "learning" | "almost" | "mastered" | "review";
-export type Strand = "number_algebra" | "measurement_geometry" | "statistics_probability";
+export type NaplanDomain = "reading" | "writing" | "spelling" | "grammar_punctuation" | "numeracy";
+export type LearningArea = "english" | "mathematics";
+export type NaplanProficiency = "exceeding" | "strong" | "developing" | "needs_additional_support";
+
+export type Strand =
+  // Mathematics
+  | "number_algebra"
+  | "measurement_geometry"
+  | "statistics_probability"
+  // English
+  | "literacy"
+  | "language"
+  | "literature";
+
 export type DifficultyBand = "below_level" | "on_level" | "above_level";
+
+export type CognitiveProcess =
+  | "locate"
+  | "infer"
+  | "analyse"
+  | "fluency"
+  | "reasoning"
+  | "problem_solving";
+
+export type StimulusType =
+  | "narrative_text"
+  | "informative_text"
+  | "table"
+  | "chart"
+  | "diagram"
+  | "word_problem"
+  | "prompt"
+  | "audio";
 
 export interface SkillNode {
   id: string;
@@ -8,6 +39,8 @@ export interface SkillNode {
   name: string;
   description?: string;
   yearLevel: number;
+  domain: NaplanDomain;
+  learningArea: LearningArea;
   strand: Strand;
   subStrand?: string;
   acaraCode?: string;
@@ -38,6 +71,17 @@ export interface StudentSkillState {
   reviewIntervalDays: number;
   easeFactor: number;
   sessionsAssessed: number;
+}
+
+export interface StudentDomainState {
+  id: string;
+  studentId: string;
+  domain: NaplanDomain;
+  theta: number;
+  thetaSe: number;
+  projectedProficiency: NaplanProficiency;
+  naplanYearTarget: number;
+  updatedAt: string;
 }
 
 export interface GapMapNode extends SkillNode {

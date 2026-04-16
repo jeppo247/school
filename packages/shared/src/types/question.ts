@@ -1,4 +1,16 @@
-export type QuestionType = "multiple_choice" | "numeric_input" | "true_false" | "drag_drop";
+import type { CognitiveProcess, StimulusType } from "./knowledge-graph";
+
+export type QuestionType =
+  | "multiple_choice"
+  | "multi_select"
+  | "numeric_input"
+  | "true_false"
+  | "drag_drop"
+  | "hot_text"
+  | "inline_choice"
+  | "gap_match"
+  | "extended_text"
+  | "audio_dictation";
 
 export interface QuestionContent {
   stem: string;
@@ -7,6 +19,19 @@ export interface QuestionContent {
   explanation?: string;
   hint?: string;
   imageUrl?: string;
+  passage?: string;
+  audioUrl?: string;
+}
+
+export interface DistractorMap {
+  [option: string]: string; // option label → misconception_code or "correct"
+}
+
+export interface ItemProvenance {
+  origin: "internal_generated" | "human_authored" | "human_reviewed" | "imported";
+  reviewStatus: "draft" | "pending_review" | "approved" | "rejected";
+  reviewer?: string;
+  approvedAt?: string;
 }
 
 export interface Question {
@@ -17,6 +42,13 @@ export interface Question {
   content: QuestionContent;
   difficultyParam: number;
   questionType: QuestionType;
+  naplanYearTarget?: number;
+  cognitiveProcess?: CognitiveProcess;
+  stimulusType?: StimulusType;
+  misconceptionCode?: string;
+  distractorMap?: DistractorMap;
+  timeExpectedSec?: number;
+  provenance?: ItemProvenance;
   isValidated: boolean;
   timesServed: number;
   timesCorrect: number;
@@ -32,6 +64,9 @@ export interface QuestionTemplate {
   discriminationParam: number;
   guessingParam: number;
   dokLevel: number;
+  naplanYearTarget?: number;
+  cognitiveProcess?: CognitiveProcess;
+  stimulusType?: StimulusType;
   isActive: boolean;
   usageCount: number;
   avgAccuracy?: number;

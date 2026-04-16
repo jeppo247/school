@@ -360,6 +360,8 @@ async function seed() {
         name: node.name,
         description: node.description,
         yearLevel: node.yearLevel,
+        domain: node.domain,
+        learningArea: node.learningArea,
         strand: node.strand,
         subStrand: node.subStrand,
         acaraCode: node.acaraCode,

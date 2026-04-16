@@ -10,3 +10,4 @@ export type * from "./types/coins";
 // Constants
 export * from "./constants/engine";
 export * from "./constants/acara";
+export * from "./constants/naplan";
