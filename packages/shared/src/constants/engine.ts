@@ -1,13 +1,13 @@
 // Adaptive engine tuning constants
 
-/** Target accuracy rate for optimal learning engagement */
-export const TARGET_ACCURACY = 0.80;
+/** Target accuracy rate for optimal learning engagement (80-82%) */
+export const TARGET_ACCURACY = 0.81;
 
 /** Accuracy band: below this, decrease difficulty */
-export const ACCURACY_FLOOR = 0.70;
+export const ACCURACY_FLOOR = 0.75;
 
 /** Accuracy band: above this, increase difficulty */
-export const ACCURACY_CEILING = 0.90;
+export const ACCURACY_CEILING = 0.87;
 
 /** Difficulty step size when adjusting */
 export const DIFFICULTY_STEP = 0.3;
@@ -89,3 +89,10 @@ export const IRT_THETA_MAX = 3;
 
 /** Theta grid step size */
 export const IRT_THETA_STEP = 0.1;
+
+// Session structure
+/** Maximum focus block duration in minutes before a mandatory break */
+export const MAX_BLOCK_DURATION_MINUTES = 20;
+
+/** Brain break duration in minutes */
+export const BRAIN_BREAK_DURATION_MINUTES = 3;

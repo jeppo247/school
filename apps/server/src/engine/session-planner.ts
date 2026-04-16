@@ -1,4 +1,8 @@
 import type { SessionPlan, PhasePlan, FrontierGap } from "./types.js";
+import {
+  MAX_BLOCK_DURATION_MINUTES,
+  BRAIN_BREAK_DURATION_MINUTES,
+} from "@upwise/shared";
 
 interface ReviewSkill {
   skillId: string;
@@ -8,12 +12,13 @@ interface ReviewSkill {
 /**
  * Plans a daily learning session structure.
  *
+ * Hard rule: max 20 minutes of learning before a mandatory break.
+ *
  * Structure:
- * - Warmup (3-5 min, ~5 questions): Spaced repetition review
- * - Focus Block 1 (10 min, ~8-12 questions): Primary frontier gap
- * - Brain Break (2-3 min): Fun activity
- * - Focus Block 2 (10 min, ~8-12 questions): Secondary gap or continuation
- * - Wrap-up (3-5 min): Review and celebration
+ * - Focus Block 1 (up to 20 min): Warmup review + primary frontier gap
+ * - Brain Break (3 min): Mandatory rest
+ * - Focus Block 2 (up to 20 min): Secondary gap or continuation
+ * - Wrap-up (3 min): Review and celebration
  */
 export function planSession(
   studentId: string,
@@ -29,45 +34,51 @@ export function planSession(
     .filter((s) => s.nextReview <= now)
     .map((s) => s.skillId);
 
-  // Warmup: spaced repetition review
-  phases.push({
-    phase: "warmup",
-    targetSkills: dueReviews.slice(0, 3),
-    questionCount: Math.min(5, dueReviews.length * 2),
-    durationMinutes: 4,
-    difficultyTarget: currentTheta - 0.5, // Slightly easier for warmup
-  });
+  // Block 1: warmup review (5 min) + primary gap focus (15 min) = 20 min max
+  const warmupMinutes = Math.min(5, dueReviews.length > 0 ? 5 : 0);
+  const focus1Minutes = MAX_BLOCK_DURATION_MINUTES - warmupMinutes;
 
-  // Focus Block 1: primary frontier gap
+  // Warmup: spaced repetition review
+  if (warmupMinutes > 0) {
+    phases.push({
+      phase: "warmup",
+      targetSkills: dueReviews.slice(0, 3),
+      questionCount: Math.min(5, dueReviews.length * 2),
+      durationMinutes: warmupMinutes,
+      difficultyTarget: currentTheta - 0.5,
+    });
+  }
+
+  // Focus Block 1: primary frontier gap (fills remainder of 20 min block)
   const primaryGap = frontierGaps[0];
   const focusSkills1 = primaryGap ? [primaryGap.skillId] : [];
 
   phases.push({
     phase: "focus_1",
     targetSkills: focusSkills1,
-    questionCount: 10,
-    durationMinutes: 10,
+    questionCount: Math.round(focus1Minutes * 1.2),
+    durationMinutes: focus1Minutes,
     difficultyTarget: currentTheta,
   });
 
-  // Brain break
+  // Mandatory brain break after 20 min block
   phases.push({
     phase: "brain_break",
     targetSkills: [],
     questionCount: 0,
-    durationMinutes: 3,
+    durationMinutes: BRAIN_BREAK_DURATION_MINUTES,
     difficultyTarget: 0,
   });
 
-  // Focus Block 2: secondary gap or different skill
+  // Focus Block 2: secondary gap (up to 20 min max)
   const secondaryGap = frontierGaps[1] ?? frontierGaps[0];
   const focusSkills2 = secondaryGap ? [secondaryGap.skillId] : focusSkills1;
 
   phases.push({
     phase: "focus_2",
     targetSkills: focusSkills2,
-    questionCount: 10,
-    durationMinutes: 10,
+    questionCount: Math.round(MAX_BLOCK_DURATION_MINUTES * 1.2),
+    durationMinutes: MAX_BLOCK_DURATION_MINUTES,
     difficultyTarget: currentTheta,
   });
 
@@ -76,17 +87,23 @@ export function planSession(
     phase: "wrapup",
     targetSkills: [],
     questionCount: 0,
-    durationMinutes: 3,
+    durationMinutes: BRAIN_BREAK_DURATION_MINUTES,
     difficultyTarget: 0,
   });
 
   const allFocusSkills = [...new Set([...focusSkills1, ...focusSkills2])];
+  const totalMinutes =
+    warmupMinutes +
+    focus1Minutes +
+    BRAIN_BREAK_DURATION_MINUTES +
+    MAX_BLOCK_DURATION_MINUTES +
+    BRAIN_BREAK_DURATION_MINUTES;
 
   return {
     studentId,
     phases,
     reviewSkills: dueReviews,
     focusSkills: allFocusSkills,
-    estimatedDurationMinutes: 30,
+    estimatedDurationMinutes: totalMinutes,
   };
 }
