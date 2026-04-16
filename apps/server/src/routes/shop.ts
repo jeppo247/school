@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "../db/client.js";
 import { shopItems, studentPurchases } from "../db/schema.js";
-import { eq, and, or, isNull, gte } from "drizzle-orm";
+import { eq, and, or, isNull, sql } from "drizzle-orm";
 import { getOwnedItems } from "../services/coin-service.js";
 
 export const shopRoutes = Router();
@@ -10,8 +10,6 @@ export const shopRoutes = Router();
 shopRoutes.get("/items", async (req, res, next) => {
   try {
     const studentId = req.query.studentId as string | undefined;
-    const now = new Date();
-
     // Get active items that are either not limited or within availability window
     const items = await db
       .select()
@@ -22,8 +20,8 @@ shopRoutes.get("/items", async (req, res, next) => {
           or(
             eq(shopItems.isLimited, false),
             and(
-              or(isNull(shopItems.availableFrom), gte(now, shopItems.availableFrom!)),
-              or(isNull(shopItems.availableUntil), gte(shopItems.availableUntil!, now)),
+              or(isNull(shopItems.availableFrom), sql`${shopItems.availableFrom} <= NOW()`),
+              or(isNull(shopItems.availableUntil), sql`${shopItems.availableUntil} >= NOW()`),
             ),
           ),
         ),

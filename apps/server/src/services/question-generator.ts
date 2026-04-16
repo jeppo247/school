@@ -55,7 +55,7 @@ export async function generateQuestionBatch(
       });
 
       // Validate the generated content
-      const validation = validateQuestionContent(content, questionType);
+      const validation = validateQuestionContent(content as unknown as Record<string, unknown>, questionType);
       if (!validation.valid) {
         logger.warn("Question validation failed", {
           skillId,
