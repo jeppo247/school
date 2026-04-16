@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import { QuestionCard } from "@/components/student/QuestionCard";
-import { Celebration } from "@/components/student/Celebration";
 import { api } from "@/lib/api";
 
 interface QuestionData {
@@ -54,13 +53,13 @@ export default function DiagnosticPage() {
   const [started, setStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(null);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [showCelebration, setShowCelebration] = useState(false);
-  const [celebrationType, setCelebrationType] = useState<"correct" | "streak">("correct");
-  const [feedback, setFeedback] = useState<{ isCorrect: boolean; explanation?: string } | null>(null);
+  const [showTransition, setShowTransition] = useState(false);
+  const [answerLocked, setAnswerLocked] = useState(false);
   const [complete, setComplete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [totalAnswered, setTotalAnswered] = useState(0);
+  // Track correct/incorrect silently — child never sees this
   const [correctStreak, setCorrectStreak] = useState(0);
 
   useEffect(() => {
@@ -130,52 +129,42 @@ export default function DiagnosticPage() {
   }
 
   async function handleAnswer(answer: string | number) {
-    if (!currentQuestion) return;
+    if (!currentQuestion || answerLocked) return;
+    setAnswerLocked(true);
 
-    let isCorrect: boolean;
-    let explanation: string | undefined;
-
-    if (demoMode) {
-      isCorrect = String(answer) === String(currentQuestion.content.answer);
-      explanation = currentQuestion.content.explanation;
-    } else {
-      try {
-        const result = await api.post<{
-          isCorrect: boolean;
-          explanation?: string;
-        }>(`/diagnostic/${studentId}/respond`, {
-          sessionId,
-          questionId: currentQuestion.id,
-          answer,
-          timeTakenMs: 0,
-        });
-        isCorrect = result.isCorrect;
-        explanation = result.explanation;
-      } catch {
-        isCorrect = String(answer) === String(currentQuestion.content.answer);
-        explanation = currentQuestion.content.explanation;
-      }
-    }
+    // Score silently — child never sees right/wrong
+    const isCorrect = demoMode
+      ? String(answer) === String(currentQuestion.content.answer)
+      : await (async () => {
+          try {
+            const result = await api.post<{ isCorrect: boolean }>(`/diagnostic/${studentId}/respond`, {
+              sessionId,
+              questionId: currentQuestion.id,
+              answer,
+              timeTakenMs: 0,
+            });
+            return result.isCorrect;
+          } catch {
+            return String(answer) === String(currentQuestion.content.answer);
+          }
+        })();
 
     setTotalAnswered((prev) => prev + 1);
-
     if (isCorrect) {
       setTotalCorrect((prev) => prev + 1);
-      const newStreak = correctStreak + 1;
-      setCorrectStreak(newStreak);
-      setCelebrationType(newStreak >= 5 ? "streak" : "correct");
-      setShowCelebration(true);
+      setCorrectStreak((prev) => prev + 1);
     } else {
       setCorrectStreak(0);
     }
 
-    setFeedback({ isCorrect, explanation });
+    // Show calm transition animation (same for right or wrong)
+    setShowTransition(true);
 
     setTimeout(() => {
-      setFeedback(null);
-      setShowCelebration(false);
+      setShowTransition(false);
+      setAnswerLocked(false);
       advanceToNextQuestion();
-    }, 2000);
+    }, 1200);
   }
 
   // Fallback: no name in sessionStorage at all
@@ -234,7 +223,7 @@ export default function DiagnosticPage() {
             Amazing work, {childName}!
           </h1>
           <p className="text-gray-500 mb-6">
-            You answered {totalAnswered} questions and got {totalCorrect} correct ({accuracy}%)
+            You finished all {totalAnswered} questions — well done!
           </p>
 
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6 text-left">
@@ -321,7 +310,7 @@ export default function DiagnosticPage() {
       {/* Question */}
       <div className="max-w-2xl mx-auto px-6">
         <AnimatePresence mode="wait">
-          {currentQuestion && (
+          {currentQuestion && !showTransition && (
             <QuestionCard
               key={currentQuestion.id}
               question={{
@@ -331,18 +320,77 @@ export default function DiagnosticPage() {
                 hint: currentQuestion.content.hint,
               }}
               onAnswer={handleAnswer}
-              disabled={feedback !== null}
-              feedback={feedback}
+              disabled={answerLocked}
+              feedback={null}
             />
           )}
         </AnimatePresence>
       </div>
 
-      <Celebration
-        trigger={showCelebration}
-        type={celebrationType}
-        onComplete={() => setShowCelebration(false)}
-      />
+      {/* Calm transition animation — same for every answer, no right/wrong */}
+      <AnimatePresence>
+        {showTransition && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Gentle floating stars */}
+            {Array.from({ length: 8 }, (_, i) => (
+              <motion.div
+                key={i}
+                className="absolute text-2xl"
+                initial={{
+                  x: 0,
+                  y: 0,
+                  opacity: 0,
+                  scale: 0.5,
+                }}
+                animate={{
+                  x: (Math.cos((i / 8) * Math.PI * 2)) * 100,
+                  y: (Math.sin((i / 8) * Math.PI * 2)) * 100 - 30,
+                  opacity: [0, 1, 0],
+                  scale: [0.5, 1.2, 0.8],
+                }}
+                transition={{
+                  duration: 1,
+                  delay: i * 0.05,
+                  ease: "easeOut",
+                }}
+              >
+                ✨
+              </motion.div>
+            ))}
+
+            {/* Mascot reaction */}
+            <motion.div
+              className="text-center"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.span
+                className="text-6xl block"
+                animate={{ y: [0, -12, 0], rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 0.6 }}
+              >
+                🦉
+              </motion.span>
+              <motion.p
+                className="font-display text-lg font-semibold text-[var(--theme-primary)] mt-2 drop-shadow-sm"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+              >
+                {["Nice!", "Let's keep going!", "Awesome!", "You're doing great!", "Good one!", "Keep it up!"][questionIndex % 6]}
+              </motion.p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
