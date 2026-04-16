@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { db } from "../client.js";
-import { themes, shopItems } from "../schema.js";
+import { themes, shopItems, skillNodes, skillPrerequisites } from "../schema.js";
+import { eq } from "drizzle-orm";
+import { allSkillNodes, prerequisites } from "./skill-nodes.js";
 import { logger } from "../../lib/logger.js";
 
 async function seed() {
@@ -348,6 +350,52 @@ async function seed() {
     .onConflictDoNothing();
 
   logger.info("Shop items seeded successfully");
+
+  // Seed skill nodes
+  for (const node of allSkillNodes) {
+    await db
+      .insert(skillNodes)
+      .values({
+        code: node.code,
+        name: node.name,
+        description: node.description,
+        yearLevel: node.yearLevel,
+        strand: node.strand,
+        subStrand: node.subStrand,
+        acaraCode: node.acaraCode,
+        dokLevel: node.dokLevel,
+        difficultyBand: node.difficultyBand,
+        displayOrder: node.displayOrder,
+      })
+      .onConflictDoNothing();
+  }
+
+  logger.info(`Skill nodes seeded: ${allSkillNodes.length} nodes`);
+
+  // Seed prerequisites
+  for (const prereq of prerequisites) {
+    const [skill] = await db
+      .select({ id: skillNodes.id })
+      .from(skillNodes)
+      .where(eq(skillNodes.code, prereq.skillCode));
+    const [prerequisite] = await db
+      .select({ id: skillNodes.id })
+      .from(skillNodes)
+      .where(eq(skillNodes.code, prereq.prerequisiteCode));
+
+    if (skill && prerequisite) {
+      await db
+        .insert(skillPrerequisites)
+        .values({
+          skillId: skill.id,
+          prerequisiteId: prerequisite.id,
+          strength: prereq.strength,
+        })
+        .onConflictDoNothing();
+    }
+  }
+
+  logger.info(`Prerequisites seeded: ${prerequisites.length} edges`);
   logger.info("Database seeding complete");
   process.exit(0);
 }
