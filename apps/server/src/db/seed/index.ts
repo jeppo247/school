@@ -4,8 +4,8 @@ import { themes, shopItems, skillNodes, skillPrerequisites } from "../schema.js"
 import { eq } from "drizzle-orm";
 import { allSkillNodes, prerequisites } from "./skill-nodes.js";
 import {
-  readingNodes, spellingNodes,
-  readingPrerequisites, spellingPrerequisites,
+  readingNodes, spellingNodes, grammarPunctuationNodes, writingNodes,
+  readingPrerequisites, spellingPrerequisites, grammarPunctuationPrerequisites, writingPrerequisites,
 } from "./english-skill-nodes.js";
 import { logger } from "../../lib/logger.js";
 
@@ -377,7 +377,7 @@ async function seed() {
   }
 
   // Seed English skill nodes (Reading + Spelling)
-  const englishNodes = [...readingNodes, ...spellingNodes];
+  const englishNodes = [...readingNodes, ...spellingNodes, ...grammarPunctuationNodes, ...writingNodes];
   for (const node of englishNodes) {
     await db
       .insert(skillNodes)
@@ -424,7 +424,7 @@ async function seed() {
   }
 
   // Seed English prerequisites (Reading + Spelling)
-  const englishPrereqs = [...readingPrerequisites, ...spellingPrerequisites];
+  const englishPrereqs = [...readingPrerequisites, ...spellingPrerequisites, ...grammarPunctuationPrerequisites, ...writingPrerequisites];
   for (const prereq of englishPrereqs) {
     const [skill] = await db
       .select({ id: skillNodes.id })

@@ -1,5 +1,6 @@
 /**
- * ACARA English skill nodes for Reading and Spelling domains.
+ * ACARA English skill nodes for all English NAPLAN domains:
+ * Reading, Spelling, Grammar & Punctuation, and Writing.
  *
  * Organised by NAPLAN domain, year level, and sub-strand.
  * Each node has a unique code:
@@ -309,6 +310,375 @@ export const spellingNodes: SkillNodeSeed[] = [
     yearLevel: 7, domain: "spelling", learningArea: "english", strand: "language", subStrand: "spelling_patterns",
     dokLevel: 3, difficultyBand: "on_level", displayOrder: 5,
   },
+];
+
+// ============================================================
+// GRAMMAR & PUNCTUATION — Years 3–7
+// ============================================================
+
+export const grammarPunctuationNodes: SkillNodeSeed[] = [
+  // Year 3 Grammar & Punctuation
+  {
+    code: "Y3-GP-SB-001",
+    name: "Sentence boundaries",
+    description: "Use capital letters and full stops to mark sentence boundaries correctly",
+    yearLevel: 3, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E3LA06", dokLevel: 1, difficultyBand: "on_level", displayOrder: 1,
+  },
+  {
+    code: "Y3-GP-SB-002",
+    name: "Question marks and exclamation marks",
+    description: "Use question marks and exclamation marks correctly at the end of sentences",
+    yearLevel: 3, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    dokLevel: 1, difficultyBand: "on_level", displayOrder: 2,
+  },
+  {
+    code: "Y3-GP-NV-001",
+    name: "Nouns, verbs, and adjectives",
+    description: "Identify and use nouns, verbs, and adjectives in sentences",
+    yearLevel: 3, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E3LA06", dokLevel: 1, difficultyBand: "on_level", displayOrder: 3,
+  },
+  {
+    code: "Y3-GP-TE-001",
+    name: "Simple past and present tense",
+    description: "Use past and present tense correctly and consistently in writing",
+    yearLevel: 3, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E3LA07", dokLevel: 2, difficultyBand: "on_level", displayOrder: 4,
+  },
+  {
+    code: "Y3-GP-AG-001",
+    name: "Subject-verb agreement (simple)",
+    description: "Ensure subjects and verbs agree in simple sentences (e.g., 'she runs' not 'she run')",
+    yearLevel: 3, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E3LA08", dokLevel: 2, difficultyBand: "on_level", displayOrder: 5,
+  },
+  {
+    code: "Y3-GP-CM-001",
+    name: "Commas in lists",
+    description: "Use commas to separate items in a list within a sentence",
+    yearLevel: 3, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "punctuation",
+    dokLevel: 1, difficultyBand: "on_level", displayOrder: 6,
+  },
+  {
+    code: "Y3-GP-AP-001",
+    name: "Apostrophes for possession",
+    description: "Use apostrophes correctly to show possession (e.g., the dog's bone, the girls' room)",
+    yearLevel: 3, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "punctuation",
+    dokLevel: 2, difficultyBand: "on_level", displayOrder: 7,
+  },
+
+  // Year 5 Grammar & Punctuation
+  {
+    code: "Y5-GP-SC-001",
+    name: "Compound sentences",
+    description: "Construct compound sentences using coordinating conjunctions (and, but, or, so, yet)",
+    yearLevel: 5, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E5LA05", dokLevel: 2, difficultyBand: "on_level", displayOrder: 1,
+  },
+  {
+    code: "Y5-GP-SC-002",
+    name: "Complex sentences with subordination",
+    description: "Write complex sentences using subordinating conjunctions (because, although, when, if, while)",
+    yearLevel: 5, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E5LA05", dokLevel: 2, difficultyBand: "on_level", displayOrder: 2,
+  },
+  {
+    code: "Y5-GP-TE-001",
+    name: "Verb tense consistency",
+    description: "Maintain consistent tense across paragraphs and identify tense shifts",
+    yearLevel: 5, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    dokLevel: 2, difficultyBand: "on_level", displayOrder: 3,
+  },
+  {
+    code: "Y5-GP-NG-001",
+    name: "Expanded noun groups",
+    description: "Build expanded noun groups using adjectives, articles, and prepositional phrases",
+    yearLevel: 5, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E5LA05", dokLevel: 2, difficultyBand: "on_level", displayOrder: 4,
+  },
+  {
+    code: "Y5-GP-CM-001",
+    name: "Commas in complex sentences",
+    description: "Use commas after introductory clauses and to separate subordinate clauses",
+    yearLevel: 5, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "punctuation",
+    acaraCode: "AC9E5LA09", dokLevel: 2, difficultyBand: "on_level", displayOrder: 5,
+  },
+  {
+    code: "Y5-GP-DP-001",
+    name: "Dialogue punctuation",
+    description: "Punctuate direct speech correctly using speech marks, commas, and reporting clauses",
+    yearLevel: 5, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "punctuation",
+    acaraCode: "AC9E5LA09", dokLevel: 2, difficultyBand: "on_level", displayOrder: 6,
+  },
+  {
+    code: "Y5-GP-PR-001",
+    name: "Pronoun reference clarity",
+    description: "Use pronouns clearly so the reader knows what each pronoun refers to",
+    yearLevel: 5, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    dokLevel: 2, difficultyBand: "on_level", displayOrder: 7,
+  },
+  {
+    code: "Y5-GP-CO-001",
+    name: "Connectives and text cohesion",
+    description: "Use a range of connectives (however, therefore, meanwhile, in addition) to link ideas across sentences",
+    yearLevel: 5, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E5LA04", dokLevel: 2, difficultyBand: "on_level", displayOrder: 8,
+  },
+
+  // Year 7 Grammar & Punctuation
+  {
+    code: "Y7-GP-SC-001",
+    name: "Compound-complex sentences",
+    description: "Construct compound-complex sentences with multiple clauses for effect",
+    yearLevel: 7, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E7LA05", dokLevel: 3, difficultyBand: "on_level", displayOrder: 1,
+  },
+  {
+    code: "Y7-GP-TE-001",
+    name: "Modal verbs and conditional tense",
+    description: "Use modal verbs (could, would, should, might) and conditional constructions accurately",
+    yearLevel: 7, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E7LA05", dokLevel: 2, difficultyBand: "on_level", displayOrder: 2,
+  },
+  {
+    code: "Y7-GP-VO-001",
+    name: "Active and passive voice",
+    description: "Identify and use active and passive voice for different purposes",
+    yearLevel: 7, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E7LA06", dokLevel: 2, difficultyBand: "on_level", displayOrder: 3,
+  },
+  {
+    code: "Y7-GP-CM-001",
+    name: "Colons, semicolons, and dashes",
+    description: "Use colons to introduce lists or explanations, semicolons to link related clauses, and dashes for emphasis",
+    yearLevel: 7, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "punctuation",
+    acaraCode: "AC9E7LA09", dokLevel: 2, difficultyBand: "on_level", displayOrder: 4,
+  },
+  {
+    code: "Y7-GP-AG-001",
+    name: "Complex subject-verb agreement",
+    description: "Maintain subject-verb agreement in complex sentences with intervening clauses",
+    yearLevel: 7, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E7LA05", dokLevel: 2, difficultyBand: "on_level", displayOrder: 5,
+  },
+  {
+    code: "Y7-GP-CO-001",
+    name: "Cohesive devices across paragraphs",
+    description: "Use reference chains, substitution, and ellipsis to create cohesion across paragraphs",
+    yearLevel: 7, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E7LA04", dokLevel: 3, difficultyBand: "on_level", displayOrder: 6,
+  },
+  {
+    code: "Y7-GP-PR-001",
+    name: "Proofreading for grammar and punctuation",
+    description: "Identify and correct grammatical errors and punctuation mistakes in extended texts",
+    yearLevel: 7, domain: "grammar_punctuation", learningArea: "english", strand: "language", subStrand: "grammar_knowledge",
+    acaraCode: "AC9E7LA09", dokLevel: 2, difficultyBand: "on_level", displayOrder: 7,
+  },
+];
+
+// ============================================================
+// WRITING — Years 3–7
+// Mapped to the 10 NAPLAN writing rubric criteria
+// ============================================================
+
+export const writingNodes: SkillNodeSeed[] = [
+  // Year 3 Writing
+  {
+    code: "Y3-WR-AU-001",
+    name: "Audience awareness (Year 3)",
+    description: "Write with awareness of the reader, using appropriate tone and language for the task",
+    yearLevel: 3, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    acaraCode: "AC9E3LY06", dokLevel: 2, difficultyBand: "on_level", displayOrder: 1,
+  },
+  {
+    code: "Y3-WR-TS-001",
+    name: "Narrative text structure",
+    description: "Write narratives with a clear orientation, complication, and resolution",
+    yearLevel: 3, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    acaraCode: "AC9E3LY06", dokLevel: 2, difficultyBand: "on_level", displayOrder: 2,
+  },
+  {
+    code: "Y3-WR-ID-001",
+    name: "Develop ideas with detail",
+    description: "Develop ideas with relevant supporting details, descriptions, and examples",
+    yearLevel: 3, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    dokLevel: 2, difficultyBand: "on_level", displayOrder: 3,
+  },
+  {
+    code: "Y3-WR-CS-001",
+    name: "Character and setting (Year 3)",
+    description: "Create characters and settings using descriptive language in narratives",
+    yearLevel: 3, domain: "writing", learningArea: "english", strand: "literature", subStrand: "writing_creation",
+    dokLevel: 2, difficultyBand: "on_level", displayOrder: 4,
+  },
+  {
+    code: "Y3-WR-VC-001",
+    name: "Vocabulary choices (Year 3)",
+    description: "Select vocabulary appropriate to the topic and text type, including some descriptive language",
+    yearLevel: 3, domain: "writing", learningArea: "english", strand: "language", subStrand: "writing_creation",
+    acaraCode: "AC9E3LA10", dokLevel: 2, difficultyBand: "on_level", displayOrder: 5,
+  },
+  {
+    code: "Y3-WR-SS-001",
+    name: "Simple and compound sentences in writing",
+    description: "Write using a mix of simple and compound sentences with correct structure",
+    yearLevel: 3, domain: "writing", learningArea: "english", strand: "language", subStrand: "writing_creation",
+    dokLevel: 2, difficultyBand: "on_level", displayOrder: 6,
+  },
+
+  // Year 5 Writing
+  {
+    code: "Y5-WR-AU-001",
+    name: "Audience and purpose control",
+    description: "Adapt writing to suit audience and purpose, adjusting tone, formality, and language choices",
+    yearLevel: 5, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    acaraCode: "AC9E5LY06", dokLevel: 3, difficultyBand: "on_level", displayOrder: 1,
+  },
+  {
+    code: "Y5-WR-TS-001",
+    name: "Persuasive text structure",
+    description: "Write persuasive texts with a clear position, supporting arguments, and a conclusion",
+    yearLevel: 5, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    acaraCode: "AC9E5LA03", dokLevel: 2, difficultyBand: "on_level", displayOrder: 2,
+  },
+  {
+    code: "Y5-WR-CO-001",
+    name: "Cohesion and paragraphing",
+    description: "Organise writing into cohesive paragraphs using topic sentences, connectives, and reference chains",
+    yearLevel: 5, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    acaraCode: "AC9E5LA04", dokLevel: 2, difficultyBand: "on_level", displayOrder: 3,
+  },
+  {
+    code: "Y5-WR-ID-001",
+    name: "Develop and elaborate ideas",
+    description: "Develop ideas with elaboration, evidence, and examples that support the main argument or narrative",
+    yearLevel: 5, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    dokLevel: 3, difficultyBand: "on_level", displayOrder: 4,
+  },
+  {
+    code: "Y5-WR-VC-001",
+    name: "Precise and varied vocabulary",
+    description: "Use precise, topic-specific vocabulary and vary word choice to engage the reader",
+    yearLevel: 5, domain: "writing", learningArea: "english", strand: "language", subStrand: "writing_creation",
+    acaraCode: "AC9E5LA08", dokLevel: 2, difficultyBand: "on_level", displayOrder: 5,
+  },
+  {
+    code: "Y5-WR-SS-001",
+    name: "Complex sentence variety",
+    description: "Write using a range of simple, compound, and complex sentences for effect",
+    yearLevel: 5, domain: "writing", learningArea: "english", strand: "language", subStrand: "writing_creation",
+    acaraCode: "AC9E5LA05", dokLevel: 2, difficultyBand: "on_level", displayOrder: 6,
+  },
+
+  // Year 7 Writing
+  {
+    code: "Y7-WR-AU-001",
+    name: "Sophisticated audience engagement",
+    description: "Engage and persuade readers through deliberate voice, tone, and rhetorical strategies",
+    yearLevel: 7, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    acaraCode: "AC9E7LY06", dokLevel: 3, difficultyBand: "on_level", displayOrder: 1,
+  },
+  {
+    code: "Y7-WR-TS-001",
+    name: "Controlled multi-paragraph structure",
+    description: "Structure extended texts with deliberate paragraph organisation, transitions, and conclusion",
+    yearLevel: 7, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    acaraCode: "AC9E7LA03", dokLevel: 3, difficultyBand: "on_level", displayOrder: 2,
+  },
+  {
+    code: "Y7-WR-ID-001",
+    name: "Sustained and nuanced ideas",
+    description: "Sustain and develop complex ideas with depth, nuance, and supporting evidence throughout a text",
+    yearLevel: 7, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    dokLevel: 3, difficultyBand: "on_level", displayOrder: 3,
+  },
+  {
+    code: "Y7-WR-VC-001",
+    name: "Sophisticated vocabulary and literary devices",
+    description: "Use sophisticated, subject-specific vocabulary and literary devices (metaphor, irony, imagery)",
+    yearLevel: 7, domain: "writing", learningArea: "english", strand: "language", subStrand: "writing_creation",
+    acaraCode: "AC9E7LA08", dokLevel: 3, difficultyBand: "on_level", displayOrder: 4,
+  },
+  {
+    code: "Y7-WR-SS-001",
+    name: "Sentence craft for effect",
+    description: "Vary sentence length, structure, and type deliberately for rhetorical and narrative effect",
+    yearLevel: 7, domain: "writing", learningArea: "english", strand: "language", subStrand: "writing_creation",
+    acaraCode: "AC9E7LA05", dokLevel: 3, difficultyBand: "on_level", displayOrder: 5,
+  },
+  {
+    code: "Y7-WR-CO-001",
+    name: "Advanced cohesion and text flow",
+    description: "Create seamless text flow using sophisticated cohesive devices, reference chains, and paragraph transitions",
+    yearLevel: 7, domain: "writing", learningArea: "english", strand: "literacy", subStrand: "writing_creation",
+    acaraCode: "AC9E7LA04", dokLevel: 3, difficultyBand: "on_level", displayOrder: 6,
+  },
+];
+
+// ============================================================
+// GRAMMAR & PUNCTUATION PREREQUISITES
+// ============================================================
+
+export const grammarPunctuationPrerequisites: PrerequisiteSeed[] = [
+  // Y3 internal
+  { skillCode: "Y3-GP-SB-002", prerequisiteCode: "Y3-GP-SB-001", strength: "required" },
+  { skillCode: "Y3-GP-TE-001", prerequisiteCode: "Y3-GP-NV-001", strength: "required" },
+  { skillCode: "Y3-GP-AG-001", prerequisiteCode: "Y3-GP-NV-001", strength: "required" },
+  { skillCode: "Y3-GP-AP-001", prerequisiteCode: "Y3-GP-SB-001", strength: "recommended" },
+
+  // Y3 → Y5
+  { skillCode: "Y5-GP-SC-001", prerequisiteCode: "Y3-GP-SB-001", strength: "required" },
+  { skillCode: "Y5-GP-SC-001", prerequisiteCode: "Y3-GP-NV-001", strength: "required" },
+  { skillCode: "Y5-GP-SC-002", prerequisiteCode: "Y5-GP-SC-001", strength: "required" },
+  { skillCode: "Y5-GP-TE-001", prerequisiteCode: "Y3-GP-TE-001", strength: "required" },
+  { skillCode: "Y5-GP-CM-001", prerequisiteCode: "Y3-GP-CM-001", strength: "required" },
+  { skillCode: "Y5-GP-DP-001", prerequisiteCode: "Y3-GP-SB-002", strength: "required" },
+  { skillCode: "Y5-GP-PR-001", prerequisiteCode: "Y3-GP-AG-001", strength: "recommended" },
+
+  // Y5 internal
+  { skillCode: "Y5-GP-NG-001", prerequisiteCode: "Y5-GP-SC-001", strength: "recommended" },
+  { skillCode: "Y5-GP-CO-001", prerequisiteCode: "Y5-GP-SC-002", strength: "required" },
+
+  // Y5 → Y7
+  { skillCode: "Y7-GP-SC-001", prerequisiteCode: "Y5-GP-SC-002", strength: "required" },
+  { skillCode: "Y7-GP-TE-001", prerequisiteCode: "Y5-GP-TE-001", strength: "required" },
+  { skillCode: "Y7-GP-VO-001", prerequisiteCode: "Y5-GP-SC-002", strength: "required" },
+  { skillCode: "Y7-GP-CM-001", prerequisiteCode: "Y5-GP-CM-001", strength: "required" },
+  { skillCode: "Y7-GP-AG-001", prerequisiteCode: "Y5-GP-SC-002", strength: "required" },
+  { skillCode: "Y7-GP-CO-001", prerequisiteCode: "Y5-GP-CO-001", strength: "required" },
+  { skillCode: "Y7-GP-PR-001", prerequisiteCode: "Y5-GP-CM-001", strength: "required" },
+  { skillCode: "Y7-GP-PR-001", prerequisiteCode: "Y5-GP-DP-001", strength: "required" },
+];
+
+// ============================================================
+// WRITING PREREQUISITES
+// ============================================================
+
+export const writingPrerequisites: PrerequisiteSeed[] = [
+  // Y3 internal
+  { skillCode: "Y3-WR-ID-001", prerequisiteCode: "Y3-WR-AU-001", strength: "recommended" },
+  { skillCode: "Y3-WR-CS-001", prerequisiteCode: "Y3-WR-TS-001", strength: "required" },
+  { skillCode: "Y3-WR-SS-001", prerequisiteCode: "Y3-WR-VC-001", strength: "recommended" },
+
+  // Y3 → Y5
+  { skillCode: "Y5-WR-AU-001", prerequisiteCode: "Y3-WR-AU-001", strength: "required" },
+  { skillCode: "Y5-WR-TS-001", prerequisiteCode: "Y3-WR-TS-001", strength: "required" },
+  { skillCode: "Y5-WR-ID-001", prerequisiteCode: "Y3-WR-ID-001", strength: "required" },
+  { skillCode: "Y5-WR-VC-001", prerequisiteCode: "Y3-WR-VC-001", strength: "required" },
+  { skillCode: "Y5-WR-SS-001", prerequisiteCode: "Y3-WR-SS-001", strength: "required" },
+
+  // Y5 internal
+  { skillCode: "Y5-WR-CO-001", prerequisiteCode: "Y5-WR-TS-001", strength: "required" },
+
+  // Y5 → Y7
+  { skillCode: "Y7-WR-AU-001", prerequisiteCode: "Y5-WR-AU-001", strength: "required" },
+  { skillCode: "Y7-WR-TS-001", prerequisiteCode: "Y5-WR-CO-001", strength: "required" },
+  { skillCode: "Y7-WR-ID-001", prerequisiteCode: "Y5-WR-ID-001", strength: "required" },
+  { skillCode: "Y7-WR-VC-001", prerequisiteCode: "Y5-WR-VC-001", strength: "required" },
+  { skillCode: "Y7-WR-SS-001", prerequisiteCode: "Y5-WR-SS-001", strength: "required" },
+  { skillCode: "Y7-WR-CO-001", prerequisiteCode: "Y5-WR-CO-001", strength: "required" },
 ];
 
 // ============================================================
