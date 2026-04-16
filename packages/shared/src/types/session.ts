@@ -41,7 +41,7 @@ export interface SessionSummary {
   accuracy: number;
   xpEarned: number;
   coinsEarned: number;
-  coinRewards: import("./coins.js").CoinReward[];
+  coinRewards: import("./coins").CoinReward[];
   skillsWorked: string[];
   skillsMastered: string[];
   streakContinued: boolean;
