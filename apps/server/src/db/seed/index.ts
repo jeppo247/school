@@ -7,6 +7,7 @@ import {
   readingNodes, spellingNodes, grammarPunctuationNodes, writingNodes,
   readingPrerequisites, spellingPrerequisites, grammarPunctuationPrerequisites, writingPrerequisites,
 } from "./english-skill-nodes.js";
+import { precursorNodes, precursorPrerequisites } from "./precursor-nodes.js";
 import { logger } from "../../lib/logger.js";
 
 async function seed() {
@@ -377,7 +378,7 @@ async function seed() {
   }
 
   // Seed English skill nodes (Reading + Spelling)
-  const englishNodes = [...readingNodes, ...spellingNodes, ...grammarPunctuationNodes, ...writingNodes];
+  const englishNodes = [...readingNodes, ...spellingNodes, ...grammarPunctuationNodes, ...writingNodes, ...precursorNodes];
   for (const node of englishNodes) {
     await db
       .insert(skillNodes)
@@ -424,7 +425,7 @@ async function seed() {
   }
 
   // Seed English prerequisites (Reading + Spelling)
-  const englishPrereqs = [...readingPrerequisites, ...spellingPrerequisites, ...grammarPunctuationPrerequisites, ...writingPrerequisites];
+  const englishPrereqs = [...readingPrerequisites, ...spellingPrerequisites, ...grammarPunctuationPrerequisites, ...writingPrerequisites, ...precursorPrerequisites];
   for (const prereq of englishPrereqs) {
     const [skill] = await db
       .select({ id: skillNodes.id })
