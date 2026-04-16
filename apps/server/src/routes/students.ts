@@ -1,3 +1,101 @@
 import { Router } from "express";
+import { db } from "../db/client.js";
+import { students, families, studentSkillStates } from "../db/schema.js";
+import { eq, sql } from "drizzle-orm";
+import { AppError } from "../middleware/error-handler.js";
+import { XP_PER_LEVEL } from "@upwise/shared";
+
 export const studentRoutes = Router();
-// TODO: Implement student routes
+
+// GET /students/:id — Get student profile
+studentRoutes.get("/:id", async (req, res, next) => {
+  try {
+    const [student] = await db.select().from(students).where(eq(students.id, req.params.id));
+    if (!student) throw new AppError(404, "NOT_FOUND", "Student not found");
+
+    const level = Math.floor(student.xpTotal / XP_PER_LEVEL);
+    const xpInLevel = student.xpTotal % XP_PER_LEVEL;
+
+    // Count mastery stats
+    const [masteryStats] = await db
+      .select({
+        total: sql<number>`COUNT(*)`,
+        mastered: sql<number>`COUNT(*) FILTER (WHERE ${studentSkillStates.masteryStatus} IN ('mastered', 'review'))`,
+      })
+      .from(studentSkillStates)
+      .where(eq(studentSkillStates.studentId, student.id));
+
+    res.json({
+      ...student,
+      level,
+      xpForNextLevel: XP_PER_LEVEL,
+      xpInCurrentLevel: xpInLevel,
+      masteryPercentage: masteryStats.total > 0 ? Math.round((masteryStats.mastered / masteryStats.total) * 100) : 0,
+      totalSkillsAssessed: masteryStats.total,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /students/:id — Update student profile
+studentRoutes.put("/:id", async (req, res, next) => {
+  try {
+    const { name, yearLevel, dateOfBirth, avatarUrl, interests } = req.body;
+    const updates: Record<string, unknown> = { updatedAt: new Date() };
+    if (name) updates.name = name;
+    if (yearLevel) updates.yearLevel = yearLevel;
+    if (dateOfBirth) updates.dateOfBirth = dateOfBirth;
+    if (avatarUrl !== undefined) updates.avatarUrl = avatarUrl;
+    if (interests) updates.interests = interests;
+
+    const [updated] = await db
+      .update(students)
+      .set(updates)
+      .where(eq(students.id, req.params.id))
+      .returning();
+
+    if (!updated) throw new AppError(404, "NOT_FOUND", "Student not found");
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /students/:id/theme — Set theme preference
+studentRoutes.put("/:id/theme", async (req, res, next) => {
+  try {
+    const { themeId } = req.body;
+    if (!themeId) throw new AppError(400, "VALIDATION_ERROR", "themeId required");
+
+    const [updated] = await db
+      .update(students)
+      .set({ themeId, updatedAt: new Date() })
+      .where(eq(students.id, req.params.id))
+      .returning();
+
+    if (!updated) throw new AppError(404, "NOT_FOUND", "Student not found");
+    res.json({ themeId: updated.themeId });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /students/:id/interests — Update interests
+studentRoutes.put("/:id/interests", async (req, res, next) => {
+  try {
+    const { interests } = req.body;
+    if (!Array.isArray(interests)) throw new AppError(400, "VALIDATION_ERROR", "interests must be an array");
+
+    const [updated] = await db
+      .update(students)
+      .set({ interests, updatedAt: new Date() })
+      .where(eq(students.id, req.params.id))
+      .returning();
+
+    if (!updated) throw new AppError(404, "NOT_FOUND", "Student not found");
+    res.json({ interests: updated.interests });
+  } catch (err) {
+    next(err);
+  }
+});
