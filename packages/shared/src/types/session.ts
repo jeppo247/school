@@ -15,6 +15,7 @@ export interface LearningSession {
   correctAnswers: number;
   accuracy?: number;
   xpEarned: number;
+  coinsEarned: number;
   skillsTargeted: string[];
   parentInvolved: boolean;
 }
@@ -39,6 +40,8 @@ export interface SessionSummary {
   correctAnswers: number;
   accuracy: number;
   xpEarned: number;
+  coinsEarned: number;
+  coinRewards: import("./coins.js").CoinReward[];
   skillsWorked: string[];
   skillsMastered: string[];
   streakContinued: boolean;

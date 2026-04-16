@@ -22,9 +22,17 @@ const CELEBRATION_COLORS = [
   "#38BDF8",
 ];
 
+const COIN_COLORS = [
+  "#FCD34D",
+  "#F59E0B",
+  "#D97706",
+  "#FBBF24",
+  "#FDE68A",
+];
+
 interface CelebrationProps {
   trigger: boolean;
-  type?: "correct" | "streak" | "levelUp" | "mastery";
+  type?: "correct" | "streak" | "levelUp" | "mastery" | "coinEarn";
   onComplete?: () => void;
 }
 
@@ -36,12 +44,12 @@ export function Celebration({
   const [particles, setParticles] = useState<Particle[]>([]);
   const [message, setMessage] = useState<string>("");
 
-  const generateParticles = useCallback((count: number): Particle[] => {
+  const generateParticles = useCallback((count: number, colors: string[] = CELEBRATION_COLORS): Particle[] => {
     return Array.from({ length: count }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      color: CELEBRATION_COLORS[Math.floor(Math.random() * CELEBRATION_COLORS.length)],
+      color: colors[Math.floor(Math.random() * colors.length)],
       size: Math.random() * 12 + 4,
       rotation: Math.random() * 360,
     }));
@@ -55,10 +63,19 @@ export function Celebration({
       streak: ["On fire! 🔥", "Unstoppable!", "Keep going!", "Legend!"],
       levelUp: ["LEVEL UP! ⭐", "You're amazing!", "New level unlocked!"],
       mastery: ["MASTERED! 🏆", "You nailed it!", "Skill complete!"],
+      coinEarn: ["Ka-ching! 💰", "Coins earned!", "Nice haul!", "Cha-ching!"],
     };
 
-    const particleCount = type === "correct" ? 15 : type === "streak" ? 25 : 40;
-    setParticles(generateParticles(particleCount));
+    const particleCounts: Record<string, number> = {
+      correct: 15,
+      streak: 25,
+      levelUp: 40,
+      mastery: 40,
+      coinEarn: 30,
+    };
+    const particleCount = particleCounts[type] ?? 15;
+    const colors = type === "coinEarn" ? COIN_COLORS : CELEBRATION_COLORS;
+    setParticles(generateParticles(particleCount, colors));
 
     const msgs = messages[type];
     setMessage(msgs[Math.floor(Math.random() * msgs.length)]);

@@ -57,6 +57,7 @@ export const students = pgTable(
     themeId: text("theme_id").default("default").notNull(),
     interests: text("interests").array().default([]).notNull(),
     xpTotal: integer("xp_total").default(0).notNull(),
+    coinBalance: integer("coin_balance").default(0).notNull(),
     currentStreak: integer("current_streak").default(0).notNull(),
     longestStreak: integer("longest_streak").default(0).notNull(),
     lastSessionDate: date("last_session_date"),
@@ -226,6 +227,7 @@ export const learningSessions = pgTable(
     correctAnswers: integer("correct_answers").default(0).notNull(),
     accuracy: real("accuracy"),
     xpEarned: integer("xp_earned").default(0).notNull(),
+    coinsEarned: integer("coins_earned").default(0).notNull(),
     skillsTargeted: uuid("skills_targeted").array().default([]).notNull(),
     parentInvolved: boolean("parent_involved").default(false).notNull(),
     metadata: jsonb("metadata").default({}).notNull(),
@@ -402,6 +404,67 @@ export const subscriptions = pgTable(
 );
 
 // ============================================================
+// GOLD COIN SYSTEM
+// ============================================================
+
+export const coinTransactions = pgTable(
+  "coin_transactions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    amount: integer("amount").notNull(),
+    type: text("type").notNull(), // 'earn' | 'spend'
+    reason: text("reason").notNull(), // CoinRewardReason
+    referenceId: text("reference_id"), // session ID, skill ID, or shop item ID
+    balanceAfter: integer("balance_after").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_coin_tx_student").on(table.studentId),
+    index("idx_coin_tx_date").on(table.studentId, table.createdAt),
+  ],
+);
+
+export const shopItems = pgTable("shop_items", {
+  id: text("id").primaryKey(),
+  category: text("category").notNull(), // 'theme' | 'avatar' | 'celebration' | 'sound_pack' | 'brain_break' | 'badge'
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  price: integer("price").notNull(),
+  imageUrl: text("image_url"),
+  previewData: jsonb("preview_data"),
+  prerequisite: jsonb("prerequisite"), // { minStreak?, minLevel?, requiredBadge? }
+  isActive: boolean("is_active").default(true).notNull(),
+  isLimited: boolean("is_limited").default(false).notNull(),
+  availableFrom: timestamp("available_from", { withTimezone: true }),
+  availableUntil: timestamp("available_until", { withTimezone: true }),
+  displayOrder: integer("display_order").default(0).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const studentPurchases = pgTable(
+  "student_purchases",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    itemId: text("item_id")
+      .notNull()
+      .references(() => shopItems.id),
+    transactionId: uuid("transaction_id")
+      .references(() => coinTransactions.id),
+    purchasedAt: timestamp("purchased_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("uq_student_item").on(table.studentId, table.itemId),
+    index("idx_purchases_student").on(table.studentId),
+  ],
+);
+
+// ============================================================
 // RELATIONS
 // ============================================================
 
@@ -425,6 +488,8 @@ export const studentsRelations = relations(students, ({ one, many }) => ({
   skillStates: many(studentSkillStates),
   sessions: many(learningSessions),
   briefings: many(dailyBriefings),
+  coinTransactions: many(coinTransactions),
+  purchases: many(studentPurchases),
 }));
 
 export const skillNodesRelations = relations(skillNodes, ({ many }) => ({
@@ -466,4 +531,14 @@ export const questionResponsesRelations = relations(questionResponses, ({ one })
   }),
   question: one(questions, { fields: [questionResponses.questionId], references: [questions.id] }),
   skill: one(skillNodes, { fields: [questionResponses.skillId], references: [skillNodes.id] }),
+}));
+
+export const coinTransactionsRelations = relations(coinTransactions, ({ one }) => ({
+  student: one(students, { fields: [coinTransactions.studentId], references: [students.id] }),
+}));
+
+export const studentPurchasesRelations = relations(studentPurchases, ({ one }) => ({
+  student: one(students, { fields: [studentPurchases.studentId], references: [students.id] }),
+  item: one(shopItems, { fields: [studentPurchases.itemId], references: [shopItems.id] }),
+  transaction: one(coinTransactions, { fields: [studentPurchases.transactionId], references: [coinTransactions.id] }),
 }));

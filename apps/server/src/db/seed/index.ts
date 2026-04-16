@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { db } from "../client.js";
-import { themes } from "../schema.js";
+import { themes, shopItems } from "../schema.js";
 import { logger } from "../../lib/logger.js";
 
 async function seed() {
@@ -91,6 +91,263 @@ async function seed() {
     .onConflictDoNothing();
 
   logger.info("Themes seeded successfully");
+
+  // Seed shop items
+  await db
+    .insert(shopItems)
+    .values([
+      // Premium Themes
+      {
+        id: "theme_underwater",
+        category: "theme",
+        name: "Underwater World",
+        description: "Dive deep into learning with ocean colours and sea creature friends!",
+        price: 150,
+        previewData: { colorPrimary: "#0891B2", colorSecondary: "#06B6D4", colorAccent: "#22D3EE" },
+        isActive: true,
+        displayOrder: 1,
+      },
+      {
+        id: "theme_dinosaurs",
+        category: "theme",
+        name: "Dinosaur Adventure",
+        description: "Stomp through maths problems like a T-Rex!",
+        price: 150,
+        previewData: { colorPrimary: "#65A30D", colorSecondary: "#A16207", colorAccent: "#CA8A04" },
+        isActive: true,
+        displayOrder: 2,
+      },
+      {
+        id: "theme_rainbow",
+        category: "theme",
+        name: "Rainbow Magic",
+        description: "Add a splash of colour to every lesson!",
+        price: 100,
+        previewData: { colorPrimary: "#EC4899", colorSecondary: "#8B5CF6", colorAccent: "#06B6D4" },
+        isActive: true,
+        displayOrder: 3,
+      },
+      // Avatar Items
+      {
+        id: "avatar_wizard_hat",
+        category: "avatar",
+        name: "Wizard Hat",
+        description: "A magical hat for a magical learner!",
+        price: 20,
+        isActive: true,
+        displayOrder: 10,
+      },
+      {
+        id: "avatar_space_helmet",
+        category: "avatar",
+        name: "Space Helmet",
+        description: "Ready for intergalactic learning missions!",
+        price: 25,
+        isActive: true,
+        displayOrder: 11,
+      },
+      {
+        id: "avatar_footy_beanie",
+        category: "avatar",
+        name: "Footy Beanie",
+        description: "Show your team spirit while you learn!",
+        price: 20,
+        isActive: true,
+        displayOrder: 12,
+      },
+      {
+        id: "avatar_crown",
+        category: "avatar",
+        name: "Golden Crown",
+        description: "For the king or queen of learning!",
+        price: 40,
+        isActive: true,
+        displayOrder: 13,
+      },
+      {
+        id: "avatar_frame_sparkle",
+        category: "avatar",
+        name: "Sparkle Frame",
+        description: "A sparkly border around your profile picture!",
+        price: 15,
+        isActive: true,
+        displayOrder: 14,
+      },
+      {
+        id: "avatar_outfit_astronaut",
+        category: "avatar",
+        name: "Astronaut Suit",
+        description: "One small step for learning, one giant leap for you!",
+        price: 40,
+        isActive: true,
+        displayOrder: 15,
+      },
+      // Celebration Styles
+      {
+        id: "celebration_stars",
+        category: "celebration",
+        name: "Star Burst",
+        description: "Correct answers explode into golden stars!",
+        price: 30,
+        previewData: { particleType: "stars" },
+        isActive: true,
+        displayOrder: 20,
+      },
+      {
+        id: "celebration_footballs",
+        category: "celebration",
+        name: "Footy Frenzy",
+        description: "Footballs fly everywhere when you get it right!",
+        price: 30,
+        previewData: { particleType: "footballs" },
+        isActive: true,
+        displayOrder: 21,
+      },
+      {
+        id: "celebration_paws",
+        category: "celebration",
+        name: "Paw Prints",
+        description: "Cute paw prints bounce across the screen!",
+        price: 30,
+        previewData: { particleType: "paws" },
+        isActive: true,
+        displayOrder: 22,
+      },
+      {
+        id: "celebration_rockets",
+        category: "celebration",
+        name: "Rocket Launch",
+        description: "Rockets blast off with every correct answer!",
+        price: 30,
+        previewData: { particleType: "rockets" },
+        isActive: true,
+        displayOrder: 23,
+      },
+      // Sound Packs
+      {
+        id: "sound_silly",
+        category: "sound_pack",
+        name: "Silly Sounds",
+        description: "Cartoon boings, squeaks, and funny noises!",
+        price: 40,
+        isActive: true,
+        displayOrder: 30,
+      },
+      {
+        id: "sound_nature",
+        category: "sound_pack",
+        name: "Nature Sounds",
+        description: "Bird calls, ocean waves, and peaceful chimes!",
+        price: 40,
+        isActive: true,
+        displayOrder: 31,
+      },
+      {
+        id: "sound_aussie_animals",
+        category: "sound_pack",
+        name: "Aussie Animals",
+        description: "Kookaburra laughs, koala grunts, and more!",
+        price: 50,
+        isActive: true,
+        displayOrder: 32,
+      },
+      {
+        id: "sound_music",
+        category: "sound_pack",
+        name: "Musical Notes",
+        description: "Short musical riffs for every answer!",
+        price: 50,
+        isActive: true,
+        displayOrder: 33,
+      },
+      // Brain Break Upgrades
+      {
+        id: "break_breathing",
+        category: "brain_break",
+        name: "Calm Breathing",
+        description: "A peaceful breathing exercise with calming animation!",
+        price: 25,
+        isActive: true,
+        displayOrder: 40,
+      },
+      {
+        id: "break_dance",
+        category: "brain_break",
+        name: "Dance Break",
+        description: "Bust some moves with a fun dance prompt!",
+        price: 40,
+        isActive: true,
+        displayOrder: 41,
+      },
+      {
+        id: "break_pattern_match",
+        category: "brain_break",
+        name: "Pattern Match",
+        description: "A fun visual pattern matching mini-game!",
+        price: 50,
+        isActive: true,
+        displayOrder: 42,
+      },
+      {
+        id: "break_coin_catcher",
+        category: "brain_break",
+        name: "Coin Catcher",
+        description: "Catch falling coins in this quick mini-game!",
+        price: 50,
+        isActive: true,
+        displayOrder: 43,
+      },
+      // Collectible Badges
+      {
+        id: "badge_maths_legend",
+        category: "badge",
+        name: "Maths Legend",
+        description: "Show everyone you're a maths legend!",
+        price: 50,
+        isActive: true,
+        displayOrder: 50,
+      },
+      {
+        id: "badge_streak_champion",
+        category: "badge",
+        name: "Streak Champion",
+        description: "For dedicated daily learners!",
+        price: 40,
+        prerequisite: { minStreak: 20 },
+        isActive: true,
+        displayOrder: 51,
+      },
+      {
+        id: "badge_number_ninja",
+        category: "badge",
+        name: "Number Ninja",
+        description: "Master of numbers and calculations!",
+        price: 30,
+        isActive: true,
+        displayOrder: 52,
+      },
+      {
+        id: "badge_early_bird",
+        category: "badge",
+        name: "Early Bird",
+        description: "For those who love morning learning sessions!",
+        price: 30,
+        isActive: true,
+        displayOrder: 53,
+      },
+      {
+        id: "badge_perfectionist",
+        category: "badge",
+        name: "Perfectionist",
+        description: "For getting a perfect score in a session!",
+        price: 50,
+        isActive: true,
+        displayOrder: 54,
+      },
+    ])
+    .onConflictDoNothing();
+
+  logger.info("Shop items seeded successfully");
   logger.info("Database seeding complete");
   process.exit(0);
 }

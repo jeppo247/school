@@ -6,6 +6,7 @@ type SoundName =
   | "streak"
   | "levelUp"
   | "sessionComplete"
+  | "coinEarn"
   | "click"
   | "whoosh";
 
@@ -41,6 +42,7 @@ export function preloadSounds(soundSet: string): void {
     "streak",
     "levelUp",
     "sessionComplete",
+    "coinEarn",
     "click",
     "whoosh",
   ];

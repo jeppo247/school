@@ -18,6 +18,8 @@ import { themeRoutes } from "./routes/themes.js";
 import { feedbackRoutes } from "./routes/feedback.js";
 import { adminRoutes } from "./routes/admin.js";
 import { webhookRoutes } from "./routes/webhooks.js";
+import { coinRoutes } from "./routes/coins.js";
+import { shopRoutes } from "./routes/shop.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 4000;
@@ -53,6 +55,8 @@ api.use("/themes", themeRoutes);
 api.use("/feedback", feedbackRoutes);
 api.use("/admin", adminRoutes);
 api.use("/webhooks", webhookRoutes);
+api.use("/coins", coinRoutes);
+api.use("/shop", shopRoutes);
 
 app.use("/api/v1", api);
 

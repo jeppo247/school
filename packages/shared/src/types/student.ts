@@ -8,6 +8,7 @@ export interface Student {
   themeId: string;
   interests: string[];
   xpTotal: number;
+  coinBalance: number;
   currentStreak: number;
   longestStreak: number;
   lastSessionDate?: string;
@@ -19,6 +20,7 @@ export interface Student {
 export interface StudentProfile extends Student {
   level: number;
   xpForNextLevel: number;
+  coinBalance: number;
   masteryPercentage: number;
   totalSkillsAssessed: number;
 }
