@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { db } from "../client.js";
-import { themes, shopItems, skillNodes, skillPrerequisites } from "../schema.js";
+import { themes, shopItems, skillNodes, skillPrerequisites, questions } from "../schema.js";
 import { eq } from "drizzle-orm";
 import { allSkillNodes, prerequisites } from "./skill-nodes.js";
 import {
@@ -8,6 +8,7 @@ import {
   readingPrerequisites, spellingPrerequisites, grammarPunctuationPrerequisites, writingPrerequisites,
 } from "./english-skill-nodes.js";
 import { precursorNodes, precursorPrerequisites } from "./precursor-nodes.js";
+import { starterQuestions } from "./starter-questions.js";
 import { logger } from "../../lib/logger.js";
 
 async function seed() {
@@ -449,6 +450,31 @@ async function seed() {
   }
 
   logger.info(`Prerequisites seeded: ${prerequisites.length} maths + ${englishPrereqs.length} english edges`);
+
+  // Seed starter questions
+  let questionsSeeded = 0;
+  for (const q of starterQuestions) {
+    const [skill] = await db
+      .select({ id: skillNodes.id })
+      .from(skillNodes)
+      .where(eq(skillNodes.code, q.skillCode));
+
+    if (skill) {
+      await db
+        .insert(questions)
+        .values({
+          skillId: skill.id,
+          content: q.content,
+          difficultyParam: q.difficultyParam,
+          questionType: q.questionType,
+          isValidated: true,
+        })
+        .onConflictDoNothing();
+      questionsSeeded++;
+    }
+  }
+
+  logger.info(`Starter questions seeded: ${questionsSeeded}`);
   logger.info("Database seeding complete");
   process.exit(0);
 }

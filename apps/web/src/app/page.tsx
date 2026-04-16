@@ -45,75 +45,6 @@ function FloatingShape({
     />
   );
 }
-
-function GapMapPreview() {
-  const nodes = [
-    { x: 20, y: 25, size: 44, color: "#22C55E", label: "Counting" },
-    { x: 55, y: 15, size: 38, color: "#22C55E", label: "Place Value" },
-    { x: 85, y: 30, size: 42, color: "#FBBF24", label: "Addition" },
-    { x: 35, y: 55, size: 36, color: "#22C55E", label: "Patterns" },
-    { x: 70, y: 50, size: 48, color: "#F87171", label: "Subtraction" },
-    { x: 15, y: 75, size: 34, color: "#22C55E", label: "Halves" },
-    { x: 50, y: 80, size: 40, color: "#D1D5DB", label: "Multiplication" },
-    { x: 82, y: 72, size: 36, color: "#D1D5DB", label: "Division" },
-  ];
-
-  return (
-    <div className="relative w-full aspect-[4/3] max-w-lg mx-auto">
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
-        <line x1="20" y1="25" x2="55" y2="15" stroke="#E5E7EB" strokeWidth="0.5" />
-        <line x1="55" y1="15" x2="85" y2="30" stroke="#E5E7EB" strokeWidth="0.5" />
-        <line x1="20" y1="25" x2="35" y2="55" stroke="#E5E7EB" strokeWidth="0.5" />
-        <line x1="85" y1="30" x2="70" y2="50" stroke="#E5E7EB" strokeWidth="0.5" />
-        <line x1="35" y1="55" x2="15" y2="75" stroke="#E5E7EB" strokeWidth="0.5" />
-        <line x1="70" y1="50" x2="50" y2="80" stroke="#E5E7EB" strokeWidth="0.5" />
-        <line x1="70" y1="50" x2="82" y2="72" stroke="#E5E7EB" strokeWidth="0.5" />
-      </svg>
-      {nodes.map((node, i) => (
-        <motion.div
-          key={node.label}
-          className="absolute flex flex-col items-center"
-          style={{
-            left: `${node.x}%`,
-            top: `${node.y}%`,
-            transform: "translate(-50%, -50%)",
-          }}
-          initial={{ opacity: 0, scale: 0 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: i * 0.08, ease: "backOut" }}
-          viewport={{ once: true }}
-        >
-          <div
-            className="rounded-full shadow-md flex items-center justify-center border-2 border-white"
-            style={{
-              width: node.size,
-              height: node.size,
-              backgroundColor: node.color,
-            }}
-          >
-            {node.color === "#22C55E" && (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
-                <path d="M13.5 4.5L6 12L2.5 8.5" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-            {node.color === "#FBBF24" && (
-              <div className="w-3 h-3 rounded-full bg-white/60" />
-            )}
-            {node.color === "#F87171" && (
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M7 3v4M7 10h.01" stroke="white" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            )}
-          </div>
-          <span className="text-[10px] font-medium text-gray-500 mt-1 whitespace-nowrap">
-            {node.label}
-          </span>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
 export default function HomePage() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -139,7 +70,7 @@ export default function HomePage() {
               Sign In
             </Link>
             <Link
-              href="/sign-up"
+              href="/start"
               className="text-sm font-semibold text-white bg-[#4F8CF7] hover:bg-[#3A6CD4] px-5 py-2.5 rounded-full transition-all hover:shadow-lg hover:shadow-blue-200 active:scale-95"
             >
               Get Started Free
@@ -238,7 +169,7 @@ export default function HomePage() {
               className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
             >
               <Link
-                href="/sign-up"
+                href="/start"
                 className="group inline-flex items-center justify-center gap-2 text-lg font-semibold text-white bg-[#4F8CF7] hover:bg-[#3A6CD4] px-8 py-4 rounded-2xl transition-all hover:shadow-xl hover:shadow-blue-200/50 active:scale-[0.98]"
               >
                 Start Free Diagnostic
@@ -269,41 +200,6 @@ export default function HomePage() {
             </motion.p>
           </motion.div>
 
-          {/* Gap Map Preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="mt-16 relative"
-          >
-            <div className="bg-white rounded-3xl shadow-2xl shadow-blue-100/50 border border-gray-100 p-8 sm:p-10 max-w-2xl mx-auto">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-300" />
-                  <div className="w-3 h-3 rounded-full bg-amber-300" />
-                  <div className="w-3 h-3 rounded-full bg-emerald-300" />
-                </div>
-                <span className="text-xs font-medium text-gray-400 ml-2">
-                  Indigo&apos;s Gap Map — Year 3 Maths
-                </span>
-              </div>
-              <GapMapPreview />
-              <div className="flex items-center justify-center gap-6 mt-6 text-xs text-gray-400">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-emerald-400" /> Mastered
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-amber-400" /> Learning
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-red-300" /> Gap Found
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-gray-300" /> Not Yet
-                </span>
-              </div>
-            </div>
-          </motion.div>
         </motion.div>
       </section>
 
@@ -761,7 +657,7 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <Link
-                  href="/sign-up"
+                  href="/start"
                   className={`block text-center font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] ${
                     plan.popular
                       ? "bg-white text-[#4F8CF7] hover:bg-blue-50 shadow-md"
@@ -836,7 +732,7 @@ export default function HomePage() {
             </motion.p>
             <motion.div variants={fadeUp} custom={2}>
               <Link
-                href="/sign-up"
+                href="/start"
                 className="inline-flex items-center gap-2 text-lg font-semibold text-white bg-[#4F8CF7] hover:bg-[#3A6CD4] px-10 py-4 rounded-2xl transition-all hover:shadow-xl hover:shadow-blue-200/50 active:scale-[0.98]"
               >
                 Start Free Diagnostic
