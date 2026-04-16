@@ -20,75 +20,52 @@ export default function StartPage() {
   const [yearLevel, setYearLevel] = useState<number | null>(null);
   const [selectedTheme, setSelectedTheme] = useState("default");
 
-  // Created IDs
-  const [familyId, setFamilyId] = useState<string | null>(null);
-  const [studentId, setStudentId] = useState<string | null>(null);
-
-  async function handleParentSubmit() {
+  // Steps 1-3 are client-side only. API calls happen at "Start Diagnostic".
+  function handleParentSubmit() {
     if (!parentName || !parentEmail) return;
+    setStep("child");
+  }
+
+  function handleChildSubmit() {
+    if (!childName || yearLevel === null) return;
+    setStep("theme");
+  }
+
+  function handleThemeSubmit() {
+    setStep("ready");
+  }
+
+  async function handleStartDiagnostic() {
     setLoading(true);
     try {
+      // Create family, parent, child, and start diagnostic in one go
       const family = await api.post<{ id: string }>("/families", {
         name: parentName,
         email: parentEmail,
       });
-      setFamilyId(family.id);
 
       await api.post(`/families/${family.id}/parents`, {
         name: parentName,
         email: parentEmail,
       });
 
-      setStep("child");
-    } catch (err) {
-      console.error("Failed to create family:", err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleChildSubmit() {
-    if (!childName || !yearLevel || !familyId) return;
-    setLoading(true);
-    try {
-      const child = await api.post<{ id: string }>(`/families/${familyId}/children`, {
+      const child = await api.post<{ id: string }>(`/families/${family.id}/children`, {
         name: childName,
         yearLevel,
+        themeId: selectedTheme,
       });
-      setStudentId(child.id);
-      setStep("theme");
-    } catch (err) {
-      console.error("Failed to create child:", err);
-    } finally {
-      setLoading(false);
-    }
-  }
 
-  async function handleThemeSubmit() {
-    if (!studentId) return;
-    setLoading(true);
-    try {
-      await api.put(`/students/${studentId}/theme`, { themeId: selectedTheme });
-      setStep("ready");
-    } catch (err) {
-      console.error("Failed to set theme:", err);
-    } finally {
-      setLoading(false);
-    }
-  }
+      const session = await api.post<{ sessionId: string }>(`/diagnostic/${child.id}/start`, {});
 
-  async function handleStartDiagnostic() {
-    if (!studentId) return;
-    setLoading(true);
-    try {
-      const session = await api.post<{ sessionId: string }>(`/diagnostic/${studentId}/start`, {});
-      // Store in sessionStorage for the diagnostic page to pick up
-      sessionStorage.setItem("upwise_student_id", studentId);
+      sessionStorage.setItem("upwise_student_id", child.id);
       sessionStorage.setItem("upwise_session_id", session.sessionId);
       sessionStorage.setItem("upwise_child_name", childName);
       router.push("/diagnostic");
     } catch (err) {
       console.error("Failed to start diagnostic:", err);
+      // Still navigate to diagnostic with demo mode
+      sessionStorage.setItem("upwise_child_name", childName);
+      router.push("/diagnostic");
     } finally {
       setLoading(false);
     }
@@ -162,12 +139,12 @@ export default function StartPage() {
 
                 <motion.button
                   onClick={handleParentSubmit}
-                  disabled={!parentName || !parentEmail || loading}
+                  disabled={!parentName || !parentEmail}
                   className="w-full bg-[#4F8CF7] text-white font-semibold py-3.5 rounded-xl disabled:opacity-50 hover:bg-[#3A6CD4] transition-all mt-2"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
-                  {loading ? "Setting up..." : "Continue"}
+                  Continue
                 </motion.button>
 
                 <p className="text-xs text-gray-400 text-center mt-2">
@@ -241,12 +218,12 @@ export default function StartPage() {
 
                 <motion.button
                   onClick={handleChildSubmit}
-                  disabled={!childName || yearLevel === null || loading}
+                  disabled={!childName || yearLevel === null}
                   className="w-full bg-[#4F8CF7] text-white font-semibold py-3.5 rounded-xl disabled:opacity-50 hover:bg-[#3A6CD4] transition-all mt-2"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
-                  {loading ? "Creating profile..." : "Continue"}
+                  Continue
                 </motion.button>
               </div>
             </motion.div>
