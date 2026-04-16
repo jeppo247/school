@@ -28,6 +28,10 @@ export async function generateQuestion(
 ): Promise<GeneratedQuestion> {
   const themeContext = getThemeContext(params.themeId, params.interests);
 
+  if (!claude) {
+    throw new Error("Claude API client not configured — set ANTHROPIC_API_KEY");
+  }
+
   const response = await claude.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 1024,
@@ -85,6 +89,10 @@ export async function generateDailyBriefing(params: {
   tips: string[];
   conversationScript: string;
 }> {
+  if (!claude) {
+    throw new Error("Claude API client not configured — set ANTHROPIC_API_KEY");
+  }
+
   const response = await claude.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 1024,
