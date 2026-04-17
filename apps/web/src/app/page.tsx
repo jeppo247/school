@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { useRef } from "react";
+import { AdventureBackground } from "@/components/student/AdventureBackground";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -22,29 +23,7 @@ const scaleIn = {
   }),
 };
 
-function FloatingShape({
-  className,
-  delay = 0,
-}: {
-  className: string;
-  delay?: number;
-}) {
-  return (
-    <motion.div
-      className={`absolute rounded-full pointer-events-none ${className}`}
-      animate={{
-        y: [0, -18, 0],
-        rotate: [0, 8, -8, 0],
-      }}
-      transition={{
-        duration: 6,
-        repeat: Infinity,
-        delay,
-        ease: "easeInOut",
-      }}
-    />
-  );
-}
+
 export default function HomePage() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -83,37 +62,12 @@ export default function HomePage() {
       <section
         ref={heroRef}
         className="relative min-h-screen flex items-center justify-center pt-20 pb-16"
-        style={{ background: "linear-gradient(180deg, #F8FAFF 0%, #EEF4FF 50%, #F8FAFF 100%)" }}
       >
-        {/* Floating decorative elements */}
-        <FloatingShape
-          className="w-64 h-64 bg-blue-200/20 -top-20 -left-20 blur-3xl"
-          delay={0}
-        />
-        <FloatingShape
-          className="w-48 h-48 bg-orange-200/20 top-40 -right-10 blur-3xl"
-          delay={1.5}
-        />
-        <FloatingShape
-          className="w-20 h-20 bg-[#4F8CF7]/10 top-[20%] left-[15%] blur-sm"
-          delay={0.5}
-        />
-        <FloatingShape
-          className="w-14 h-14 bg-[#FF8C42]/10 top-[30%] right-[20%] blur-sm"
-          delay={2}
-        />
-        <FloatingShape
-          className="w-10 h-10 bg-emerald-300/15 bottom-[25%] left-[10%] blur-sm"
-          delay={1}
-        />
-        <FloatingShape
-          className="w-16 h-16 bg-amber-300/10 bottom-[20%] right-[12%] blur-sm"
-          delay={3}
-        />
+        <AdventureBackground />
 
         <motion.div
           style={{ y: heroY, opacity: heroOpacity }}
-          className="relative z-10 max-w-4xl mx-auto px-6 text-center"
+          className="relative z-10 max-w-4xl mx-auto px-6 text-center bg-white/70 backdrop-blur-sm rounded-3xl py-12"
         >
           <motion.div
             initial="hidden"
