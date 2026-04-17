@@ -120,17 +120,6 @@ export default function HomePage() {
             animate="visible"
             className="space-y-6"
           >
-            <motion.div
-              variants={fadeUp}
-              custom={0}
-              className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-blue-100 rounded-full px-4 py-1.5 shadow-sm"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-sm font-medium text-gray-600">
-                Aligned to the Australian Curriculum (ACARA)
-              </span>
-            </motion.div>
-
             <motion.h1
               variants={fadeUp}
               custom={1}
