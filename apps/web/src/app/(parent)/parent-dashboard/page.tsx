@@ -2,35 +2,31 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
-// Mock data — replaced by API
-const mockChild = {
-  id: "1",
-  name: "Indigo",
-  yearLevel: 3,
-  currentStreak: 7,
-  sessionsThisWeek: 4,
-  recentAccuracy: 81,
-  coinBalance: 142,
-  diagnosticCompleted: true,
-  domainProficiencies: [
-    { domain: "numeracy", projectedProficiency: "strong", theta: 0.8, thetaSe: 0.4 },
-    { domain: "reading", projectedProficiency: "developing", theta: -0.2, thetaSe: 0.6 },
-    { domain: "spelling", projectedProficiency: "strong", theta: 0.5, thetaSe: 0.5 },
-    { domain: "grammar_punctuation", projectedProficiency: "developing", theta: 0.1, thetaSe: 0.7 },
-    { domain: "writing", projectedProficiency: "developing", theta: -0.1, thetaSe: 0.8 },
-  ],
-  topMisconceptions: [
-    { misconceptionCode: "forgets_regrouping", description: "Forgetting to carry or borrow when adding or subtracting", count: 5 },
-    { misconceptionCode: "comma_splice", description: "Joining two complete sentences with only a comma", count: 3 },
-  ],
-};
+interface DomainScore {
+  domain: string;
+  correct: number;
+  total: number;
+  accuracy: number;
+  proficiency: string;
+}
 
-const PROFICIENCY_COLORS: Record<string, { bg: string; text: string; label: string }> = {
-  exceeding: { bg: "bg-emerald-100", text: "text-emerald-700", label: "Exceeding" },
-  strong: { bg: "bg-blue-100", text: "text-blue-700", label: "Strong" },
-  developing: { bg: "bg-amber-100", text: "text-amber-700", label: "Developing" },
-  needs_additional_support: { bg: "bg-red-100", text: "text-red-700", label: "Needs Support" },
+interface DiagnosticResults {
+  childName: string;
+  yearLevel: number;
+  totalAnswered: number;
+  totalCorrect: number;
+  overallAccuracy: number;
+  domainScores: DomainScore[];
+  completedAt: string;
+}
+
+const PROFICIENCY_COLORS: Record<string, { bg: string; text: string; label: string; bar: string }> = {
+  exceeding: { bg: "bg-emerald-100", text: "text-emerald-700", label: "Exceeding", bar: "bg-emerald-400" },
+  strong: { bg: "bg-blue-100", text: "text-blue-700", label: "Strong", bar: "bg-blue-400" },
+  developing: { bg: "bg-amber-100", text: "text-amber-700", label: "Developing", bar: "bg-amber-400" },
+  needs_additional_support: { bg: "bg-red-100", text: "text-red-700", label: "Needs Support", bar: "bg-red-300" },
 };
 
 const DOMAIN_LABELS: Record<string, string> = {
@@ -50,22 +46,67 @@ const fadeUp = {
 };
 
 export default function ParentDashboard() {
-  const child = mockChild;
+  const [results, setResults] = useState<DiagnosticResults | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem("upwise_diagnostic_results");
+    if (stored) {
+      try {
+        setResults(JSON.parse(stored));
+      } catch {
+        // Invalid data
+      }
+    }
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+        <p className="text-gray-400">Loading...</p>
+      </main>
+    );
+  }
+
+  if (!results) {
+    return (
+      <main className="min-h-screen bg-[#FAFAFA] flex flex-col items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <span className="text-6xl block mb-4">📊</span>
+          <h1 className="text-2xl font-semibold text-gray-800 mb-3">No diagnostic results yet</h1>
+          <p className="text-gray-500 mb-6">
+            Complete the free diagnostic first to see your child&apos;s results here.
+          </p>
+          <Link
+            href="/start"
+            className="inline-block bg-[#4F8CF7] text-white font-semibold px-8 py-3 rounded-xl"
+          >
+            Start Free Diagnostic
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  const { childName, yearLevel, totalAnswered, totalCorrect, overallAccuracy, domainScores, completedAt } = results;
+  const completedDate = new Date(completedAt).toLocaleDateString("en-AU", {
+    day: "numeric", month: "long", year: "numeric",
+  });
+
+  const gaps = domainScores.filter((d) => d.total > 0 && (d.proficiency === "developing" || d.proficiency === "needs_additional_support"));
+  const strengths = domainScores.filter((d) => d.total > 0 && (d.proficiency === "exceeding" || d.proficiency === "strong"));
+  const untested = domainScores.filter((d) => d.total === 0);
 
   return (
     <main className="min-h-screen bg-[#FAFAFA]">
       {/* Nav */}
       <nav className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <span className="font-display text-xl font-bold text-[#4F8CF7]">Upwise</span>
-          <div className="flex items-center gap-4">
-            <select className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700">
-              <option>{child.name} (Year {child.yearLevel})</option>
-            </select>
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">
-              P
-            </div>
-          </div>
+          <Link href="/" className="font-display text-xl font-bold text-[#4F8CF7]">Upwise</Link>
+          <span className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700">
+            {childName} (Year {yearLevel})
+          </span>
         </div>
       </nav>
 
@@ -73,10 +114,11 @@ export default function ParentDashboard() {
         <motion.h1
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-2xl font-semibold text-[#1A1A2E] mb-6"
+          className="text-2xl font-semibold text-[#1A1A2E] mb-2"
         >
-          {child.name}&apos;s Dashboard
+          {childName}&apos;s Dashboard
         </motion.h1>
+        <p className="text-sm text-gray-400 mb-6">Diagnostic completed {completedDate}</p>
 
         {/* Top stats */}
         <motion.div
@@ -85,9 +127,9 @@ export default function ParentDashboard() {
           className="grid grid-cols-3 gap-4 mb-8"
         >
           {[
-            { label: "This Week", value: `${child.sessionsThisWeek}/5`, sub: "sessions", color: "text-[#4F8CF7]" },
-            { label: "Accuracy", value: `${child.recentAccuracy}%`, sub: "last 7 days", color: "text-emerald-600" },
-            { label: "Streak", value: `🔥 ${child.currentStreak}`, sub: "days", color: "text-orange-500" },
+            { label: "Questions", value: String(totalAnswered), sub: "completed", color: "text-[#4F8CF7]" },
+            { label: "Accuracy", value: `${overallAccuracy}%`, sub: "overall", color: overallAccuracy >= 70 ? "text-emerald-600" : "text-amber-600" },
+            { label: "Correct", value: String(totalCorrect), sub: `of ${totalAnswered}`, color: "text-[#4F8CF7]" },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -117,27 +159,40 @@ export default function ParentDashboard() {
           </div>
 
           <div className="space-y-3">
-            {child.domainProficiencies.map((domain) => {
-              const prof = PROFICIENCY_COLORS[domain.projectedProficiency] ?? PROFICIENCY_COLORS.developing;
+            {domainScores.map((domain) => {
+              const prof = PROFICIENCY_COLORS[domain.proficiency] ?? PROFICIENCY_COLORS.developing;
+              const hasData = domain.total > 0;
+
               return (
                 <div key={domain.domain} className="flex items-center justify-between py-2">
-                  <span className="text-sm font-medium text-gray-700 w-48">
-                    {DOMAIN_LABELS[domain.domain]}
-                  </span>
+                  <div className="w-48">
+                    <span className="text-sm font-medium text-gray-700">
+                      {DOMAIN_LABELS[domain.domain] ?? domain.domain}
+                    </span>
+                    {hasData && (
+                      <span className="text-xs text-gray-400 ml-2">
+                        {domain.correct}/{domain.total}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex-1 mx-4">
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${
-                          domain.projectedProficiency === "exceeding" ? "bg-emerald-400" :
-                          domain.projectedProficiency === "strong" ? "bg-blue-400" :
-                          domain.projectedProficiency === "developing" ? "bg-amber-400" : "bg-red-300"
-                        }`}
-                        style={{ width: `${Math.max(10, ((domain.theta + 3) / 6) * 100)}%` }}
-                      />
+                      {hasData ? (
+                        <motion.div
+                          className={`h-full rounded-full ${prof.bar}`}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${domain.accuracy}%` }}
+                          transition={{ duration: 0.8, delay: 0.3 }}
+                        />
+                      ) : (
+                        <div className="h-full rounded-full bg-gray-200" style={{ width: "5%" }} />
+                      )}
                     </div>
                   </div>
-                  <span className={`text-xs font-semibold px-3 py-1 rounded-full ${prof.bg} ${prof.text}`}>
-                    {prof.label}
+                  <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                    hasData ? `${prof.bg} ${prof.text}` : "bg-gray-100 text-gray-400"
+                  }`}>
+                    {hasData ? prof.label : "Not tested"}
                   </span>
                 </div>
               );
@@ -146,76 +201,113 @@ export default function ParentDashboard() {
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-6 mb-6">
-          {/* Daily Briefing */}
+          {/* Strengths */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="bg-white rounded-xl p-6 border border-gray-100"
           >
-            <div className="flex items-center gap-2 mb-4">
-              <span>📋</span>
-              <h2 className="text-lg font-semibold text-[#1A1A2E]">Today&apos;s Briefing</h2>
-              <span className="text-[10px] text-[#4F8CF7] bg-blue-50 px-2 py-0.5 rounded-full font-medium ml-auto">
-                New
-              </span>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">
-              Today <strong>{child.name}</strong> is working on <strong>3-digit subtraction with regrouping</strong>.
-              She&apos;s been getting about 72% correct, so the system will start with simpler problems to rebuild confidence.
-            </p>
-            <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
-              <p className="text-xs font-medium text-amber-700 mb-1">💡 If she gets stuck:</p>
-              <p className="text-xs text-amber-600 italic">
-                &quot;Can you show me what 342 minus 178 looks like using the blocks? Which column should we start with?&quot;
-              </p>
-            </div>
+            <h2 className="text-lg font-semibold text-[#1A1A2E] mb-4">💪 Strengths</h2>
+            {strengths.length > 0 ? (
+              <div className="space-y-3">
+                {strengths.map((s) => (
+                  <div key={s.domain} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-bold text-emerald-500">{s.accuracy}%</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">{DOMAIN_LABELS[s.domain]}</p>
+                      <p className="text-xs text-gray-400">{s.correct} of {s.total} correct</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400">Keep practising to build strengths!</p>
+            )}
           </motion.div>
 
-          {/* Misconceptions */}
+          {/* Areas to focus on */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             className="bg-white rounded-xl p-6 border border-gray-100"
           >
-            <h2 className="text-lg font-semibold text-[#1A1A2E] mb-4">
-              🔍 Common Mistakes
-            </h2>
-            {child.topMisconceptions.length > 0 ? (
+            <h2 className="text-lg font-semibold text-[#1A1A2E] mb-4">🎯 Areas to Focus On</h2>
+            {gaps.length > 0 || untested.length > 0 ? (
               <div className="space-y-3">
-                {child.topMisconceptions.map((m) => (
-                  <div key={m.misconceptionCode} className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-bold text-red-400">{m.count}x</span>
+                {gaps.map((g) => (
+                  <div key={g.domain} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-bold text-amber-500">{g.accuracy}%</span>
                     </div>
-                    <p className="text-sm text-gray-600">{m.description}</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">{DOMAIN_LABELS[g.domain]}</p>
+                      <p className="text-xs text-gray-400">{g.correct} of {g.total} correct — targeted practice recommended</p>
+                    </div>
+                  </div>
+                ))}
+                {untested.map((u) => (
+                  <div key={u.domain} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-bold text-gray-400">—</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">{DOMAIN_LABELS[u.domain]}</p>
+                      <p className="text-xs text-gray-400">Not yet assessed — will be covered in daily sessions</p>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-400">No recurring patterns detected yet.</p>
+              <p className="text-sm text-gray-400">Great work — no major gaps detected!</p>
             )}
           </motion.div>
         </div>
 
-        {/* Quick links */}
-        <div className="grid grid-cols-4 gap-4">
-          {[
-            { label: "Gap Map", href: "#", icon: "🗺️" },
-            { label: "Session History", href: "#", icon: "📊" },
-            { label: "Weekly Report", href: "#", icon: "📋" },
-            { label: "Give Feedback", href: "#", icon: "💬" },
-          ].map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="bg-white rounded-xl p-4 border border-gray-100 text-center hover:shadow-md transition-shadow"
-            >
-              <span className="text-2xl block mb-2">{link.icon}</span>
-              <span className="text-xs font-medium text-gray-600">{link.label}</span>
-            </Link>
-          ))}
+        {/* Next steps */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100/50 mb-6"
+        >
+          <h2 className="text-lg font-semibold text-[#1A1A2E] mb-3">📋 What happens next?</h2>
+          <div className="space-y-3 text-sm text-gray-600">
+            <p>
+              Based on the diagnostic, Upwise has built a personalised learning path for {childName}.
+              Daily sessions will target the specific gaps identified, starting with the highest-priority skills.
+            </p>
+            {gaps.length > 0 && (
+              <p>
+                <strong>Priority areas:</strong>{" "}
+                {gaps.map((g) => DOMAIN_LABELS[g.domain]).join(", ")}.
+                These will receive focused attention in the first few weeks.
+              </p>
+            )}
+            <p>
+              Each session is 10–20 minutes. {childName} will work through adaptive questions
+              that stay in the optimal difficulty zone — challenging enough to learn, easy enough to stay confident.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* CTA */}
+        <div className="flex gap-4">
+          <Link
+            href="/dashboard"
+            className="flex-1 bg-[#4F8CF7] text-white font-semibold py-4 rounded-xl text-center hover:bg-[#3A6CD4] transition-all"
+          >
+            Start {childName}&apos;s First Session
+          </Link>
+          <Link
+            href="/start"
+            className="bg-white text-gray-600 font-semibold py-4 px-6 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all"
+          >
+            Add Another Child
+          </Link>
         </div>
       </div>
     </main>

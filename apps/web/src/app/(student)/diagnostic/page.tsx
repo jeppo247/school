@@ -6,9 +6,12 @@ import { QuestionCard } from "@/components/student/QuestionCard";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
 import { api } from "@/lib/api";
 
+type NaplanDomain = "numeracy" | "reading" | "spelling" | "grammar_punctuation" | "writing";
+
 interface QuestionData {
   id: string;
   type: string;
+  domain: NaplanDomain;
   content: {
     stem: string;
     answer: string | number;
@@ -19,31 +22,49 @@ interface QuestionData {
 }
 
 /**
- * Demo question bank — used when the API isn't available.
- * Covers a spread of difficulties across numeracy, reading, and spelling.
+ * Demo question bank — each question tagged with its NAPLAN domain.
  */
 const DEMO_QUESTIONS: QuestionData[] = [
-  { id: "d1", type: "multiple_choice", content: { stem: "What number comes after 7?", answer: "8", options: ["6", "7", "8", "9"], explanation: "When we count forward from 7, the next number is 8.", hint: "Try counting: 5, 6, 7, ..." } },
-  { id: "d2", type: "multiple_choice", content: { stem: "What is 3 + 5?", answer: "8", options: ["7", "8", "9", "10"], explanation: "3 + 5 = 8.", hint: "Start at 3 and count on 5 more." } },
-  { id: "d3", type: "multiple_choice", content: { stem: "What is 9 - 4?", answer: "5", options: ["3", "4", "5", "6"], explanation: "9 - 4 = 5.", hint: "Start at 9 and count back 4." } },
-  { id: "d4", type: "multiple_choice", content: { stem: "Which two numbers make 10?", answer: "3 and 7", options: ["3 and 7", "4 and 5", "2 and 9", "6 and 3"], explanation: "3 + 7 = 10!", hint: "Think about pairs that add up to 10." } },
-  { id: "d5", type: "multiple_choice", content: { stem: "What is the value of the 4 in the number 47?", answer: "40", options: ["4", "40", "47", "7"], explanation: "The 4 is in the tens place, so it means 40.", hint: "The 4 is in the tens column." } },
-  { id: "d6", type: "multiple_choice", content: { stem: "There are 3 bags with 4 apples in each bag. How many apples altogether?", answer: "12", options: ["7", "10", "12", "14"], explanation: "3 groups of 4 = 12.", hint: "Count by fours: 4, 8, ..." } },
-  { id: "d7", type: "multiple_choice", content: { stem: "What is 365 written in expanded form?", answer: "300 + 60 + 5", options: ["300 + 60 + 5", "3 + 6 + 5", "360 + 5", "30 + 65"], explanation: "365 = 300 + 60 + 5.", hint: "Break it into hundreds, tens, and ones." } },
-  { id: "d8", type: "multiple_choice", content: { stem: "What is 6 × 5?", answer: "30", options: ["25", "30", "35", "36"], explanation: "6 × 5 = 30.", hint: "Count by 5s six times." } },
-  { id: "d9", type: "multiple_choice", content: { stem: "A farmer has 342 sheep. He sells 178. How many are left?", answer: "164", options: ["164", "174", "236", "264"], explanation: "342 - 178 = 164. You need to borrow twice.", hint: "Start with the ones column: 2 - 8. You'll need to borrow." } },
-  { id: "d10", type: "multiple_choice", content: { stem: "What is 7 × 8?", answer: "56", options: ["48", "54", "56", "63"], explanation: "7 × 8 = 56.", hint: "Think: 7 × 8 is the same as 8 × 7." } },
-  { id: "d11", type: "multiple_choice", content: { stem: "Which fraction is the same as 1/2?", answer: "2/4", options: ["1/4", "2/4", "2/3", "3/4"], explanation: "1/2 = 2/4. Double both top and bottom.", hint: "Try doubling the top and bottom of 1/2." } },
-  { id: "d12", type: "multiple_choice", content: { stem: "A school has 4 classes with 28 students each. How many students altogether?", answer: "112", options: ["96", "102", "112", "128"], explanation: "4 × 28 = 112.", hint: "Break it: 4 × 20 = 80, 4 × 8 = 32, then add." } },
-  { id: "d13", type: "multiple_choice", content: { stem: "'The koala sat in the tall eucalyptus tree, munching on leaves.' Where was the koala?", answer: "In a eucalyptus tree", options: ["On the ground", "In a eucalyptus tree", "In a cave", "On a rock"], explanation: "The text says 'in the tall eucalyptus tree'.", hint: "Look for the words that tell you where." } },
-  { id: "d14", type: "multiple_choice", content: { stem: "'Mia looked at her empty lunchbox and sighed.' How was Mia feeling?", answer: "Disappointed or sad", options: ["Happy and excited", "Disappointed or sad", "Angry and annoyed", "Scared and worried"], explanation: "Sighing at an empty lunchbox suggests disappointment.", hint: "What would make someone sigh at an empty lunchbox?" } },
-  { id: "d15", type: "multiple_choice", content: { stem: "'The enormous waves crashed onto the shore.' What does 'enormous' mean?", answer: "Very big", options: ["Very small", "Very big", "Very fast", "Very quiet"], explanation: "'Enormous' means very big or huge.", hint: "Waves that crash are usually what size?" } },
-  { id: "d16", type: "multiple_choice", content: { stem: "Which spelling is correct?", answer: "because", options: ["becuz", "becaus", "because", "becouse"], explanation: "'Because' is the correct spelling.", hint: "Sound it out: be-cause." } },
-  { id: "d17", type: "multiple_choice", content: { stem: "What is the correct way to add -ing to 'run'?", answer: "running", options: ["runing", "running", "runeing", "runnning"], explanation: "Double the consonant before -ing: running.", hint: "Do you need to double the last letter?" } },
-  { id: "d18", type: "multiple_choice", content: { stem: "What is the plural of 'baby'?", answer: "babies", options: ["babys", "babyes", "babies", "babiez"], explanation: "Change y to i and add -es: babies.", hint: "What happens to the 'y' at the end?" } },
-  { id: "d19", type: "multiple_choice", content: { stem: "Which sentence uses capital letters and full stops correctly?", answer: "The cat sat on the mat.", options: ["the cat sat on the mat.", "The cat sat on the mat", "The cat sat on the mat.", "the Cat sat on the Mat."], explanation: "Start with a capital, end with a full stop.", hint: "Look for capital at start AND full stop at end." } },
-  { id: "d20", type: "multiple_choice", content: { stem: "Choose the correct past tense: 'Yesterday, I ___ to the park.'", answer: "walked", options: ["walk", "walked", "walking", "walks"], explanation: "'Yesterday' means past tense: walked.", hint: "'Yesterday' is a clue — it already happened." } },
+  // NUMERACY (12 questions)
+  { id: "d1", type: "multiple_choice", domain: "numeracy", content: { stem: "What number comes after 7?", answer: "8", options: ["6", "7", "8", "9"], explanation: "The next number is 8.", hint: "Try counting: 5, 6, 7, ..." } },
+  { id: "d2", type: "multiple_choice", domain: "numeracy", content: { stem: "What is 3 + 5?", answer: "8", options: ["7", "8", "9", "10"], explanation: "3 + 5 = 8.", hint: "Start at 3 and count on 5 more." } },
+  { id: "d3", type: "multiple_choice", domain: "numeracy", content: { stem: "What is 9 - 4?", answer: "5", options: ["3", "4", "5", "6"], explanation: "9 - 4 = 5.", hint: "Start at 9 and count back 4." } },
+  { id: "d4", type: "multiple_choice", domain: "numeracy", content: { stem: "Which two numbers make 10?", answer: "3 and 7", options: ["3 and 7", "4 and 5", "2 and 9", "6 and 3"], explanation: "3 + 7 = 10!", hint: "Think about pairs that add up to 10." } },
+  { id: "d5", type: "multiple_choice", domain: "numeracy", content: { stem: "What is the value of the 4 in the number 47?", answer: "40", options: ["4", "40", "47", "7"], explanation: "The 4 is in the tens place, so it means 40.", hint: "The 4 is in the tens column." } },
+  { id: "d6", type: "multiple_choice", domain: "numeracy", content: { stem: "There are 3 bags with 4 apples in each bag. How many apples altogether?", answer: "12", options: ["7", "10", "12", "14"], explanation: "3 groups of 4 = 12.", hint: "Count by fours: 4, 8, ..." } },
+  { id: "d7", type: "multiple_choice", domain: "numeracy", content: { stem: "What is 365 written in expanded form?", answer: "300 + 60 + 5", options: ["300 + 60 + 5", "3 + 6 + 5", "360 + 5", "30 + 65"], explanation: "365 = 300 + 60 + 5.", hint: "Break it into hundreds, tens, and ones." } },
+  { id: "d8", type: "multiple_choice", domain: "numeracy", content: { stem: "What is 6 × 5?", answer: "30", options: ["25", "30", "35", "36"], explanation: "6 × 5 = 30.", hint: "Count by 5s six times." } },
+  { id: "d9", type: "multiple_choice", domain: "numeracy", content: { stem: "A farmer has 342 sheep. He sells 178. How many are left?", answer: "164", options: ["164", "174", "236", "264"], explanation: "342 - 178 = 164.", hint: "Start with the ones column: 2 - 8. You'll need to borrow." } },
+  { id: "d10", type: "multiple_choice", domain: "numeracy", content: { stem: "What is 7 × 8?", answer: "56", options: ["48", "54", "56", "63"], explanation: "7 × 8 = 56.", hint: "Think: 7 × 8 is the same as 8 × 7." } },
+  { id: "d11", type: "multiple_choice", domain: "numeracy", content: { stem: "Which fraction is the same as 1/2?", answer: "2/4", options: ["1/4", "2/4", "2/3", "3/4"], explanation: "1/2 = 2/4.", hint: "Try doubling the top and bottom of 1/2." } },
+  { id: "d12", type: "multiple_choice", domain: "numeracy", content: { stem: "A school has 4 classes with 28 students each. How many students altogether?", answer: "112", options: ["96", "102", "112", "128"], explanation: "4 × 28 = 112.", hint: "Break it: 4 × 20 = 80, 4 × 8 = 32, then add." } },
+  // READING (3 questions)
+  { id: "d13", type: "multiple_choice", domain: "reading", content: { stem: "'The koala sat in the tall eucalyptus tree, munching on leaves.' Where was the koala?", answer: "In a eucalyptus tree", options: ["On the ground", "In a eucalyptus tree", "In a cave", "On a rock"], explanation: "The text says 'in the tall eucalyptus tree'.", hint: "Look for the words that tell you where." } },
+  { id: "d14", type: "multiple_choice", domain: "reading", content: { stem: "'Mia looked at her empty lunchbox and sighed.' How was Mia feeling?", answer: "Disappointed or sad", options: ["Happy and excited", "Disappointed or sad", "Angry and annoyed", "Scared and worried"], explanation: "Sighing at an empty lunchbox suggests disappointment.", hint: "What would make someone sigh at an empty lunchbox?" } },
+  { id: "d15", type: "multiple_choice", domain: "reading", content: { stem: "'The enormous waves crashed onto the shore.' What does 'enormous' mean?", answer: "Very big", options: ["Very small", "Very big", "Very fast", "Very quiet"], explanation: "'Enormous' means very big or huge.", hint: "Waves that crash are usually what size?" } },
+  // SPELLING (3 questions)
+  { id: "d16", type: "multiple_choice", domain: "spelling", content: { stem: "Which spelling is correct?", answer: "because", options: ["becuz", "becaus", "because", "becouse"], explanation: "'Because' is the correct spelling.", hint: "Sound it out: be-cause." } },
+  { id: "d17", type: "multiple_choice", domain: "spelling", content: { stem: "What is the correct way to add -ing to 'run'?", answer: "running", options: ["runing", "running", "runeing", "runnning"], explanation: "Double the consonant before -ing: running.", hint: "Do you need to double the last letter?" } },
+  { id: "d18", type: "multiple_choice", domain: "spelling", content: { stem: "What is the plural of 'baby'?", answer: "babies", options: ["babys", "babyes", "babies", "babiez"], explanation: "Change y to i and add -es: babies.", hint: "What happens to the 'y' at the end?" } },
+  // GRAMMAR & PUNCTUATION (2 questions)
+  { id: "d19", type: "multiple_choice", domain: "grammar_punctuation", content: { stem: "Which sentence uses capital letters and full stops correctly?", answer: "The cat sat on the mat.", options: ["the cat sat on the mat.", "The cat sat on the mat", "The cat sat on the mat.", "the Cat sat on the Mat."], explanation: "Start with a capital, end with a full stop.", hint: "Look for capital at start AND full stop at end." } },
+  { id: "d20", type: "multiple_choice", domain: "grammar_punctuation", content: { stem: "Choose the correct past tense: 'Yesterday, I ___ to the park.'", answer: "walked", options: ["walk", "walked", "walking", "walks"], explanation: "'Yesterday' means past tense: walked.", hint: "'Yesterday' is a clue — it already happened." } },
 ];
+
+interface DomainScore {
+  domain: NaplanDomain;
+  correct: number;
+  total: number;
+  accuracy: number;
+  proficiency: string;
+}
+
+function calculateProficiency(accuracy: number): string {
+  if (accuracy >= 0.85) return "exceeding";
+  if (accuracy >= 0.65) return "strong";
+  if (accuracy >= 0.40) return "developing";
+  return "needs_additional_support";
+}
 
 export default function DiagnosticPage() {
   const [childName, setChildName] = useState("Mate");
@@ -60,8 +81,15 @@ export default function DiagnosticPage() {
   const [loading, setLoading] = useState(false);
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [totalAnswered, setTotalAnswered] = useState(0);
-  // Track correct/incorrect silently — child never sees this
   const [correctStreak, setCorrectStreak] = useState(0);
+  // Per-domain tracking — silently scored, shown on parent dashboard
+  const [domainResults, setDomainResults] = useState<Record<NaplanDomain, { correct: number; total: number }>>({
+    numeracy: { correct: 0, total: 0 },
+    reading: { correct: 0, total: 0 },
+    spelling: { correct: 0, total: 0 },
+    grammar_punctuation: { correct: 0, total: 0 },
+    writing: { correct: 0, total: 0 },
+  });
 
   useEffect(() => {
     const sid = sessionStorage.getItem("upwise_student_id");
@@ -114,6 +142,36 @@ export default function DiagnosticPage() {
     }
   }, [started, demoMode, studentId, sessionId, currentQuestion, complete, fetchNextQuestion]);
 
+  // Save results to sessionStorage when diagnostic completes
+  useEffect(() => {
+    if (!complete) return;
+
+    const domains: NaplanDomain[] = ["numeracy", "reading", "spelling", "grammar_punctuation", "writing"];
+    const domainScores: DomainScore[] = domains.map((domain) => {
+      const r = domainResults[domain];
+      const accuracy = r.total > 0 ? r.correct / r.total : 0;
+      return {
+        domain,
+        correct: r.correct,
+        total: r.total,
+        accuracy: Math.round(accuracy * 100),
+        proficiency: calculateProficiency(accuracy),
+      };
+    });
+
+    const results = {
+      childName,
+      yearLevel: Number(sessionStorage.getItem("upwise_year_level") ?? 3),
+      totalAnswered,
+      totalCorrect,
+      overallAccuracy: totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0,
+      domainScores,
+      completedAt: new Date().toISOString(),
+    };
+
+    sessionStorage.setItem("upwise_diagnostic_results", JSON.stringify(results));
+  }, [complete, domainResults, childName, totalAnswered, totalCorrect]);
+
   function advanceToNextQuestion() {
     const nextIndex = questionIndex + 1;
     if (demoMode) {
@@ -156,6 +214,18 @@ export default function DiagnosticPage() {
       setCorrectStreak((prev) => prev + 1);
     } else {
       setCorrectStreak(0);
+    }
+
+    // Track per-domain results
+    if (demoMode && currentQuestion) {
+      const domain = currentQuestion.domain;
+      setDomainResults((prev) => ({
+        ...prev,
+        [domain]: {
+          correct: prev[domain].correct + (isCorrect ? 1 : 0),
+          total: prev[domain].total + 1,
+        },
+      }));
     }
 
     // Show calm transition animation (same for right or wrong)
