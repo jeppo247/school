@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import { QuestionCard } from "@/components/student/QuestionCard";
+import { AdventureBackground } from "@/components/student/AdventureBackground";
 import { api } from "@/lib/api";
 
 interface QuestionData {
@@ -170,7 +171,8 @@ export default function DiagnosticPage() {
   // Fallback: no name in sessionStorage at all
   if (!started) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50 flex flex-col items-center justify-center px-6">
+      <main className="min-h-screen flex flex-col items-center justify-center px-6">
+        <AdventureBackground />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -205,7 +207,8 @@ export default function DiagnosticPage() {
     const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
 
     return (
-      <main className="min-h-screen bg-gradient-to-b from-emerald-50 to-teal-50 flex flex-col items-center justify-center px-6">
+      <main className="min-h-screen flex flex-col items-center justify-center px-6">
+        <AdventureBackground />
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -263,7 +266,8 @@ export default function DiagnosticPage() {
   // Loading
   if (loading && !currentQuestion) {
     return (
-      <main className="min-h-screen bg-[var(--theme-bg)] flex flex-col items-center justify-center">
+      <main className="min-h-screen flex flex-col items-center justify-center">
+        <AdventureBackground />
         <motion.span
           className="text-6xl"
           animate={{ y: [0, -8, 0], rotate: [0, 5, -5, 0] }}
@@ -283,7 +287,8 @@ export default function DiagnosticPage() {
   const progress = Math.min((questionIndex / totalQuestions) * 100, 100);
 
   return (
-    <main className="min-h-screen bg-[var(--theme-bg)] pb-8">
+    <main className="min-h-screen pb-8">
+      <AdventureBackground />
       {/* Progress bar */}
       <div className="px-6 pt-6 pb-4">
         <div className="max-w-2xl mx-auto">

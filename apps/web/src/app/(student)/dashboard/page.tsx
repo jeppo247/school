@@ -6,6 +6,7 @@ import { ProgressRing } from "@/components/student/ProgressRing";
 import { StreakCounter } from "@/components/student/StreakCounter";
 import { XPBar } from "@/components/student/XPBar";
 import { CoinCounter } from "@/components/student/CoinCounter";
+import { AdventureBackground } from "@/components/student/AdventureBackground";
 
 // Mock data — will be replaced with API calls
 const mockStudent = {
@@ -23,7 +24,8 @@ const mockStudent = {
 
 export default function StudentDashboard() {
   return (
-    <main className="min-h-screen bg-[var(--theme-bg)] pb-24">
+    <main className="min-h-screen pb-24">
+      <AdventureBackground />
       {/* Header bar */}
       <header className="sticky top-0 z-30 bg-[var(--theme-surface)]/90 backdrop-blur-md border-b border-gray-100 px-6 py-3">
         <div className="max-w-2xl mx-auto flex items-center justify-between">

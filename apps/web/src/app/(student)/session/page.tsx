@@ -5,6 +5,7 @@ import { useState, useCallback } from "react";
 import { QuestionCard } from "@/components/student/QuestionCard";
 import { Celebration } from "@/components/student/Celebration";
 import { CoinEarnOverlay } from "@/components/student/CoinEarnOverlay";
+import { AdventureBackground } from "@/components/student/AdventureBackground";
 
 type SessionPhase = "warmup" | "focus_1" | "brain_break" | "focus_2" | "wrapup";
 
@@ -74,7 +75,8 @@ export default function SessionPage() {
 
   if (phase === "brain_break") {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-teal-50 to-emerald-50 flex flex-col items-center justify-center px-6">
+      <main className="min-h-screen flex flex-col items-center justify-center px-6">
+        <AdventureBackground />
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -108,7 +110,8 @@ export default function SessionPage() {
 
   if (phase === "wrapup" || sessionComplete) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-amber-50 to-yellow-50 flex flex-col items-center justify-center px-6">
+      <main className="min-h-screen flex flex-col items-center justify-center px-6">
+        <AdventureBackground />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -160,7 +163,8 @@ export default function SessionPage() {
   }
 
   return (
-    <main className={`min-h-screen bg-gradient-to-b ${phaseConfig.bg} pb-8`}>
+    <main className="min-h-screen pb-8">
+      <AdventureBackground />
       {/* Session header */}
       <header className="px-6 py-4">
         <div className="max-w-2xl mx-auto">

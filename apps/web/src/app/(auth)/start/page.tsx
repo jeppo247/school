@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { THEMES } from "@/lib/themes";
 import { api } from "@/lib/api";
+import { AdventureBackground } from "@/components/student/AdventureBackground";
 
 type Step = "parent" | "child" | "theme" | "ready";
 
@@ -72,10 +73,8 @@ export default function StartPage() {
   }
 
   return (
-    <main
-      className="min-h-screen flex items-center justify-center px-6"
-      style={{ background: "linear-gradient(180deg, #F8FAFF 0%, #EEF4FF 60%, #F8FAFF 100%)" }}
-    >
+    <main className="min-h-screen flex items-center justify-center px-6">
+      <AdventureBackground />
       <div className="w-full max-w-md">
         {/* Progress indicator */}
         <div className="flex gap-2 mb-8 justify-center">
