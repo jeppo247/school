@@ -243,8 +243,9 @@ export default function HomePage() {
       </section>
 
       {/* Mastery vs Traditional Comparison */}
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
+      <section className="relative py-20 overflow-hidden">
+        <AdventureBackground />
+        <div className="relative z-10 max-w-4xl mx-auto px-6">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -267,57 +268,59 @@ export default function HomePage() {
             </motion.h2>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="rounded-2xl border border-gray-200 overflow-hidden"
-          >
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="text-left text-sm font-semibold text-gray-500 px-6 py-4 w-[40%]"></th>
-                  <th className="text-center text-sm font-bold text-[#4F8CF7] px-6 py-4 w-[30%]">
-                    Mastery Learning
-                  </th>
-                  <th className="text-center text-sm font-semibold text-gray-600 px-6 py-4 w-[30%]">
-                    Traditional Classroom
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {[
-                  {
-                    feature: "Eliminates knowledge gaps",
-                    mastery: "Can't progress until they truly understand — no gaps stack up",
-                    traditional: "Class moves on regardless — missed concepts compound over time",
-                  },
-                  {
-                    feature: "Matches pace to the individual",
-                    mastery: "Progress based on competence — every child in their optimal zone",
-                    traditional: "Progress based on group timing — top students bored, struggling students fall behind",
-                  },
-                  {
-                    feature: "Tight feedback loops",
-                    mastery: "Instant feedback, targeted practice on weak areas — faster learning cycles",
-                    traditional: "Delayed feedback, broad correction — errors become embedded habits",
-                  },
-                ].map((row, i) => (
-                  <tr key={row.feature} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-800">{row.feature}</td>
-                    <td className="px-6 py-4 text-sm text-gray-800">{row.mastery}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.traditional}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="px-6 py-3 bg-gray-50 border-t border-gray-100">
-              <p className="text-[11px] text-gray-400">
-                Mastery learning aligns with how humans actually learn: fix gaps before progressing, learn at the right pace, iterate quickly with feedback.
-              </p>
-            </div>
-          </motion.div>
+          <div className="space-y-5">
+            {[
+              {
+                icon: "🧩",
+                feature: "Eliminates knowledge gaps",
+                mastery: "Can't progress until they truly understand — no gaps stack up",
+                traditional: "Class moves on regardless — missed concepts compound over time",
+                color: "from-blue-500 to-blue-600",
+              },
+              {
+                icon: "🎯",
+                feature: "Matches pace to the individual",
+                mastery: "Progress based on competence — every child in their optimal zone",
+                traditional: "Progress based on group timing — top students bored, struggling students fall behind",
+                color: "from-emerald-500 to-emerald-600",
+              },
+              {
+                icon: "⚡",
+                feature: "Tight feedback loops",
+                mastery: "Instant feedback, targeted practice on weak areas — faster learning cycles",
+                traditional: "Delayed feedback, broad correction — errors become embedded habits",
+                color: "from-amber-500 to-orange-500",
+              },
+            ].map((row, i) => (
+              <motion.div
+                key={row.feature}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${row.color} flex items-center justify-center text-lg shadow-sm`}>
+                    {row.icon}
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-gray-800">
+                    {row.feature}
+                  </h3>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="bg-blue-50/80 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-[#4F8CF7] mb-1.5">Mastery Learning</p>
+                    <p className="text-sm text-gray-700">{row.mastery}</p>
+                  </div>
+                  <div className="bg-gray-50/80 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-gray-500 mb-1.5">Traditional Classroom</p>
+                    <p className="text-sm text-gray-600">{row.traditional}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
 
           {/* Compounding gaps — short with expand */}
           <GapsExplainer />
@@ -819,35 +822,6 @@ export default function HomePage() {
           <p className="text-center text-sm text-gray-400 mt-8">
             Annual pricing available: 20% off. Cancel anytime.
           </p>
-        </div>
-      </section>
-
-      {/* Trust Signals */}
-      <section className="py-16 bg-[#F8FAFF] border-t border-gray-100">
-        <div className="max-w-4xl mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="flex flex-wrap items-center justify-center gap-8 sm:gap-14"
-          >
-            {[
-              { icon: "📚", label: "ACARA Aligned" },
-              { icon: "🇦🇺", label: "Australian Made" },
-              { icon: "🔒", label: "Privacy First" },
-              { icon: "🎓", label: "Evidence-Based" },
-            ].map((badge, i) => (
-              <motion.div
-                key={badge.label}
-                variants={fadeUp}
-                custom={i}
-                className="flex items-center gap-2.5 text-gray-500"
-              >
-                <span className="text-2xl">{badge.icon}</span>
-                <span className="text-sm font-medium">{badge.label}</span>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
       </section>
 
