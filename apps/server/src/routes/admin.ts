@@ -13,8 +13,427 @@ import {
 import { eq, sql, desc, and, count } from "drizzle-orm";
 import { AppError } from "../middleware/error-handler.js";
 import { generateQuestionBatch, generateQuestionsForGaps } from "../services/question-generator.js";
+import { themes, shopItems } from "../db/schema.js";
+import { logger } from "../lib/logger.js";
+
+// Seed data imports
+import { allSkillNodes, prerequisites } from "../db/seed/skill-nodes.js";
+import {
+  readingNodes, spellingNodes, grammarPunctuationNodes, writingNodes,
+  readingPrerequisites, spellingPrerequisites, grammarPunctuationPrerequisites, writingPrerequisites,
+} from "../db/seed/english-skill-nodes.js";
+import { precursorNodes, precursorPrerequisites } from "../db/seed/precursor-nodes.js";
+import { starterQuestions } from "../db/seed/starter-questions.js";
 
 export const adminRoutes = Router();
+
+// ============================================================
+// ONE-TIME SETUP — Push schema + seed data
+// ============================================================
+
+// GET /admin/setup — One-time database setup (visit in browser)
+adminRoutes.get("/setup", async (_req, res) => {
+  try {
+    logger.info("Starting database setup...");
+    const results: string[] = [];
+
+    // Push schema using raw SQL for each table
+    // Drizzle push is not available at runtime, so we create tables via raw SQL
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS themes (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        color_primary TEXT NOT NULL,
+        color_secondary TEXT NOT NULL,
+        color_accent TEXT NOT NULL,
+        icon_set TEXT,
+        sound_set TEXT,
+        bg_pattern TEXT,
+        is_active BOOLEAN DEFAULT TRUE NOT NULL,
+        display_order INTEGER DEFAULT 0 NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS families (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        clerk_org_id TEXT UNIQUE,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        stripe_customer_id TEXT,
+        subscription_tier TEXT DEFAULT 'trial' NOT NULL,
+        subscription_status TEXT DEFAULT 'active' NOT NULL,
+        trial_ends_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS parents (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        family_id UUID NOT NULL REFERENCES families(id) ON DELETE CASCADE,
+        clerk_user_id TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        notification_prefs JSONB DEFAULT '{"daily_briefing": true, "nudges": true, "weekly_report": true}' NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS students (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        family_id UUID NOT NULL REFERENCES families(id) ON DELETE CASCADE,
+        name TEXT NOT NULL,
+        year_level INTEGER NOT NULL,
+        date_of_birth DATE,
+        avatar_url TEXT,
+        theme_id TEXT DEFAULT 'default' NOT NULL,
+        interests TEXT[] DEFAULT '{}' NOT NULL,
+        xp_total INTEGER DEFAULT 0 NOT NULL,
+        coin_balance INTEGER DEFAULT 0 NOT NULL,
+        current_streak INTEGER DEFAULT 0 NOT NULL,
+        longest_streak INTEGER DEFAULT 0 NOT NULL,
+        last_session_date DATE,
+        diagnostic_completed BOOLEAN DEFAULT FALSE NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS skill_nodes (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        code TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        year_level INTEGER NOT NULL,
+        domain TEXT DEFAULT 'numeracy' NOT NULL,
+        learning_area TEXT DEFAULT 'mathematics' NOT NULL,
+        strand TEXT NOT NULL,
+        sub_strand TEXT,
+        acara_code TEXT,
+        acara_description TEXT,
+        dok_level INTEGER DEFAULT 1 NOT NULL,
+        difficulty_band TEXT DEFAULT 'on_level' NOT NULL,
+        is_active BOOLEAN DEFAULT TRUE NOT NULL,
+        display_order INTEGER DEFAULT 0 NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS skill_prerequisites (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        skill_id UUID NOT NULL REFERENCES skill_nodes(id) ON DELETE CASCADE,
+        prerequisite_id UUID NOT NULL REFERENCES skill_nodes(id) ON DELETE CASCADE,
+        strength TEXT DEFAULT 'required' NOT NULL,
+        UNIQUE(skill_id, prerequisite_id)
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS student_skill_states (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        skill_id UUID NOT NULL REFERENCES skill_nodes(id) ON DELETE CASCADE,
+        mastery_probability REAL DEFAULT 0.5 NOT NULL,
+        total_attempts INTEGER DEFAULT 0 NOT NULL,
+        correct_attempts INTEGER DEFAULT 0 NOT NULL,
+        mastery_status TEXT DEFAULT 'unknown' NOT NULL,
+        last_assessed TIMESTAMPTZ,
+        next_review TIMESTAMPTZ,
+        review_interval_days INTEGER DEFAULT 1 NOT NULL,
+        ease_factor REAL DEFAULT 2.5 NOT NULL,
+        sessions_assessed INTEGER DEFAULT 0 NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        UNIQUE(student_id, skill_id)
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS question_templates (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        skill_id UUID NOT NULL REFERENCES skill_nodes(id),
+        template_type TEXT NOT NULL,
+        structure JSONB NOT NULL,
+        difficulty_param REAL DEFAULT 0 NOT NULL,
+        discrimination_param REAL DEFAULT 1 NOT NULL,
+        guessing_param REAL DEFAULT 0.25 NOT NULL,
+        dok_level INTEGER DEFAULT 1 NOT NULL,
+        naplan_year_target INTEGER,
+        cognitive_process TEXT,
+        stimulus_type TEXT,
+        is_active BOOLEAN DEFAULT TRUE NOT NULL,
+        usage_count INTEGER DEFAULT 0 NOT NULL,
+        avg_accuracy REAL,
+        created_by TEXT DEFAULT 'system' NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS questions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        template_id UUID REFERENCES question_templates(id),
+        skill_id UUID NOT NULL REFERENCES skill_nodes(id),
+        theme_id TEXT,
+        content JSONB NOT NULL,
+        difficulty_param REAL DEFAULT 0 NOT NULL,
+        question_type TEXT NOT NULL,
+        naplan_year_target INTEGER,
+        cognitive_process TEXT,
+        stimulus_type TEXT,
+        misconception_code TEXT,
+        distractor_map JSONB,
+        time_expected_sec INTEGER,
+        provenance JSONB,
+        is_validated BOOLEAN DEFAULT FALSE NOT NULL,
+        validation_notes TEXT,
+        times_served INTEGER DEFAULT 0 NOT NULL,
+        times_correct INTEGER DEFAULT 0 NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS learning_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID NOT NULL REFERENCES students(id),
+        session_type TEXT NOT NULL,
+        status TEXT DEFAULT 'in_progress' NOT NULL,
+        phase TEXT DEFAULT 'warmup' NOT NULL,
+        started_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        completed_at TIMESTAMPTZ,
+        duration_seconds INTEGER,
+        total_questions INTEGER DEFAULT 0 NOT NULL,
+        correct_answers INTEGER DEFAULT 0 NOT NULL,
+        accuracy REAL,
+        xp_earned INTEGER DEFAULT 0 NOT NULL,
+        coins_earned INTEGER DEFAULT 0 NOT NULL,
+        skills_targeted UUID[] DEFAULT '{}' NOT NULL,
+        parent_involved BOOLEAN DEFAULT FALSE NOT NULL,
+        metadata JSONB DEFAULT '{}' NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS question_responses (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        session_id UUID NOT NULL REFERENCES learning_sessions(id) ON DELETE CASCADE,
+        question_id UUID NOT NULL REFERENCES questions(id),
+        skill_id UUID NOT NULL REFERENCES skill_nodes(id),
+        student_answer JSONB,
+        correct_answer JSONB,
+        is_correct BOOLEAN NOT NULL,
+        time_taken_ms INTEGER,
+        hint_used BOOLEAN DEFAULT FALSE NOT NULL,
+        difficulty_at_time REAL,
+        ability_estimate_at_time REAL,
+        sequence_number INTEGER NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS coin_transactions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        amount INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        reference_id TEXT,
+        balance_after INTEGER NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS shop_items (
+        id TEXT PRIMARY KEY,
+        category TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        price INTEGER NOT NULL,
+        image_url TEXT,
+        preview_data JSONB,
+        prerequisite JSONB,
+        is_active BOOLEAN DEFAULT TRUE NOT NULL,
+        is_limited BOOLEAN DEFAULT FALSE NOT NULL,
+        available_from TIMESTAMPTZ,
+        available_until TIMESTAMPTZ,
+        display_order INTEGER DEFAULT 0 NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS student_purchases (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        item_id TEXT NOT NULL REFERENCES shop_items(id),
+        transaction_id UUID REFERENCES coin_transactions(id),
+        purchased_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        UNIQUE(student_id, item_id)
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS domain_states (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        domain TEXT NOT NULL,
+        theta REAL DEFAULT 0 NOT NULL,
+        theta_se REAL DEFAULT 1 NOT NULL,
+        projected_proficiency TEXT DEFAULT 'developing' NOT NULL,
+        naplan_year_target INTEGER NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        UNIQUE(student_id, domain)
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS daily_briefings (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID NOT NULL REFERENCES students(id),
+        parent_id UUID NOT NULL REFERENCES parents(id),
+        briefing_date DATE NOT NULL,
+        content JSONB NOT NULL,
+        was_read BOOLEAN DEFAULT FALSE NOT NULL,
+        read_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        UNIQUE(student_id, briefing_date)
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS feedback (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        family_id UUID NOT NULL REFERENCES families(id),
+        parent_id UUID NOT NULL REFERENCES parents(id),
+        category TEXT DEFAULT 'general' NOT NULL,
+        subject TEXT NOT NULL,
+        body TEXT NOT NULL,
+        status TEXT DEFAULT 'open' NOT NULL,
+        admin_response TEXT,
+        responded_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS audit_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        actor_id TEXT,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        metadata JSONB,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    results.push("Schema created");
+
+    // Seed themes
+    const themeData = [
+      { id: "default", name: "Upwise Blue", description: "The classic look", colorPrimary: "#4F8CF7", colorSecondary: "#A78BFA", colorAccent: "#34D399", isActive: true, displayOrder: 0 },
+      { id: "afl", name: "AFL Footy", description: "Kick goals!", colorPrimary: "#002B5C", colorSecondary: "#E31937", colorAccent: "#FFD700", isActive: true, displayOrder: 1 },
+      { id: "bluey", name: "Bluey", description: "Learn like Bluey!", colorPrimary: "#5B9BD5", colorSecondary: "#FF8C42", colorAccent: "#7EC8E3", isActive: true, displayOrder: 2 },
+      { id: "superheroes", name: "Superheroes", description: "Be a hero!", colorPrimary: "#DC2626", colorSecondary: "#1D4ED8", colorAccent: "#FACC15", isActive: true, displayOrder: 3 },
+      { id: "space", name: "Space Explorer", description: "Explore the universe!", colorPrimary: "#6366F1", colorSecondary: "#06B6D4", colorAccent: "#F59E0B", isActive: true, displayOrder: 4 },
+      { id: "animals", name: "Animal Kingdom", description: "Learn with animals!", colorPrimary: "#16A34A", colorSecondary: "#92400E", colorAccent: "#F97316", isActive: true, displayOrder: 5 },
+      { id: "golf", name: "Golf Pro", description: "Ace it!", colorPrimary: "#15803D", colorSecondary: "#FBBF24", colorAccent: "#ECFDF5", isActive: true, displayOrder: 6 },
+    ];
+    for (const t of themeData) {
+      await db.insert(themes).values(t).onConflictDoNothing();
+    }
+    results.push(`Themes seeded: ${themeData.length}`);
+
+    // Seed skill nodes (all domains)
+    const allNodes = [...allSkillNodes, ...readingNodes, ...spellingNodes, ...grammarPunctuationNodes, ...writingNodes, ...precursorNodes];
+    let nodesSeeded = 0;
+    for (const node of allNodes) {
+      try {
+        await db.insert(skillNodes).values({
+          code: node.code,
+          name: node.name,
+          description: node.description,
+          yearLevel: node.yearLevel,
+          domain: node.domain,
+          learningArea: node.learningArea,
+          strand: node.strand,
+          subStrand: node.subStrand,
+          acaraCode: node.acaraCode,
+          dokLevel: node.dokLevel,
+          difficultyBand: node.difficultyBand,
+          displayOrder: node.displayOrder,
+        }).onConflictDoNothing();
+        nodesSeeded++;
+      } catch { /* skip duplicates */ }
+    }
+    results.push(`Skill nodes seeded: ${nodesSeeded}`);
+
+    // Seed prerequisites
+    const allPrereqs = [...prerequisites, ...readingPrerequisites, ...spellingPrerequisites, ...grammarPunctuationPrerequisites, ...writingPrerequisites, ...precursorPrerequisites];
+    let prereqsSeeded = 0;
+    for (const prereq of allPrereqs) {
+      try {
+        const [skill] = await db.select({ id: skillNodes.id }).from(skillNodes).where(eq(skillNodes.code, prereq.skillCode));
+        const [pre] = await db.select({ id: skillNodes.id }).from(skillNodes).where(eq(skillNodes.code, prereq.prerequisiteCode));
+        if (skill && pre) {
+          await db.insert(skillPrerequisites).values({
+            skillId: skill.id,
+            prerequisiteId: pre.id,
+            strength: prereq.strength,
+          }).onConflictDoNothing();
+          prereqsSeeded++;
+        }
+      } catch { /* skip */ }
+    }
+    results.push(`Prerequisites seeded: ${prereqsSeeded}`);
+
+    // Seed starter questions
+    let questionsSeeded = 0;
+    for (const q of starterQuestions) {
+      try {
+        const [skill] = await db.select({ id: skillNodes.id }).from(skillNodes).where(eq(skillNodes.code, q.skillCode));
+        if (skill) {
+          await db.insert(questions).values({
+            skillId: skill.id,
+            content: q.content,
+            difficultyParam: q.difficultyParam,
+            questionType: q.questionType,
+            isValidated: true,
+          });
+          questionsSeeded++;
+        }
+      } catch { /* skip */ }
+    }
+    results.push(`Starter questions seeded: ${questionsSeeded}`);
+
+    logger.info("Setup complete", { results });
+
+    res.json({
+      success: true,
+      results,
+      next: "Database is ready. You can now use the diagnostic and generate more questions via POST /admin/questions/generate-gaps",
+    });
+  } catch (err) {
+    logger.error("Setup failed", { error: err instanceof Error ? err.message : String(err) });
+    res.status(500).json({
+      success: false,
+      error: err instanceof Error ? err.message : "Setup failed",
+    });
+  }
+});
 
 // ============================================================
 // KNOWLEDGE GRAPH — SKILL NODES
