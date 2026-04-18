@@ -1,10 +1,13 @@
 import { claude } from "../lib/claude.js";
 import { logger } from "../lib/logger.js";
 
+type NaplanDomain = "numeracy" | "reading" | "spelling" | "grammar_punctuation" | "writing";
+
 interface GenerateQuestionParams {
   skillName: string;
   skillDescription: string;
   yearLevel: number;
+  domain: NaplanDomain;
   difficulty: "easy" | "medium" | "hard";
   questionType: "multiple_choice" | "numeric_input" | "true_false";
   themeId?: string;
@@ -20,25 +23,64 @@ interface GeneratedQuestion {
 }
 
 /**
- * Generates a question using Claude API with template-based constraints.
- * Questions are wrapped in thematic contexts based on the child's theme.
+ * Generates a question using Claude API.
+ * Detects the NAPLAN domain and uses a tailored prompt for each.
  */
 export async function generateQuestion(
   params: GenerateQuestionParams,
 ): Promise<GeneratedQuestion> {
-  const themeContext = getThemeContext(params.themeId, params.interests);
-
   if (!claude) {
     throw new Error("Claude API client not configured — set ANTHROPIC_API_KEY");
   }
 
+  const prompt = buildPrompt(params);
+
   const response = await claude.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 1024,
-    messages: [
-      {
-        role: "user",
-        content: `Generate a ${params.difficulty} ${params.questionType} maths question for an Australian Year ${params.yearLevel} student.
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const text = response.content[0].type === "text" ? response.content[0].text : "";
+
+  // Extract JSON from response (handle markdown code blocks)
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    logger.error("No JSON found in Claude response", { text });
+    throw new Error("Failed to generate valid question content");
+  }
+
+  try {
+    return JSON.parse(jsonMatch[0]) as GeneratedQuestion;
+  } catch {
+    logger.error("Failed to parse Claude response as JSON", { text });
+    throw new Error("Failed to generate valid question content");
+  }
+}
+
+function buildPrompt(params: GenerateQuestionParams): string {
+  const { domain } = params;
+
+  switch (domain) {
+    case "numeracy":
+      return buildNumeracyPrompt(params);
+    case "reading":
+      return buildReadingPrompt(params);
+    case "spelling":
+      return buildSpellingPrompt(params);
+    case "grammar_punctuation":
+      return buildGrammarPrompt(params);
+    case "writing":
+      // Writing uses rubric scoring, not MCQ generation
+      throw new Error("Writing domain uses rubric scoring, not question generation");
+    default:
+      return buildNumeracyPrompt(params);
+  }
+}
+
+function buildNumeracyPrompt(params: GenerateQuestionParams): string {
+  const themeContext = getThemeContext(params.themeId, params.interests);
+  return `Generate a ${params.difficulty} ${params.questionType} maths question for an Australian Year ${params.yearLevel} student.
 
 Skill: ${params.skillName}
 Description: ${params.skillDescription}
@@ -48,32 +90,102 @@ Requirements:
 - Use Australian English (colour, favourite, maths, etc.)
 - Use Australian contexts (AUD currency, km for distance, Australian cities/animals/sports)
 - Age-appropriate language for Year ${params.yearLevel} (ages ${params.yearLevel + 5}-${params.yearLevel + 6})
-- ${params.questionType === "multiple_choice" ? "Provide exactly 4 options with one correct answer. Make distractors plausible (common misconceptions)." : ""}
+- ${params.questionType === "multiple_choice" ? "Provide exactly 4 options with one correct answer. Make distractors based on common misconceptions." : ""}
 - Include a clear, encouraging explanation of the correct answer
 - Include a gentle hint that guides without giving away the answer
 
-Respond in valid JSON format:
+Respond in valid JSON only (no markdown):
 {
   "stem": "the question text",
   "answer": "the correct answer",
   ${params.questionType === "multiple_choice" ? '"options": ["option1", "option2", "option3", "option4"],' : ""}
   "explanation": "why this is the correct answer, explained simply",
   "hint": "a helpful hint"
-}`,
-      },
-    ],
-  });
+}`;
+}
 
-  const text =
-    response.content[0].type === "text" ? response.content[0].text : "";
+function buildReadingPrompt(params: GenerateQuestionParams): string {
+  return `Generate a ${params.difficulty} reading comprehension question for an Australian Year ${params.yearLevel} student.
 
-  try {
-    const parsed = JSON.parse(text) as GeneratedQuestion;
-    return parsed;
-  } catch {
-    logger.error("Failed to parse Claude response as JSON", { text });
-    throw new Error("Failed to generate valid question content");
-  }
+Skill being assessed: ${params.skillName}
+Description: ${params.skillDescription}
+
+Requirements:
+- Write a short passage (3-5 sentences for Year 1-3, 5-8 sentences for Year 4-7)
+- The passage should be age-appropriate, interesting, and use Australian English
+- Use Australian contexts (Australian animals, places, culture, sport)
+- Then ask ONE comprehension question about the passage
+- Provide exactly 4 multiple-choice options with one correct answer
+- Distractors should be plausible but clearly wrong when the passage is read carefully
+- Include an explanation that references the specific part of the passage
+- Include a hint that guides the student to look at the right part of the passage
+
+Respond in valid JSON only (no markdown):
+{
+  "stem": "[THE PASSAGE]\\n\\n[THE QUESTION]",
+  "answer": "the correct answer",
+  "options": ["option1", "option2", "option3", "option4"],
+  "explanation": "The answer is found in the passage where it says...",
+  "hint": "Look at the second sentence for a clue"
+}`;
+}
+
+function buildSpellingPrompt(params: GenerateQuestionParams): string {
+  return `Generate a ${params.difficulty} spelling question for an Australian Year ${params.yearLevel} student.
+
+Skill being assessed: ${params.skillName}
+Description: ${params.skillDescription}
+
+Requirements:
+- Use Australian English spelling (colour, favourite, catalogue, etc.)
+- Age-appropriate words for Year ${params.yearLevel}
+- Choose ONE of these question formats (pick the best fit for the skill):
+  a) "Which spelling is correct?" — show 4 options, one correct
+  b) "Which word is spelled incorrectly?" — show a sentence with one misspelled word
+  c) "Add the correct suffix/prefix to this word" — 4 options
+  d) "What is the plural/past tense of [word]?" — 4 options
+- Provide exactly 4 options with one correct answer
+- Make wrong options reflect common spelling mistakes children actually make
+- Include an explanation that teaches the spelling rule
+- Include a hint
+
+Respond in valid JSON only (no markdown):
+{
+  "stem": "the question text",
+  "answer": "the correct answer",
+  "options": ["option1", "option2", "option3", "option4"],
+  "explanation": "the spelling rule explained simply",
+  "hint": "a helpful hint"
+}`;
+}
+
+function buildGrammarPrompt(params: GenerateQuestionParams): string {
+  return `Generate a ${params.difficulty} grammar and punctuation question for an Australian Year ${params.yearLevel} student.
+
+Skill being assessed: ${params.skillName}
+Description: ${params.skillDescription}
+
+Requirements:
+- Use Australian English
+- Age-appropriate sentences for Year ${params.yearLevel}
+- Choose ONE of these question formats (pick the best fit for the skill):
+  a) "Which sentence is correct?" — show 4 versions of a sentence, one grammatically correct
+  b) "Choose the correct word to complete the sentence" — fill in the blank
+  c) "Where should the [comma/apostrophe/full stop] go?" — 4 placement options
+  d) "Which sentence uses the correct tense?" — 4 options
+- Provide exactly 4 options with one correct answer
+- Make wrong options reflect common grammar mistakes children make
+- Include an explanation that teaches the grammar rule clearly
+- Include a hint
+
+Respond in valid JSON only (no markdown):
+{
+  "stem": "the question text",
+  "answer": "the correct answer",
+  "options": ["option1", "option2", "option3", "option4"],
+  "explanation": "the grammar rule explained simply",
+  "hint": "a helpful hint"
+}`;
 }
 
 /**
@@ -116,9 +228,9 @@ Respond in JSON:
     ],
   });
 
-  const text =
-    response.content[0].type === "text" ? response.content[0].text : "";
-  return JSON.parse(text);
+  const text = response.content[0].type === "text" ? response.content[0].text : "";
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  return JSON.parse(jsonMatch?.[0] ?? text);
 }
 
 function getThemeContext(themeId?: string, interests?: string[]): string {
