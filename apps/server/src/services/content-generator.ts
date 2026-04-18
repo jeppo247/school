@@ -58,6 +58,32 @@ export async function generateQuestion(
   }
 }
 
+/**
+ * Diverse Australian names to rotate through in questions.
+ * Includes Aboriginal, Anglo, Asian-Australian, and multicultural names
+ * reflecting the diversity of Australian classrooms.
+ */
+const DIVERSE_NAMES = [
+  "Ava", "Liam", "Aroha", "Kai", "Zara", "Noah", "Indigo", "Mateo",
+  "Lily", "Oliver", "Maya", "Jack", "Priya", "Tom", "Aisha", "Finn",
+  "Ruby", "Leo", "Jade", "Sam", "Amara", "Max", "Sienna", "Ravi",
+  "Grace", "Hugo", "Willow", "Ari", "Chloe", "Taj", "Sophie", "Ethan",
+  "Mia", "Darcy", "Nina", "Riley", "Isla", "Kobi", "Ella", "Yusuf",
+];
+
+function getRandomName(): string {
+  return DIVERSE_NAMES[Math.floor(Math.random() * DIVERSE_NAMES.length)];
+}
+
+const DIVERSITY_INSTRUCTIONS = `
+CRITICAL RULES FOR UNIQUENESS:
+- Use the character name "${getRandomName()}" in this question (vary names across questions)
+- Create a UNIQUE scenario — do NOT reuse common scenarios like Taronga Zoo, Great Barrier Reef, or Bondi Beach
+- Vary the question format and structure — avoid starting every question the same way
+- Never use words like: kill, death, die, blood, weapon, gun, murder, violence, drug, scary, frightening, destroy, war
+- Use only Australian English: colour (not color), favourite (not favorite), maths (not math), realise (not realize), organise (not organize)
+`;
+
 function buildPrompt(params: GenerateQuestionParams): string {
   const { domain } = params;
 
@@ -93,6 +119,7 @@ Requirements:
 - ${params.questionType === "multiple_choice" ? "Provide exactly 4 options with one correct answer. Make distractors based on common misconceptions." : ""}
 - Include a clear, encouraging explanation of the correct answer
 - Include a gentle hint that guides without giving away the answer
+${DIVERSITY_INSTRUCTIONS}
 
 Respond in valid JSON only (no markdown):
 {
@@ -119,6 +146,7 @@ Requirements:
 - Distractors should be plausible but clearly wrong when the passage is read carefully
 - Include an explanation that references the specific part of the passage
 - Include a hint that guides the student to look at the right part of the passage
+${DIVERSITY_INSTRUCTIONS}
 
 Respond in valid JSON only (no markdown):
 {
@@ -148,6 +176,7 @@ Requirements:
 - Make wrong options reflect common spelling mistakes children actually make
 - Include an explanation that teaches the spelling rule
 - Include a hint
+${DIVERSITY_INSTRUCTIONS}
 
 Respond in valid JSON only (no markdown):
 {
@@ -177,6 +206,7 @@ Requirements:
 - Make wrong options reflect common grammar mistakes children make
 - Include an explanation that teaches the grammar rule clearly
 - Include a hint
+${DIVERSITY_INSTRUCTIONS}
 
 Respond in valid JSON only (no markdown):
 {
