@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
 
 const fadeUp = {
@@ -23,6 +23,71 @@ const scaleIn = {
   }),
 };
 
+
+function GapsExplainer() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: 0.1 }}
+      className="mt-10 bg-white rounded-2xl p-8 border border-gray-200"
+    >
+      <h3 className="font-display text-lg font-bold text-gray-800 mb-2">
+        Why gaps get bigger over time
+      </h3>
+      <p className="text-sm text-gray-600 leading-relaxed">
+        Gaps start small. The class moves on. Schools don&apos;t have time to go back. And suddenly, a child falls behind.
+      </p>
+
+      {!expanded && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="text-sm font-medium text-[#4F8CF7] hover:underline mt-3 inline-flex items-center gap-1"
+        >
+          Read more
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      )}
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <p className="text-sm text-gray-600 leading-relaxed mt-4">
+              In a traditional classroom, if your child doesn&apos;t fully understand a concept, the class moves on anyway.
+              That gap becomes the foundation for the next topic. Each new lesson builds on something they didn&apos;t
+              master, and the deficit compounds. By the end of the year, what started as a small misunderstanding
+              can become a major barrier.
+            </p>
+            <p className="text-sm text-gray-600 leading-relaxed mt-3">
+              Mastery learning works differently. Your child doesn&apos;t move on until they&apos;ve genuinely understood
+              the basics. Once those foundations are solid, everything built on top is stronger. Gaps are closed
+              at the source — so learning accelerates instead of slowing down.
+            </p>
+            <button
+              onClick={() => setExpanded(false)}
+              className="text-sm font-medium text-[#4F8CF7] hover:underline mt-3 inline-flex items-center gap-1"
+            >
+              Show less
+              <svg className="w-4 h-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
 
 export default function HomePage() {
   const heroRef = useRef(null);
@@ -254,29 +319,8 @@ export default function HomePage() {
             </div>
           </motion.div>
 
-          {/* Compounding gaps explanation */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="mt-10 bg-white rounded-2xl p-8 border border-gray-200"
-          >
-            <h3 className="font-display text-lg font-bold text-gray-800 mb-3">
-              Why gaps get bigger over time
-            </h3>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              In a traditional classroom, if your child doesn&apos;t fully understand a concept, the class moves on anyway.
-              That gap doesn&apos;t go away — it becomes the foundation for the next topic. Each new lesson builds on
-              something they didn&apos;t master, and the deficit compounds. By the end of the year, what started as a
-              small misunderstanding can become a major barrier.
-            </p>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Mastery learning works differently. Your child doesn&apos;t move on until they&apos;ve genuinely understood
-              the basics. Once those foundations are solid, everything built on top of them is stronger. Gaps are
-              closed at the source, not papered over — so learning accelerates instead of slowing down.
-            </p>
-          </motion.div>
+          {/* Compounding gaps — short with expand */}
+          <GapsExplainer />
 
           {/* Research citations */}
           <motion.div
