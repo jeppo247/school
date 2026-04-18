@@ -2,17 +2,38 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useState } from "react";
 
 interface PaywallProps {
   childName: string;
-  onSelectPlan?: (plan: "standard" | "family") => void;
 }
 
-/**
- * Shown when the 7-day free trial has expired.
- * Prompts the parent to subscribe to continue using Upwise.
- */
-export function Paywall({ childName, onSelectPlan }: PaywallProps) {
+export function Paywall({ childName }: PaywallProps) {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  if (selected) {
+    return (
+      <main className="min-h-screen bg-[#FAFAFA] flex items-center justify-center px-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-md text-center"
+        >
+          <span className="text-6xl block mb-4">✅</span>
+          <h1 className="font-display text-2xl font-bold text-gray-800 mb-3">
+            {selected === "standard" ? "Standard" : "Family"} plan selected
+          </h1>
+          <p className="text-gray-500 mb-6">
+            Payment integration coming soon. You&apos;ll be able to subscribe via Stripe.
+          </p>
+          <a href="/dashboard" className="text-[#4F8CF7] hover:underline text-sm font-medium">
+            Return to dashboard
+          </a>
+        </motion.div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#FAFAFA] flex items-center justify-center px-6">
       <motion.div
@@ -30,9 +51,8 @@ export function Paywall({ childName, onSelectPlan }: PaywallProps) {
         </p>
 
         <div className="space-y-4 mb-8">
-          {/* Standard plan */}
           <motion.button
-            onClick={() => onSelectPlan?.("standard")}
+            onClick={() => setSelected("standard")}
             className="w-full bg-[#4F8CF7] text-white rounded-2xl p-6 text-left hover:bg-[#3A6CD4] transition-all"
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
@@ -46,9 +66,8 @@ export function Paywall({ childName, onSelectPlan }: PaywallProps) {
             </p>
           </motion.button>
 
-          {/* Family plan */}
           <motion.button
-            onClick={() => onSelectPlan?.("family")}
+            onClick={() => setSelected("family")}
             className="w-full bg-white text-gray-800 rounded-2xl p-6 text-left border border-gray-200 hover:border-[#4F8CF7] hover:shadow-md transition-all"
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
