@@ -23,8 +23,9 @@ export const families = pgTable("families", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   stripeCustomerId: text("stripe_customer_id"),
-  subscriptionTier: text("subscription_tier").default("free").notNull(),
+  subscriptionTier: text("subscription_tier").default("trial").notNull(),
   subscriptionStatus: text("subscription_status").default("active").notNull(),
+  trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

@@ -12,7 +12,8 @@ familyRoutes.post("/", async (req, res, next) => {
     const { name, email } = req.body;
     if (!name || !email) throw new AppError(400, "VALIDATION_ERROR", "name and email required");
 
-    const [family] = await db.insert(families).values({ name, email }).returning();
+    const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+    const [family] = await db.insert(families).values({ name, email, trialEndsAt }).returning();
     res.status(201).json(family);
   } catch (err) {
     next(err);
@@ -28,7 +29,13 @@ familyRoutes.get("/:id", async (req, res, next) => {
     const children = await db.select().from(students).where(eq(students.familyId, family.id));
     const parentList = await db.select().from(parents).where(eq(parents.familyId, family.id));
 
-    res.json({ ...family, children, parents: parentList });
+    const now = new Date();
+    const trialActive = family.subscriptionTier === "trial" && family.trialEndsAt && new Date(family.trialEndsAt) > now;
+    const isPaid = family.subscriptionTier === "standard" || family.subscriptionTier === "family";
+    const hasAccess = trialActive || isPaid;
+    const trialDaysLeft = family.trialEndsAt ? Math.max(0, Math.ceil((new Date(family.trialEndsAt).getTime() - now.getTime()) / 86400000)) : 0;
+
+    res.json({ ...family, children, parents: parentList, hasAccess, trialActive, trialDaysLeft });
   } catch (err) {
     next(err);
   }
