@@ -698,18 +698,18 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {[
               {
-                name: "Free",
+                name: "Free Trial",
                 price: "$0",
-                period: "forever",
-                description: "Try the diagnostic",
+                period: "for 7 days",
+                description: "Full access, no commitment",
                 features: [
-                  "1 diagnostic assessment",
-                  "3 sessions per week",
+                  "7 days of full access",
+                  "Unlimited sessions",
                   "All 5 NAPLAN domains",
                   "1 child",
-                  "Basic progress summary",
+                  "Full parent dashboard",
                 ],
-                cta: "Start Free",
+                cta: "Start Free Trial",
                 popular: false,
               },
               {
