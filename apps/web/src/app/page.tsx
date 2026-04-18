@@ -214,11 +214,9 @@ export default function HomePage() {
                 <tr className="bg-gray-50">
                   <th className="text-left text-sm font-semibold text-gray-500 px-6 py-4 w-[40%]"></th>
                   <th className="text-center text-sm font-bold text-[#4F8CF7] px-6 py-4 w-[30%]">
-                    <span className="inline-flex items-center gap-1.5">
-                      🚀 Mastery Learning
-                    </span>
+                    Mastery Learning
                   </th>
-                  <th className="text-center text-sm font-medium text-gray-400 px-6 py-4 w-[30%]">
+                  <th className="text-center text-sm font-semibold text-gray-600 px-6 py-4 w-[30%]">
                     Traditional Classroom
                   </th>
                 </tr>
@@ -239,7 +237,7 @@ export default function HomePage() {
                   <tr key={row.feature} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
                     <td className="px-6 py-3.5 text-sm font-medium text-gray-700">{row.feature}</td>
                     <td className="px-6 py-3.5 text-sm text-center text-gray-800 font-medium">{row.mastery}</td>
-                    <td className="px-6 py-3.5 text-sm text-center text-gray-400">{row.traditional}</td>
+                    <td className="px-6 py-3.5 text-sm text-center text-gray-600">{row.traditional}</td>
                   </tr>
                 ))}
               </tbody>
@@ -249,6 +247,30 @@ export default function HomePage() {
                 *Bloom&apos;s 2 Sigma Problem (1984): students receiving 1:1 mastery-based tutoring performed 2 standard deviations above classroom peers.
               </p>
             </div>
+          </motion.div>
+
+          {/* Compounding gaps explanation */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mt-10 bg-white rounded-2xl p-8 border border-gray-200"
+          >
+            <h3 className="font-display text-lg font-bold text-gray-800 mb-3">
+              Why gaps get bigger over time
+            </h3>
+            <p className="text-sm text-gray-600 leading-relaxed mb-4">
+              In a traditional classroom, if your child doesn&apos;t fully understand a concept, the class moves on anyway.
+              That gap doesn&apos;t go away — it becomes the foundation for the next topic. Each new lesson builds on
+              something they didn&apos;t master, and the deficit compounds. By the end of the year, what started as a
+              small misunderstanding can become a major barrier.
+            </p>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Mastery learning works differently. Your child doesn&apos;t move on until they&apos;ve genuinely understood
+              the basics. Once those foundations are solid, everything built on top of them is stronger. Gaps are
+              closed at the source, not papered over — so learning accelerates instead of slowing down.
+            </p>
           </motion.div>
 
           {/* Research citations */}
@@ -264,7 +286,9 @@ export default function HomePage() {
             </h3>
             <div className="grid sm:grid-cols-2 gap-6 text-sm">
               <div>
-                <p className="font-semibold text-gray-700 mb-1">Bloom&apos;s 2 Sigma Problem (1984)</p>
+                <a href="https://en.wikipedia.org/wiki/Bloom%27s_2_sigma_problem" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
+                  Bloom&apos;s 2 Sigma Problem (1984) &rarr;
+                </a>
                 <p className="text-gray-500 text-xs leading-relaxed">
                   The landmark study that proved 1:1 mastery-based tutoring produces 2 standard deviations
                   of improvement — equivalent to outperforming 98% of classroom-taught peers. Bloom concluded
@@ -272,21 +296,27 @@ export default function HomePage() {
                 </p>
               </div>
               <div>
-                <p className="font-semibold text-gray-700 mb-1">Kulik Meta-Analysis (1990)</p>
+                <a href="https://www.cambridge.org/core/journals/journal-of-educational-research/article/effectiveness-of-mastery-learning-programs/abs" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
+                  Kulik Meta-Analysis (1990) &rarr;
+                </a>
                 <p className="text-gray-500 text-xs leading-relaxed">
                   Meta-analysis across subjects and age groups confirmed consistent positive effects of mastery
                   learning on achievement, retention, and student confidence. Published by Cambridge University Press.
                 </p>
               </div>
               <div>
-                <p className="font-semibold text-gray-700 mb-1">Carnegie Cognitive Tutor Trials</p>
+                <a href="https://arxiv.org/abs/2303.04634" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
+                  Carnegie Cognitive Tutor Trials &rarr;
+                </a>
                 <p className="text-gray-500 text-xs leading-relaxed">
                   Randomised controlled trials showed AI-based cognitive tutors produced measurable gains
                   in maths outcomes. Strongest when paired with mastery progression and human support.
                 </p>
               </div>
               <div>
-                <p className="font-semibold text-gray-700 mb-1">AI Tutoring Literature Review (48 studies)</p>
+                <a href="https://nhsjs.com/2024/a-literature-review-of-ai-based-tutoring-systems/" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
+                  AI Tutoring Literature Review (48 studies) &rarr;
+                </a>
                 <p className="text-gray-500 text-xs leading-relaxed">
                   Comprehensive review found AI tutoring systems often outperform traditional teaching,
                   with strongest gains when AI is paired with human guidance — the exact model Upwise uses.
