@@ -177,6 +177,83 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Mastery vs Traditional Comparison */}
+      <section className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="text-center mb-12"
+          >
+            <motion.p
+              variants={fadeUp}
+              custom={0}
+              className="text-sm font-semibold text-[#FF8C42] uppercase tracking-wider mb-3"
+            >
+              The Difference
+            </motion.p>
+            <motion.h2
+              variants={fadeUp}
+              custom={1}
+              className="font-display text-4xl sm:text-5xl font-bold text-gray-900"
+            >
+              Mastery learning vs classroom learning
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="rounded-2xl border border-gray-200 overflow-hidden"
+          >
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="text-left text-sm font-semibold text-gray-500 px-6 py-4 w-[40%]"></th>
+                  <th className="text-center text-sm font-bold text-[#4F8CF7] px-6 py-4 w-[30%]">
+                    <span className="inline-flex items-center gap-1.5">
+                      🚀 Mastery Learning
+                    </span>
+                  </th>
+                  <th className="text-center text-sm font-medium text-gray-400 px-6 py-4 w-[30%]">
+                    Traditional Classroom
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {[
+                  { feature: "Pacing", mastery: "Adapts to your child", traditional: "Fixed for the whole class" },
+                  { feature: "Gaps detected", mastery: "Every skill, every session", traditional: "Occasional tests" },
+                  { feature: "Moves on when", mastery: "Skill is truly mastered", traditional: "The class moves on" },
+                  { feature: "Feedback speed", mastery: "Instant, after every answer", traditional: "Days or weeks later" },
+                  { feature: "Difficulty level", mastery: "Always in the sweet spot", traditional: "Too easy or too hard" },
+                  { feature: "Daily time needed", mastery: "10–20 focused minutes", traditional: "5–6 hours (mixed value)" },
+                  { feature: "Retention method", mastery: "Spaced repetition (proven)", traditional: "Cram before tests" },
+                  { feature: "Learning speed", mastery: "Up to 2× faster*", traditional: "1× (standard pace)" },
+                ].map((row, i) => (
+                  <tr key={row.feature} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
+                    <td className="px-6 py-3.5 text-sm font-medium text-gray-700">{row.feature}</td>
+                    <td className="px-6 py-3.5 text-sm text-center text-gray-800 font-medium">{row.mastery}</td>
+                    <td className="px-6 py-3.5 text-sm text-center text-gray-400">{row.traditional}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="px-6 py-3 bg-gray-50 border-t border-gray-100">
+              <p className="text-[11px] text-gray-400">
+                *Based on research from mastery-based AI learning models.{" "}
+                <a href="https://alpha.school/blog/the-two-hour-school-day-how-ai-tutors-are-redefining-learning-efficiency/" target="_blank" rel="noopener noreferrer" className="text-[#4F8CF7] hover:underline">
+                  Source: Alpha School
+                </a>
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section id="how-it-works" className="py-24 bg-[#F8FAFF]">
         <div className="max-w-6xl mx-auto px-6">
