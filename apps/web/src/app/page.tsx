@@ -32,19 +32,19 @@ function GapsExplainer() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: 0.1 }}
-      className="mt-10 bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+      className="mt-10 bg-white rounded-2xl p-8 border border-gray-200 shadow-sm"
     >
-      <h3 className="font-display text-lg font-bold text-white mb-2">
+      <h3 className="font-display text-lg font-bold text-gray-800 mb-2">
         Why gaps get bigger over time
       </h3>
-      <p className="text-sm text-white/80 leading-relaxed">
+      <p className="text-sm text-gray-600 leading-relaxed">
         Gaps start small. The class moves on. Schools don&apos;t have time to go back. And suddenly, a child falls behind.
       </p>
 
       {!expanded && (
         <button
           onClick={() => setExpanded(true)}
-          className="text-sm font-medium text-white hover:underline mt-3 inline-flex items-center gap-1"
+          className="text-sm font-medium text-[#4F8CF7] hover:underline mt-3 inline-flex items-center gap-1"
         >
           Read more
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -62,20 +62,20 @@ function GapsExplainer() {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <p className="text-sm text-white/80 leading-relaxed mt-4">
+            <p className="text-sm text-gray-600 leading-relaxed mt-4">
               In a traditional classroom, if your child doesn&apos;t fully understand a concept, the class moves on anyway.
               That gap becomes the foundation for the next topic. Each new lesson builds on something they didn&apos;t
               master, and the deficit compounds. By the end of the year, what started as a small misunderstanding
               can become a major barrier.
             </p>
-            <p className="text-sm text-white/80 leading-relaxed mt-3">
+            <p className="text-sm text-gray-600 leading-relaxed mt-3">
               Mastery learning works differently. Your child doesn&apos;t move on until they&apos;ve genuinely understood
               the basics. Once those foundations are solid, everything built on top is stronger. Gaps are closed
               at the source — so learning accelerates instead of slowing down.
             </p>
             <button
               onClick={() => setExpanded(false)}
-              className="text-sm font-medium text-white hover:underline mt-3 inline-flex items-center gap-1"
+              className="text-sm font-medium text-[#4F8CF7] hover:underline mt-3 inline-flex items-center gap-1"
             >
               Show less
               <svg className="w-4 h-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -243,7 +243,14 @@ export default function HomePage() {
       </section>
 
       {/* Mastery vs Traditional Comparison */}
-      <section className="py-20" style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
+      <section
+        className="py-20 relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #F0F0FF 50%, #E8E8F8 100%)" }}
+      >
+        {/* Geometric pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234F8CF7' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }} />
         <div className="max-w-4xl mx-auto px-6">
           <motion.div
             initial="hidden"
@@ -254,14 +261,14 @@ export default function HomePage() {
             <motion.p
               variants={fadeUp}
               custom={0}
-              className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-3"
+              className="text-sm font-semibold text-[#FF8C42] uppercase tracking-wider mb-3"
             >
               The Difference
             </motion.p>
             <motion.h2
               variants={fadeUp}
               custom={1}
-              className="font-display text-4xl sm:text-5xl font-bold text-white"
+              className="font-display text-4xl sm:text-5xl font-bold text-gray-900"
             >
               Mastery learning vs classroom learning
             </motion.h2>
@@ -272,7 +279,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="rounded-2xl border border-white/20 overflow-hidden shadow-2xl"
+            className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm bg-white"
           >
             <table className="w-full">
               <thead>
@@ -328,51 +335,51 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="mt-10 bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+            className="mt-10 bg-white rounded-2xl p-8 border border-gray-200 shadow-sm"
           >
-            <h3 className="font-display text-lg font-bold text-white mb-4">
+            <h3 className="font-display text-lg font-bold text-gray-800 mb-4">
               Backed by decades of research
             </h3>
             <div className="grid sm:grid-cols-2 gap-6 text-sm">
               <div>
-                <a href="https://en.wikipedia.org/wiki/Bloom%27s_2_sigma_problem" target="_blank" rel="noopener noreferrer" className="font-semibold text-white hover:underline mb-1 inline-block">
+                <a href="https://en.wikipedia.org/wiki/Bloom%27s_2_sigma_problem" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
                   Bloom&apos;s 2 Sigma Problem (1984) &rarr;
                 </a>
-                <p className="text-white/60 text-xs leading-relaxed">
+                <p className="text-gray-500 text-xs leading-relaxed">
                   The landmark study that proved 1:1 mastery-based tutoring produces 2 standard deviations
                   of improvement — equivalent to outperforming 98% of classroom-taught peers. Bloom concluded
                   the bottleneck was the delivery model, not student ability.
                 </p>
               </div>
               <div>
-                <a href="https://www.cambridge.org/core/journals/journal-of-educational-research/article/effectiveness-of-mastery-learning-programs/abs" target="_blank" rel="noopener noreferrer" className="font-semibold text-white hover:underline mb-1 inline-block">
+                <a href="https://www.cambridge.org/core/journals/journal-of-educational-research/article/effectiveness-of-mastery-learning-programs/abs" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
                   Kulik Meta-Analysis (1990) &rarr;
                 </a>
-                <p className="text-white/60 text-xs leading-relaxed">
+                <p className="text-gray-500 text-xs leading-relaxed">
                   Meta-analysis across subjects and age groups confirmed consistent positive effects of mastery
                   learning on achievement, retention, and student confidence. Published by Cambridge University Press.
                 </p>
               </div>
               <div>
-                <a href="https://arxiv.org/abs/2303.04634" target="_blank" rel="noopener noreferrer" className="font-semibold text-white hover:underline mb-1 inline-block">
+                <a href="https://arxiv.org/abs/2303.04634" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
                   Carnegie Cognitive Tutor Trials &rarr;
                 </a>
-                <p className="text-white/60 text-xs leading-relaxed">
+                <p className="text-gray-500 text-xs leading-relaxed">
                   Randomised controlled trials showed AI-based cognitive tutors produced measurable gains
                   in maths outcomes. Strongest when paired with mastery progression and human support.
                 </p>
               </div>
               <div>
-                <a href="https://nhsjs.com/2024/a-literature-review-of-ai-based-tutoring-systems/" target="_blank" rel="noopener noreferrer" className="font-semibold text-white hover:underline mb-1 inline-block">
+                <a href="https://nhsjs.com/2024/a-literature-review-of-ai-based-tutoring-systems/" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
                   AI Tutoring Literature Review (48 studies) &rarr;
                 </a>
-                <p className="text-white/60 text-xs leading-relaxed">
+                <p className="text-gray-500 text-xs leading-relaxed">
                   Comprehensive review found AI tutoring systems often outperform traditional teaching,
                   with strongest gains when AI is paired with human guidance — the exact model Upwise uses.
                 </p>
               </div>
             </div>
-            <p className="text-[11px] text-white/40 mt-5">
+            <p className="text-[11px] text-gray-400 mt-5">
               Upwise builds on these foundations: mastery learning (proven over 40 years) + adaptive AI (first
               credible attempt to deliver 1:1 mastery at scale) + parent as guide (the human layer research shows is essential).
             </p>
