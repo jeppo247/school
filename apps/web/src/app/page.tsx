@@ -79,11 +79,10 @@ export default function HomePage() {
               custom={1}
               className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight"
             >
-              <span className="text-gray-900">See exactly where</span>
+              <span className="text-gray-900">Every child can</span>
               <br />
-              <span className="text-gray-900">your child&apos;s </span>
               <span className="relative inline-block">
-                <span className="relative z-10 text-[#4F8CF7]">learning gaps</span>
+                <span className="relative z-10 text-[#4F8CF7]">master</span>
                 <motion.span
                   className="absolute -bottom-1 left-0 right-0 h-3 bg-[#4F8CF7]/10 rounded-full -z-0"
                   initial={{ scaleX: 0 }}
@@ -92,8 +91,9 @@ export default function HomePage() {
                   style={{ originX: 0 }}
                 />
               </span>
+              <span className="text-gray-900"> what school</span>
               <br />
-              <span className="text-gray-900">are hiding</span>
+              <span className="text-gray-900">moves past</span>
             </motion.h1>
 
             <motion.p
@@ -101,9 +101,9 @@ export default function HomePage() {
               custom={2}
               className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed"
             >
-              Upwise uses adaptive AI to diagnose your child&apos;s knowledge gaps in
-              minutes, then builds a personalised learning path to close them.
-              <span className="text-gray-700 font-medium"> For Prep to Year 7.</span>
+              When the class moves on, gaps grow. Upwise makes sure your child
+              truly understands before moving forward.
+              <span className="text-gray-700 font-medium"> Personalised, mastery-based learning for Prep to Year 7.</span>
             </motion.p>
 
             <motion.div
@@ -223,28 +223,33 @@ export default function HomePage() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {[
-                  { feature: "Progression", mastery: "Only when skill is truly mastered", traditional: "When the class moves on" },
-                  { feature: "Personalisation", mastery: "Private tutor-level, for every child", traditional: "One teacher, 25+ students" },
-                  { feature: "Feedback", mastery: "Instant, after every answer", traditional: "Hours to days later" },
-                  { feature: "Gap detection", mastery: "Pinpoints exact weaknesses", traditional: "General test scores" },
-                  { feature: "Time efficiency", mastery: "10–20 focused minutes per day", traditional: "5–6 hours (mixed value)" },
-                  { feature: "Difficulty", mastery: "Always in the optimal zone", traditional: "Too easy or too hard" },
-                  { feature: "Retention", mastery: "Spaced repetition (science-backed)", traditional: "Cram before tests, forget after" },
-                  { feature: "Engagement", mastery: "Active, gamified, in flow state", traditional: "Passive listening, waiting" },
-                  { feature: "Consistency", mastery: "Same quality every session", traditional: "Varies by teacher and day" },
-                  { feature: "Outcome", mastery: "Outperforms 98% of peers*", traditional: "Average performance" },
+                  {
+                    feature: "Eliminates knowledge gaps",
+                    mastery: "Can't progress until they truly understand — no gaps stack up",
+                    traditional: "Class moves on regardless — missed concepts compound over time",
+                  },
+                  {
+                    feature: "Matches pace to the individual",
+                    mastery: "Progress based on competence — every child in their optimal zone",
+                    traditional: "Progress based on group timing — top students bored, struggling students fall behind",
+                  },
+                  {
+                    feature: "Tight feedback loops",
+                    mastery: "Instant feedback, targeted practice on weak areas — faster learning cycles",
+                    traditional: "Delayed feedback, broad correction — errors become embedded habits",
+                  },
                 ].map((row, i) => (
                   <tr key={row.feature} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
-                    <td className="px-6 py-3.5 text-sm font-medium text-gray-700">{row.feature}</td>
-                    <td className="px-6 py-3.5 text-sm text-center text-gray-800 font-medium">{row.mastery}</td>
-                    <td className="px-6 py-3.5 text-sm text-center text-gray-600">{row.traditional}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-gray-800">{row.feature}</td>
+                    <td className="px-6 py-4 text-sm text-gray-800">{row.mastery}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{row.traditional}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <div className="px-6 py-3 bg-gray-50 border-t border-gray-100">
               <p className="text-[11px] text-gray-400">
-                *Bloom&apos;s 2 Sigma Problem (1984): students receiving 1:1 mastery-based tutoring performed 2 standard deviations above classroom peers.
+                Mastery learning aligns with how humans actually learn: fix gaps before progressing, learn at the right pace, iterate quickly with feedback.
               </p>
             </div>
           </motion.div>
