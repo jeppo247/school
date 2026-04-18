@@ -709,7 +709,7 @@ export default function HomePage() {
                   "1 child",
                   "Full parent dashboard",
                 ],
-                cta: "Start Free Trial",
+                cta: "Coming Soon",
                 popular: false,
               },
               {
@@ -726,7 +726,7 @@ export default function HomePage() {
                   "Daily briefings & nudges",
                   "Weekly reports",
                 ],
-                cta: "Get Started",
+                cta: "Coming Soon",
                 popular: true,
               },
               {
@@ -741,7 +741,7 @@ export default function HomePage() {
                   "Term reports",
                   "Teacher-shareable reports",
                 ],
-                cta: "Get Started",
+                cta: "Coming Soon",
                 popular: false,
               },
             ].map((plan, i) => (
@@ -809,16 +809,15 @@ export default function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/start"
-                  className={`block text-center font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] ${
+                <span
+                  className={`block text-center font-semibold py-3.5 rounded-xl cursor-not-allowed opacity-70 ${
                     plan.popular
-                      ? "bg-white text-[#4F8CF7] hover:bg-blue-50 shadow-md"
-                      : "bg-[#4F8CF7] text-white hover:bg-[#3A6CD4] hover:shadow-lg hover:shadow-blue-100"
+                      ? "bg-white/60 text-[#4F8CF7]"
+                      : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   {plan.cta}
-                </Link>
+                </span>
               </motion.div>
             ))}
           </div>
