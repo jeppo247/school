@@ -123,7 +123,7 @@ export default function DiagnosticPage() {
       setStarted(true);
     } else if (name) {
       // Filter demo questions to the child's year level
-      const filtered = ALL_DEMO_QUESTIONS.filter((q) => q.maxYear <= yearLevel);
+      const filtered = ALL_DEMO_QUESTIONS.filter((q) => q.maxYear === yearLevel);
       setDemoQuestions(filtered);
       setDemoMode(true);
       setStarted(true);

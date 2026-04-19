@@ -50,6 +50,10 @@ diagnosticRoutes.get("/:studentId/next-question", async (req, res, next) => {
     const sessionId = req.query.sessionId as string;
     if (!sessionId) throw new AppError(400, "VALIDATION_ERROR", "sessionId query parameter required");
 
+    // Get student for year level filtering
+    const [student] = await db.select().from(students).where(eq(students.id, studentId));
+    if (!student) throw new AppError(404, "NOT_FOUND", "Student not found");
+
     // Get session
     const [session] = await db
       .select()
@@ -93,9 +97,8 @@ diagnosticRoutes.get("/:studentId/next-question", async (req, res, next) => {
       return res.json({ complete: true, message: "Diagnostic complete — maximum questions reached" });
     }
 
-    // Get available questions (filter by domain if specified)
-    const sessionMeta = session.metadata as { domain?: string } | null;
-    let availableQuery = db
+    // Get available questions — ONLY at the student's year level for diagnostic
+    const available = await db
       .select({
         id: questions.id,
         skillId: questions.skillId,
@@ -104,10 +107,13 @@ diagnosticRoutes.get("/:studentId/next-question", async (req, res, next) => {
         questionType: questions.questionType,
       })
       .from(questions)
-      .where(eq(questions.isValidated, true))
-      .$dynamic();
-
-    const available = await availableQuery;
+      .innerJoin(skillNodes, eq(questions.skillId, skillNodes.id))
+      .where(
+        and(
+          eq(questions.isValidated, true),
+          eq(skillNodes.yearLevel, student.yearLevel),
+        ),
+      );
 
     // Filter out already-asked questions
     const candidates = available.filter((q) => !askedIds.has(q.id));
