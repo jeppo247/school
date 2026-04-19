@@ -12,6 +12,8 @@ interface QuestionData {
   id: string;
   type: string;
   domain: NaplanDomain;
+  /** Maximum year level this question is appropriate for */
+  maxYear: number;
   content: {
     stem: string;
     answer: string | number;
@@ -22,33 +24,47 @@ interface QuestionData {
 }
 
 /**
- * Demo question bank — each question tagged with its NAPLAN domain.
+ * Demo question bank — tagged by domain AND year level appropriateness.
+ * Questions are filtered by the child's year level so Prep kids
+ * only see Prep-appropriate questions.
  */
-const DEMO_QUESTIONS: QuestionData[] = [
-  // NUMERACY (12 questions)
-  { id: "d1", type: "multiple_choice", domain: "numeracy", content: { stem: "What number comes after 7?", answer: "8", options: ["6", "7", "8", "9"], explanation: "The next number is 8.", hint: "Try counting: 5, 6, 7, ..." } },
-  { id: "d2", type: "multiple_choice", domain: "numeracy", content: { stem: "What is 3 + 5?", answer: "8", options: ["7", "8", "9", "10"], explanation: "3 + 5 = 8.", hint: "Start at 3 and count on 5 more." } },
-  { id: "d3", type: "multiple_choice", domain: "numeracy", content: { stem: "What is 9 - 4?", answer: "5", options: ["3", "4", "5", "6"], explanation: "9 - 4 = 5.", hint: "Start at 9 and count back 4." } },
-  { id: "d4", type: "multiple_choice", domain: "numeracy", content: { stem: "Which two numbers make 10?", answer: "3 and 7", options: ["3 and 7", "4 and 5", "2 and 9", "6 and 3"], explanation: "3 + 7 = 10!", hint: "Think about pairs that add up to 10." } },
-  { id: "d5", type: "multiple_choice", domain: "numeracy", content: { stem: "What is the value of the 4 in the number 47?", answer: "40", options: ["4", "40", "47", "7"], explanation: "The 4 is in the tens place, so it means 40.", hint: "The 4 is in the tens column." } },
-  { id: "d6", type: "multiple_choice", domain: "numeracy", content: { stem: "There are 3 bags with 4 apples in each bag. How many apples altogether?", answer: "12", options: ["7", "10", "12", "14"], explanation: "3 groups of 4 = 12.", hint: "Count by fours: 4, 8, ..." } },
-  { id: "d7", type: "multiple_choice", domain: "numeracy", content: { stem: "What is 365 written in expanded form?", answer: "300 + 60 + 5", options: ["300 + 60 + 5", "3 + 6 + 5", "360 + 5", "30 + 65"], explanation: "365 = 300 + 60 + 5.", hint: "Break it into hundreds, tens, and ones." } },
-  { id: "d8", type: "multiple_choice", domain: "numeracy", content: { stem: "What is 6 × 5?", answer: "30", options: ["25", "30", "35", "36"], explanation: "6 × 5 = 30.", hint: "Count by 5s six times." } },
-  { id: "d9", type: "multiple_choice", domain: "numeracy", content: { stem: "A farmer has 342 sheep. He sells 178. How many are left?", answer: "164", options: ["164", "174", "236", "264"], explanation: "342 - 178 = 164.", hint: "Start with the ones column: 2 - 8. You'll need to borrow." } },
-  { id: "d10", type: "multiple_choice", domain: "numeracy", content: { stem: "What is 7 × 8?", answer: "56", options: ["48", "54", "56", "63"], explanation: "7 × 8 = 56.", hint: "Think: 7 × 8 is the same as 8 × 7." } },
-  { id: "d11", type: "multiple_choice", domain: "numeracy", content: { stem: "Which fraction is the same as 1/2?", answer: "2/4", options: ["1/4", "2/4", "2/3", "3/4"], explanation: "1/2 = 2/4.", hint: "Try doubling the top and bottom of 1/2." } },
-  { id: "d12", type: "multiple_choice", domain: "numeracy", content: { stem: "A school has 4 classes with 28 students each. How many students altogether?", answer: "112", options: ["96", "102", "112", "128"], explanation: "4 × 28 = 112.", hint: "Break it: 4 × 20 = 80, 4 × 8 = 32, then add." } },
-  // READING (3 questions)
-  { id: "d13", type: "multiple_choice", domain: "reading", content: { stem: "'The koala sat in the tall eucalyptus tree, munching on leaves.' Where was the koala?", answer: "In a eucalyptus tree", options: ["On the ground", "In a eucalyptus tree", "In a cave", "On a rock"], explanation: "The text says 'in the tall eucalyptus tree'.", hint: "Look for the words that tell you where." } },
-  { id: "d14", type: "multiple_choice", domain: "reading", content: { stem: "'Mia looked at her empty lunchbox and sighed.' How was Mia feeling?", answer: "Disappointed or sad", options: ["Happy and excited", "Disappointed or sad", "Angry and annoyed", "Scared and worried"], explanation: "Sighing at an empty lunchbox suggests disappointment.", hint: "What would make someone sigh at an empty lunchbox?" } },
-  { id: "d15", type: "multiple_choice", domain: "reading", content: { stem: "'The enormous waves crashed onto the shore.' What does 'enormous' mean?", answer: "Very big", options: ["Very small", "Very big", "Very fast", "Very quiet"], explanation: "'Enormous' means very big or huge.", hint: "Waves that crash are usually what size?" } },
-  // SPELLING (3 questions)
-  { id: "d16", type: "multiple_choice", domain: "spelling", content: { stem: "Which spelling is correct?", answer: "because", options: ["becuz", "becaus", "because", "becouse"], explanation: "'Because' is the correct spelling.", hint: "Sound it out: be-cause." } },
-  { id: "d17", type: "multiple_choice", domain: "spelling", content: { stem: "What is the correct way to add -ing to 'run'?", answer: "running", options: ["runing", "running", "runeing", "runnning"], explanation: "Double the consonant before -ing: running.", hint: "Do you need to double the last letter?" } },
-  { id: "d18", type: "multiple_choice", domain: "spelling", content: { stem: "What is the plural of 'baby'?", answer: "babies", options: ["babys", "babyes", "babies", "babiez"], explanation: "Change y to i and add -es: babies.", hint: "What happens to the 'y' at the end?" } },
-  // GRAMMAR & PUNCTUATION (2 questions)
-  { id: "d19", type: "multiple_choice", domain: "grammar_punctuation", content: { stem: "Which sentence uses capital letters and full stops correctly?", answer: "The cat sat on the mat.", options: ["the cat sat on the mat.", "The cat sat on the mat", "The cat sat on the mat.", "the Cat sat on the Mat."], explanation: "Start with a capital, end with a full stop.", hint: "Look for capital at start AND full stop at end." } },
-  { id: "d20", type: "multiple_choice", domain: "grammar_punctuation", content: { stem: "Choose the correct past tense: 'Yesterday, I ___ to the park.'", answer: "walked", options: ["walk", "walked", "walking", "walks"], explanation: "'Yesterday' means past tense: walked.", hint: "'Yesterday' is a clue — it already happened." } },
+const ALL_DEMO_QUESTIONS: QuestionData[] = [
+  // PREP / YEAR 1 — Numbers to 10, counting, simple addition
+  { id: "d1", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "How many stars are there? ⭐⭐⭐", answer: "3", options: ["2", "3", "4", "5"], explanation: "Count them: 1, 2, 3!", hint: "Point to each star and count." } },
+  { id: "d2", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "What number comes after 4?", answer: "5", options: ["3", "4", "5", "6"], explanation: "When we count: 3, 4, 5 — so 5 comes after 4.", hint: "Try counting: 1, 2, 3, 4, ..." } },
+  { id: "d3", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "Which group has more? Group A: 🍎🍎🍎 Group B: 🍎🍎🍎🍎🍎", answer: "Group B", options: ["Group A", "Group B", "They are the same", "I don't know"], explanation: "Group B has 5 apples, Group A has 3. 5 is more than 3.", hint: "Count the apples in each group." } },
+  { id: "d4", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "What comes next? 🔵🔴🔵🔴🔵___", answer: "🔴", options: ["🔵", "🔴", "🟢", "🟡"], explanation: "The pattern goes blue, red, blue, red — so red comes next!", hint: "Look at the pattern: blue, red, blue, red..." } },
+  { id: "d5", type: "multiple_choice", domain: "reading", maxYear: 0, content: { stem: "Kobi the koala climbed a big tree. He ate some leaves. Then he had a nap.\n\nWhat did Kobi do first?", answer: "Climbed a tree", options: ["Had a nap", "Climbed a tree", "Ate some leaves", "Went home"], explanation: "The story says Kobi climbed a tree first.", hint: "What happened at the very start?" } },
+  { id: "d6", type: "multiple_choice", domain: "grammar_punctuation", maxYear: 0, content: { stem: "Which one starts with a capital letter?", answer: "The dog is big.", options: ["the dog is big.", "The dog is big.", "the Dog is big.", "THE DOG IS BIG."], explanation: "Sentences start with ONE capital letter: 'The dog is big.'", hint: "Only the first letter should be big." } },
+
+  // YEAR 1 — Addition/subtraction to 10, counting to 20
+  { id: "d7", type: "multiple_choice", domain: "numeracy", maxYear: 1, content: { stem: "What number comes after 7?", answer: "8", options: ["6", "7", "8", "9"], explanation: "The next number is 8.", hint: "Try counting: 5, 6, 7, ..." } },
+  { id: "d8", type: "multiple_choice", domain: "numeracy", maxYear: 1, content: { stem: "What is 3 + 5?", answer: "8", options: ["7", "8", "9", "10"], explanation: "3 + 5 = 8.", hint: "Start at 3 and count on 5 more." } },
+  { id: "d9", type: "multiple_choice", domain: "numeracy", maxYear: 1, content: { stem: "What is 9 - 4?", answer: "5", options: ["3", "4", "5", "6"], explanation: "9 - 4 = 5.", hint: "Start at 9 and count back 4." } },
+  { id: "d10", type: "multiple_choice", domain: "numeracy", maxYear: 1, content: { stem: "Which two numbers make 10?", answer: "3 and 7", options: ["3 and 7", "4 and 5", "2 and 9", "6 and 3"], explanation: "3 + 7 = 10!", hint: "Think about pairs that add up to 10." } },
+  { id: "d11", type: "multiple_choice", domain: "spelling", maxYear: 1, content: { stem: "Which word is 'cat'?", answer: "cat", options: ["kat", "cat", "cet", "kat"], explanation: "'Cat' starts with c-a-t.", hint: "Sound it out: c-a-t." } },
+
+  // YEAR 2 — Numbers to 100, place value, simple multiplication concept
+  { id: "d12", type: "multiple_choice", domain: "numeracy", maxYear: 2, content: { stem: "What is the value of the 4 in the number 47?", answer: "40", options: ["4", "40", "47", "7"], explanation: "The 4 is in the tens place, so it means 40.", hint: "The 4 is in the tens column." } },
+  { id: "d13", type: "multiple_choice", domain: "numeracy", maxYear: 2, content: { stem: "There are 3 bags with 4 apples in each bag. How many apples altogether?", answer: "12", options: ["7", "10", "12", "14"], explanation: "3 groups of 4 = 12.", hint: "Count by fours: 4, 8, ..." } },
+  { id: "d14", type: "multiple_choice", domain: "reading", maxYear: 2, content: { stem: "'The koala sat in the tall eucalyptus tree, munching on leaves.' Where was the koala?", answer: "In a eucalyptus tree", options: ["On the ground", "In a eucalyptus tree", "In a cave", "On a rock"], explanation: "The text says 'in the tall eucalyptus tree'.", hint: "Look for the words that tell you where." } },
+  { id: "d15", type: "multiple_choice", domain: "spelling", maxYear: 2, content: { stem: "Which spelling is correct?", answer: "because", options: ["becuz", "becaus", "because", "becouse"], explanation: "'Because' is the correct spelling.", hint: "Sound it out: be-cause." } },
+  { id: "d16", type: "multiple_choice", domain: "grammar_punctuation", maxYear: 2, content: { stem: "Which sentence uses capital letters and full stops correctly?", answer: "The cat sat on the mat.", options: ["the cat sat on the mat.", "The cat sat on the mat", "The cat sat on the mat.", "the Cat sat on the Mat."], explanation: "Start with a capital, end with a full stop.", hint: "Look for capital at start AND full stop at end." } },
+
+  // YEAR 3 — Numbers to 1000, times tables, regrouping
+  { id: "d17", type: "multiple_choice", domain: "numeracy", maxYear: 3, content: { stem: "What is 365 written in expanded form?", answer: "300 + 60 + 5", options: ["300 + 60 + 5", "3 + 6 + 5", "360 + 5", "30 + 65"], explanation: "365 = 300 + 60 + 5.", hint: "Break it into hundreds, tens, and ones." } },
+  { id: "d18", type: "multiple_choice", domain: "numeracy", maxYear: 3, content: { stem: "What is 6 × 5?", answer: "30", options: ["25", "30", "35", "36"], explanation: "6 × 5 = 30.", hint: "Count by 5s six times." } },
+  { id: "d19", type: "multiple_choice", domain: "reading", maxYear: 3, content: { stem: "'Lily looked at her empty lunchbox and sighed.' How was Lily feeling?", answer: "Disappointed or sad", options: ["Happy and excited", "Disappointed or sad", "Angry and annoyed", "Scared and worried"], explanation: "Sighing at an empty lunchbox suggests disappointment.", hint: "What would make someone sigh at an empty lunchbox?" } },
+  { id: "d20", type: "multiple_choice", domain: "reading", maxYear: 3, content: { stem: "'The enormous waves crashed onto the shore.' What does 'enormous' mean?", answer: "Very big", options: ["Very small", "Very big", "Very fast", "Very quiet"], explanation: "'Enormous' means very big or huge.", hint: "Waves that crash are usually what size?" } },
+  { id: "d21", type: "multiple_choice", domain: "spelling", maxYear: 3, content: { stem: "What is the correct way to add -ing to 'run'?", answer: "running", options: ["runing", "running", "runeing", "runnning"], explanation: "Double the consonant before -ing: running.", hint: "Do you need to double the last letter?" } },
+  { id: "d22", type: "multiple_choice", domain: "grammar_punctuation", maxYear: 3, content: { stem: "Choose the correct past tense: 'Yesterday, I ___ to the park.'", answer: "walked", options: ["walk", "walked", "walking", "walks"], explanation: "'Yesterday' means past tense: walked.", hint: "'Yesterday' is a clue — it already happened." } },
+
+  // YEAR 4+ — Larger numbers, fractions, multiplication
+  { id: "d23", type: "multiple_choice", domain: "numeracy", maxYear: 4, content: { stem: "A farmer has 342 sheep. He sells 178. How many are left?", answer: "164", options: ["164", "174", "236", "264"], explanation: "342 - 178 = 164.", hint: "Start with the ones column: 2 - 8. You'll need to borrow." } },
+  { id: "d24", type: "multiple_choice", domain: "numeracy", maxYear: 4, content: { stem: "What is 7 × 8?", answer: "56", options: ["48", "54", "56", "63"], explanation: "7 × 8 = 56.", hint: "Think: 7 × 8 is the same as 8 × 7." } },
+  { id: "d25", type: "multiple_choice", domain: "numeracy", maxYear: 4, content: { stem: "Which fraction is the same as 1/2?", answer: "2/4", options: ["1/4", "2/4", "2/3", "3/4"], explanation: "1/2 = 2/4.", hint: "Try doubling the top and bottom of 1/2." } },
+  { id: "d26", type: "multiple_choice", domain: "numeracy", maxYear: 7, content: { stem: "A school has 4 classes with 28 students each. How many students altogether?", answer: "112", options: ["96", "102", "112", "128"], explanation: "4 × 28 = 112.", hint: "Break it: 4 × 20 = 80, 4 × 8 = 32, then add." } },
+  { id: "d27", type: "multiple_choice", domain: "spelling", maxYear: 4, content: { stem: "What is the plural of 'baby'?", answer: "babies", options: ["babys", "babyes", "babies", "babiez"], explanation: "Change y to i and add -es: babies.", hint: "What happens to the 'y' at the end?" } },
 ];
 
 interface DomainScore {
@@ -91,10 +107,14 @@ export default function DiagnosticPage() {
     writing: { correct: 0, total: 0 },
   });
 
+  const [demoQuestions, setDemoQuestions] = useState<QuestionData[]>([]);
+
   useEffect(() => {
     const sid = sessionStorage.getItem("upwise_student_id");
     const sessId = sessionStorage.getItem("upwise_session_id");
     const name = sessionStorage.getItem("upwise_child_name");
+    const yearStr = sessionStorage.getItem("upwise_year_level");
+    const yearLevel = yearStr ? Number(yearStr) : 3;
     if (name) setChildName(name);
 
     if (sid && sessId) {
@@ -102,10 +122,12 @@ export default function DiagnosticPage() {
       setSessionId(sessId);
       setStarted(true);
     } else if (name) {
-      // No API session — run in demo mode
+      // Filter demo questions to the child's year level
+      const filtered = ALL_DEMO_QUESTIONS.filter((q) => q.maxYear <= yearLevel);
+      setDemoQuestions(filtered);
       setDemoMode(true);
       setStarted(true);
-      setCurrentQuestion(DEMO_QUESTIONS[0]);
+      setCurrentQuestion(filtered[0] ?? null);
     }
   }, []);
 
@@ -175,11 +197,11 @@ export default function DiagnosticPage() {
   function advanceToNextQuestion() {
     const nextIndex = questionIndex + 1;
     if (demoMode) {
-      if (nextIndex >= DEMO_QUESTIONS.length) {
+      if (nextIndex >= demoQuestions.length) {
         setComplete(true);
       } else {
         setQuestionIndex(nextIndex);
-        setCurrentQuestion(DEMO_QUESTIONS[nextIndex]);
+        setCurrentQuestion(demoQuestions[nextIndex]);
       }
     } else {
       setCurrentQuestion(null); // triggers API fetch via useEffect
@@ -353,7 +375,7 @@ export default function DiagnosticPage() {
   }
 
   // Active diagnostic
-  const totalQuestions = demoMode ? DEMO_QUESTIONS.length : 25;
+  const totalQuestions = demoMode ? demoQuestions.length : 25;
   const progress = Math.min((questionIndex / totalQuestions) * 100, 100);
 
   return (
