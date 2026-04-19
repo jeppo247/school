@@ -257,7 +257,7 @@ export default function DiagnosticPage() {
       setShowTransition(false);
       setAnswerLocked(false);
       advanceToNextQuestion();
-    }, 1200);
+    }, 2000);
   }
 
   // Fallback: no name in sessionStorage at all
@@ -378,34 +378,103 @@ export default function DiagnosticPage() {
   const totalQuestions = demoMode ? demoQuestions.length : 25;
   const progress = Math.min((questionIndex / totalQuestions) * 100, 100);
 
+  // Varied animations — different fun animation each time
+  const animations = [
+    { emoji: "🦉", particles: "✨", msg: "Nice!" },
+    { emoji: "⭐", particles: "🌟", msg: "Awesome!" },
+    { emoji: "🦘", particles: "💫", msg: "You're doing great!" },
+    { emoji: "🐨", particles: "⭐", msg: "Keep going!" },
+    { emoji: "🌈", particles: "🎵", msg: "Wonderful!" },
+    { emoji: "🚀", particles: "✨", msg: "Superstar!" },
+    { emoji: "🎈", particles: "🎉", msg: "Amazing!" },
+    { emoji: "🦋", particles: "💐", msg: "Brilliant!" },
+    { emoji: "🐬", particles: "🌊", msg: "Fantastic!" },
+    { emoji: "🌻", particles: "🌸", msg: "You rock!" },
+  ];
+  const currentAnim = animations[questionIndex % animations.length];
+
+  function handleStartAgain() {
+    setQuestionIndex(0);
+    setTotalAnswered(0);
+    setTotalCorrect(0);
+    setCorrectStreak(0);
+    setDomainResults({
+      numeracy: { correct: 0, total: 0 },
+      reading: { correct: 0, total: 0 },
+      spelling: { correct: 0, total: 0 },
+      grammar_punctuation: { correct: 0, total: 0 },
+      writing: { correct: 0, total: 0 },
+    });
+    if (demoMode && demoQuestions.length > 0) {
+      setCurrentQuestion(demoQuestions[0]);
+    }
+  }
+
+  function handleFinishEarly() {
+    setComplete(true);
+  }
+
+  function handleSaveForLater() {
+    // Save current progress to sessionStorage
+    sessionStorage.setItem("upwise_diagnostic_progress", JSON.stringify({
+      questionIndex,
+      totalAnswered,
+      totalCorrect,
+      domainResults,
+      childName,
+    }));
+    window.location.href = "/";
+  }
+
   return (
     <main className="min-h-screen pb-8">
       <AdventureBackground />
+
+      {/* Header bar with Upwise logo + controls */}
+      <header className="relative z-20 px-4 py-3 flex items-center justify-between">
+        <a href="/" className="font-display text-xl font-bold text-[#4F8CF7]">
+          Upwise
+        </a>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSaveForLater}
+            className="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
+          >
+            Save for later
+          </button>
+          <button
+            onClick={handleFinishEarly}
+            className="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
+          >
+            Finish early
+          </button>
+          <button
+            onClick={handleStartAgain}
+            className="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
+          >
+            Start again
+          </button>
+        </div>
+      </header>
+
       {/* Progress bar */}
-      <div className="px-6 pt-6 pb-4">
+      <div className="relative z-10 px-6 pb-4">
         <div className="max-w-2xl mx-auto">
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-2 bg-white/40 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-[var(--theme-primary)] rounded-full"
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
-
-          {questionIndex > 0 && questionIndex % 6 === 0 && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center text-sm text-gray-400 mt-3 font-display"
-            >
-              🦉 You&apos;re doing great, {childName}! Keep going!
-            </motion.p>
-          )}
+          <p className="text-center text-xs text-gray-400 mt-2">
+            Question {questionIndex + 1}{demoMode ? ` of ${demoQuestions.length}` : ""}
+          </p>
         </div>
       </div>
 
       {/* Question */}
-      <div className="max-w-2xl mx-auto px-6">
+      <div className="relative z-10 max-w-2xl mx-auto px-6">
         <AnimatePresence mode="wait">
           {currentQuestion && !showTransition && (
             <QuestionCard
@@ -424,7 +493,7 @@ export default function DiagnosticPage() {
         </AnimatePresence>
       </div>
 
-      {/* Calm transition animation — same for every answer, no right/wrong */}
+      {/* Fun transition animation — varies each question */}
       <AnimatePresence>
         {showTransition && (
           <motion.div
@@ -434,55 +503,47 @@ export default function DiagnosticPage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Gentle floating stars */}
-            {Array.from({ length: 8 }, (_, i) => (
+            {/* Floating particles — different emoji each time */}
+            {Array.from({ length: 12 }, (_, i) => (
               <motion.div
                 key={i}
                 className="absolute text-2xl"
-                initial={{
-                  x: 0,
-                  y: 0,
-                  opacity: 0,
-                  scale: 0.5,
-                }}
+                initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
                 animate={{
-                  x: (Math.cos((i / 8) * Math.PI * 2)) * 100,
-                  y: (Math.sin((i / 8) * Math.PI * 2)) * 100 - 30,
-                  opacity: [0, 1, 0],
-                  scale: [0.5, 1.2, 0.8],
+                  x: (Math.cos((i / 12) * Math.PI * 2)) * (80 + Math.random() * 60),
+                  y: (Math.sin((i / 12) * Math.PI * 2)) * (80 + Math.random() * 60) - 20,
+                  opacity: [0, 1, 1, 0],
+                  scale: [0, 1.3, 1, 0.6],
+                  rotate: [0, Math.random() * 30 - 15],
                 }}
-                transition={{
-                  duration: 1,
-                  delay: i * 0.05,
-                  ease: "easeOut",
-                }}
+                transition={{ duration: 1.2, delay: i * 0.04, ease: "easeOut" }}
               >
-                ✨
+                {currentAnim.particles}
               </motion.div>
             ))}
 
-            {/* Mascot reaction */}
+            {/* Main character/emoji — bounces in */}
             <motion.div
               className="text-center"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: [0, 1.4, 1], opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ duration: 0.5, ease: "backOut" }}
             >
               <motion.span
-                className="text-6xl block"
-                animate={{ y: [0, -12, 0], rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 0.6 }}
+                className="text-7xl block"
+                animate={{ y: [0, -20, 0], rotate: [0, 8, -8, 0] }}
+                transition={{ duration: 0.8 }}
               >
-                🦉
+                {currentAnim.emoji}
               </motion.span>
               <motion.p
-                className="font-display text-lg font-semibold text-[var(--theme-primary)] mt-2 drop-shadow-sm"
-                initial={{ opacity: 0, y: 5 }}
+                className="font-display text-xl font-bold text-[var(--theme-primary)] mt-3 drop-shadow-md"
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
+                transition={{ delay: 0.2 }}
               >
-                {["Nice!", "Let's keep going!", "Awesome!", "You're doing great!", "Good one!", "Keep it up!"][questionIndex % 6]}
+                {currentAnim.msg}
               </motion.p>
             </motion.div>
           </motion.div>
