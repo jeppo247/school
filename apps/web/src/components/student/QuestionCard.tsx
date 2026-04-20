@@ -66,7 +66,7 @@ export function QuestionCard({
 
       {/* Answer options */}
       {question.type === "multiple_choice" && question.options && (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {question.options.map((option, index) => {
             const isSelected = selected === option;
             const showResult = feedback && isSelected;
@@ -107,7 +107,7 @@ export function QuestionCard({
             value={numericInput}
             onChange={(e) => setNumericInput(e.target.value)}
             disabled={disabled}
-            className="w-48 text-center text-3xl font-display font-bold p-4 rounded-xl border-2 border-gray-200 focus:border-[var(--theme-primary)] focus:outline-none"
+            className="w-full max-w-48 text-center text-3xl font-display font-bold p-4 rounded-xl border-2 border-gray-200 focus:border-[var(--theme-primary)] focus:outline-none"
             placeholder="?"
             onKeyDown={(e) => e.key === "Enter" && handleNumericSubmit()}
           />
@@ -125,7 +125,7 @@ export function QuestionCard({
 
       {/* True/False */}
       {question.type === "true_false" && (
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
           {["True", "False"].map((option) => {
             const isSelected = selected === option;
             const showResult = feedback && isSelected;

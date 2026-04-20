@@ -124,7 +124,7 @@ export default function ParentDashboard() {
         <motion.div
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-3 gap-4 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8"
         >
           {[
             { label: "Questions", value: String(totalAnswered), sub: "completed", color: "text-[#4F8CF7]" },
@@ -165,7 +165,7 @@ export default function ParentDashboard() {
 
               return (
                 <div key={domain.domain} className="flex items-center justify-between py-2">
-                  <div className="w-48">
+                  <div className="w-full sm:w-48">
                     <span className="text-sm font-medium text-gray-700">
                       {DOMAIN_LABELS[domain.domain] ?? domain.domain}
                     </span>

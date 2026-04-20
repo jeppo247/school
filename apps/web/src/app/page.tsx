@@ -281,11 +281,11 @@ export default function HomePage() {
             transition={{ duration: 0.5 }}
             className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm bg-white"
           >
-            <table className="w-full">
+            <table className="w-full hidden sm:table">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="text-left text-sm font-semibold text-gray-500 px-6 py-4 w-[40%]"></th>
-                  <th className="text-center text-sm font-bold text-[#4F8CF7] px-6 py-4 w-[30%]">
+                  <th className="text-left text-sm font-semibold text-gray-500 px-4 sm:px-6 py-4 w-[40%]"></th>
+                  <th className="text-center text-sm font-bold text-[#4F8CF7] px-4 sm:px-6 py-4 w-[30%]">
                     Mastery Learning
                   </th>
                   <th className="text-center text-sm font-semibold text-gray-600 px-6 py-4 w-[30%]">
@@ -319,7 +319,27 @@ export default function HomePage() {
                 ))}
               </tbody>
             </table>
-            <div className="px-6 py-3 bg-gray-50 border-t border-gray-100">
+            {/* Mobile card view */}
+            <div className="sm:hidden divide-y divide-gray-100">
+              {[
+                { feature: "Eliminates knowledge gaps", mastery: "Can't progress until they truly understand — no gaps stack up", traditional: "Class moves on regardless — missed concepts compound over time" },
+                { feature: "Matches pace to the individual", mastery: "Progress based on competence — every child in their optimal zone", traditional: "Progress based on group timing — top students bored, struggling students fall behind" },
+                { feature: "Tight feedback loops", mastery: "Instant feedback, targeted practice on weak areas — faster learning cycles", traditional: "Delayed feedback, broad correction — errors become embedded habits" },
+              ].map((row) => (
+                <div key={row.feature} className="p-4">
+                  <p className="text-sm font-semibold text-gray-800 mb-2">{row.feature}</p>
+                  <div className="bg-blue-50 rounded-lg p-3 mb-2">
+                    <p className="text-xs font-semibold text-[#4F8CF7] mb-1">Mastery Learning</p>
+                    <p className="text-xs text-gray-700">{row.mastery}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-xs font-semibold text-gray-500 mb-1">Traditional</p>
+                    <p className="text-xs text-gray-600">{row.traditional}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="px-4 sm:px-6 py-3 bg-gray-50 border-t border-gray-100">
               <p className="text-[11px] text-gray-400">
                 Mastery learning aligns with how humans actually learn: fix gaps before progressing, learn at the right pace, iterate quickly with feedback.
               </p>

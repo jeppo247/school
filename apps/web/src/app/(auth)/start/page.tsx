@@ -81,7 +81,7 @@ export default function StartPage() {
           {(["parent", "child", "theme", "ready"] as Step[]).map((s, i) => (
             <div
               key={s}
-              className={`h-1.5 w-12 rounded-full transition-colors ${
+              className={`h-1.5 w-8 sm:w-12 rounded-full transition-colors ${
                 (["parent", "child", "theme", "ready"] as Step[]).indexOf(step) >= i
                   ? "bg-[#4F8CF7]"
                   : "bg-gray-200"
@@ -189,7 +189,7 @@ export default function StartPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Year level
                   </label>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
                       { value: 0, label: "Prep" },
                       { value: 1, label: "Year 1" },

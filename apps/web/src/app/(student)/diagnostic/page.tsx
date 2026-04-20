@@ -435,24 +435,24 @@ export default function DiagnosticPage() {
         <a href="/" className="font-display text-xl font-bold text-[#4F8CF7]">
           Upwise
         </a>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={handleSaveForLater}
-            className="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
+            className="text-[10px] sm:text-xs text-gray-400 hover:text-gray-600 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
           >
-            Save for later
+            Save
           </button>
           <button
             onClick={handleFinishEarly}
-            className="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
+            className="text-[10px] sm:text-xs text-gray-400 hover:text-gray-600 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
           >
-            Finish early
+            Finish
           </button>
           <button
             onClick={handleStartAgain}
-            className="text-xs text-gray-400 hover:text-gray-600 px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
+            className="text-[10px] sm:text-xs text-gray-400 hover:text-gray-600 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
           >
-            Start again
+            Restart
           </button>
         </div>
       </header>
