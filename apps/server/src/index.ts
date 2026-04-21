@@ -20,6 +20,7 @@ import { adminRoutes } from "./routes/admin.js";
 import { webhookRoutes } from "./routes/webhooks.js";
 import { coinRoutes } from "./routes/coins.js";
 import { shopRoutes } from "./routes/shop.js";
+import { subscriptionRoutes } from "./routes/subscriptions.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 4000;
@@ -57,6 +58,7 @@ api.use("/admin", adminRoutes);
 api.use("/webhooks", webhookRoutes);
 api.use("/coins", coinRoutes);
 api.use("/shop", shopRoutes);
+api.use("/subscriptions", subscriptionRoutes);
 
 app.use("/api/v1", api);
 

@@ -729,7 +729,7 @@ export default function HomePage() {
                   "1 child",
                   "Full parent dashboard",
                 ],
-                cta: "Coming Soon",
+                cta: "Start Free Trial",
                 popular: false,
               },
               {
@@ -746,7 +746,7 @@ export default function HomePage() {
                   "Daily briefings & nudges",
                   "Weekly reports",
                 ],
-                cta: "Coming Soon",
+                cta: "Subscribe",
                 popular: true,
               },
               {
@@ -761,7 +761,7 @@ export default function HomePage() {
                   "Term reports",
                   "Teacher-shareable reports",
                 ],
-                cta: "Coming Soon",
+                cta: "Subscribe",
                 popular: false,
               },
             ].map((plan, i) => (
@@ -829,15 +829,16 @@ export default function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <span
-                  className={`block text-center font-semibold py-3.5 rounded-xl cursor-not-allowed opacity-70 ${
+                <Link
+                  href={plan.name === "Free Trial" ? "/start" : "/subscribe"}
+                  className={`block text-center font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] ${
                     plan.popular
-                      ? "bg-white/60 text-[#4F8CF7]"
-                      : "bg-gray-200 text-gray-500"
+                      ? "bg-white text-[#4F8CF7] hover:bg-blue-50 shadow-md"
+                      : "bg-[#4F8CF7] text-white hover:bg-[#3A6CD4] hover:shadow-lg hover:shadow-blue-100"
                   }`}
                 >
                   {plan.cta}
-                </span>
+                </Link>
               </motion.div>
             ))}
           </div>
