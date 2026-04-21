@@ -21,7 +21,7 @@ export function XPBar({ currentXP, levelXP, level }: XPBarProps) {
           <span className="font-medium">{currentXP} XP</span>
           <span>{levelXP} XP</span>
         </div>
-        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-2.5 bg-[#E0E7F4] rounded-full overflow-hidden">
           <motion.div
             className="h-full rounded-full bg-gradient-to-r from-[var(--theme-primary)] to-[var(--theme-accent)]"
             initial={{ width: 0 }}

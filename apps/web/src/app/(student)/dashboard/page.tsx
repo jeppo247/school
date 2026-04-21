@@ -27,7 +27,7 @@ export default function StudentDashboard() {
     <main className="min-h-screen pb-24 md:ml-[220px]">
       <AdventureBackground />
       {/* Header bar */}
-      <header className="sticky top-0 z-30 bg-[var(--theme-surface)]/90 backdrop-blur-md border-b border-gray-100 px-6 py-3">
+      <header className="sticky top-0 z-30 bg-[#F5F7FF]/90 backdrop-blur-md border-b border-[#E0E7EF] px-6 py-3">
         <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[var(--theme-primary)]/10 flex items-center justify-center">
@@ -58,7 +58,8 @@ export default function StudentDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[var(--theme-surface)] rounded-3xl p-8 shadow-sm border border-gray-100 text-center mb-8 lg:mb-0"
+          className="rounded-3xl p-8 lg:p-12 border border-gray-100/50 text-center mb-8 lg:mb-0"
+          style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F0F7FF 100%)", boxShadow: "0 8px 32px rgba(79, 140, 247, 0.12)" }}
         >
           {/* Mascot */}
           <motion.div
@@ -97,12 +98,12 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-[var(--theme-surface)] rounded-2xl p-4 lg:p-6 border border-gray-100 flex flex-col items-center"
+            className="bg-[#EFF6FF] rounded-2xl p-4 lg:p-6 border border-blue-100 flex flex-col items-center min-h-[160px] justify-center"
           >
             <ProgressRing
               progress={(mockStudent.weeklySessionsCompleted / mockStudent.weeklySessionsTarget) * 100}
-              size={80}
-              strokeWidth={8}
+              size={100}
+              strokeWidth={10}
               label="This week"
               color="var(--theme-primary)"
             />
@@ -113,9 +114,9 @@ export default function StudentDashboard() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-[var(--theme-surface)] rounded-2xl p-4 lg:p-6 border border-gray-100 flex flex-col items-center justify-center gap-2 hover:shadow-md transition-shadow cursor-pointer h-full"
+              className="bg-white rounded-2xl p-4 lg:p-6 border border-gray-100 flex flex-col items-center justify-center gap-2 hover:shadow-md transition-shadow cursor-pointer h-full"
             >
-              <span className="text-3xl">🏆</span>
+              <span className="text-3xl lg:text-5xl">🏆</span>
               <span className="text-xs font-medium text-gray-500">Rewards</span>
             </motion.div>
           </Link>
@@ -125,7 +126,7 @@ export default function StudentDashboard() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-[var(--theme-surface)] rounded-2xl p-4 lg:p-6 border border-gray-100 flex flex-col items-center justify-center gap-2 hover:shadow-md transition-shadow cursor-pointer h-full"
+              className="bg-white rounded-2xl p-4 lg:p-6 border border-gray-100 flex flex-col items-center justify-center gap-2 hover:shadow-md transition-shadow cursor-pointer h-full"
             >
               <span className="text-3xl">🎨</span>
               <span className="text-xs font-medium text-gray-500">Theme</span>
@@ -136,7 +137,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Sidebar nav — visible md+ */}
-      <aside className="hidden md:flex md:flex-col md:fixed md:left-0 md:top-0 md:w-[220px] md:h-full bg-[var(--theme-surface)] border-r border-gray-100 py-8 px-4 z-40">
+      <aside className="hidden md:flex md:flex-col md:fixed md:left-0 md:top-0 md:w-[220px] md:h-full border-r border-[#E0E7EF] py-8 px-4 z-40" style={{ background: "linear-gradient(180deg, #EEF2FF 0%, #F5F7FF 100%)" }}>
         <div className="mb-8">
           <span className="font-display font-bold text-lg text-gray-800">Upwise</span>
         </div>

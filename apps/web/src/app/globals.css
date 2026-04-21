@@ -8,7 +8,8 @@
   --theme-secondary: #A78BFA;
   --theme-accent: #34D399;
   --theme-bg: #F8FAFC;
-  --theme-surface: #FFFFFF;
+  --theme-surface: #F5F7FF;
+  --theme-surface-elevated: #FFFFFF;
 
   /* Spacing & layout */
   --content-max-width: 1200px;
@@ -21,7 +22,7 @@
   --theme-secondary: #E31937;
   --theme-accent: #FFD700;
   --theme-bg: #F0F4F8;
-  --theme-surface: #FFFFFF;
+  --theme-surface: #F5F7FF;
 }
 
 /* Theme: Bluey */
@@ -30,7 +31,7 @@
   --theme-secondary: #FF8C42;
   --theme-accent: #7EC8E3;
   --theme-bg: #EDF6FF;
-  --theme-surface: #FFFFFF;
+  --theme-surface: #F5F7FF;
 }
 
 /* Theme: Superheroes */
@@ -39,7 +40,7 @@
   --theme-secondary: #1D4ED8;
   --theme-accent: #FACC15;
   --theme-bg: #FEF2F2;
-  --theme-surface: #FFFFFF;
+  --theme-surface: #F5F7FF;
 }
 
 /* Theme: Space */
@@ -48,7 +49,7 @@
   --theme-secondary: #06B6D4;
   --theme-accent: #F59E0B;
   --theme-bg: #F0F0FF;
-  --theme-surface: #FFFFFF;
+  --theme-surface: #F5F7FF;
 }
 
 /* Theme: Animals */
@@ -57,7 +58,7 @@
   --theme-secondary: #92400E;
   --theme-accent: #F97316;
   --theme-bg: #F0FDF4;
-  --theme-surface: #FFFFFF;
+  --theme-surface: #F5F7FF;
 }
 
 /* Theme: Golf */
@@ -66,7 +67,7 @@
   --theme-secondary: #FBBF24;
   --theme-accent: #ECFDF5;
   --theme-bg: #F7FEE7;
-  --theme-surface: #FFFFFF;
+  --theme-surface: #F5F7FF;
 }
 
 @layer base {

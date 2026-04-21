@@ -12,7 +12,7 @@ export function StreakCounter({ count }: StreakCounterProps) {
 
   return (
     <motion.div
-      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-50 border border-orange-200"
+      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FFF8E1] border border-amber-200"
       animate={{
         scale: count > 0 ? [1, 1.05, 1] : 1,
       }}

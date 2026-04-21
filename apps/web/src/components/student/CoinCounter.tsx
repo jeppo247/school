@@ -40,7 +40,7 @@ export function CoinCounter({ balance, onOpenShop }: CoinCounterProps) {
   return (
     <motion.button
       onClick={onOpenShop}
-      className="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors cursor-pointer"
+      className="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FFFBEB] border border-amber-200 hover:bg-amber-100 transition-colors cursor-pointer"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >
