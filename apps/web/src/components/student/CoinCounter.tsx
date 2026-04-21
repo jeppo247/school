@@ -54,7 +54,7 @@ export function CoinCounter({ balance, onOpenShop }: CoinCounterProps) {
       </motion.div>
 
       {/* Balance */}
-      <span className="font-display font-bold text-amber-700 text-lg tabular-nums">
+      <span className="font-display font-bold text-amber-700 text-lg md:text-xl tabular-nums">
         {displayBalance}
       </span>
 

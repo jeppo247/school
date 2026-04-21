@@ -102,19 +102,19 @@ export default function ParentDashboard() {
     <main className="min-h-screen bg-[#FAFAFA]">
       {/* Nav */}
       <nav className="bg-white border-b border-gray-100 px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+        <div className="max-w-5xl lg:max-w-6xl mx-auto flex items-center justify-between">
           <Link href="/" className="font-display text-xl font-bold text-[#4F8CF7]">Upwise</Link>
-          <span className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700">
+          <span className="text-sm md:text-base border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700">
             {childName} (Year {yearLevel})
           </span>
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="max-w-5xl lg:max-w-6xl mx-auto px-6 py-8">
         <motion.h1
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-2xl font-semibold text-[#1A1A2E] mb-2"
+          className="text-2xl md:text-3xl font-semibold text-[#1A1A2E] mb-2"
         >
           {childName}&apos;s Dashboard
         </motion.h1>
@@ -135,10 +135,10 @@ export default function ParentDashboard() {
               key={stat.label}
               variants={fadeUp}
               custom={i}
-              className="bg-white rounded-xl p-5 border border-gray-100"
+              className="bg-white rounded-xl p-5 lg:p-6 border border-gray-100"
             >
               <p className="text-xs text-gray-400 font-medium mb-1">{stat.label}</p>
-              <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+              <p className={`text-2xl md:text-3xl font-bold ${stat.color}`}>{stat.value}</p>
               <p className="text-xs text-gray-400">{stat.sub}</p>
             </motion.div>
           ))}
@@ -152,7 +152,7 @@ export default function ParentDashboard() {
           className="bg-white rounded-xl p-6 border border-gray-100 mb-6"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-[#1A1A2E]">NAPLAN Domain Projections</h2>
+            <h2 className="text-lg md:text-xl font-semibold text-[#1A1A2E]">NAPLAN Domain Projections</h2>
             <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
               Unofficial practice estimate
             </span>
@@ -166,7 +166,7 @@ export default function ParentDashboard() {
               return (
                 <div key={domain.domain} className="flex items-center justify-between py-2">
                   <div className="w-full sm:w-48">
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm md:text-base font-medium text-gray-700">
                       {DOMAIN_LABELS[domain.domain] ?? domain.domain}
                     </span>
                     {hasData && (
@@ -189,7 +189,7 @@ export default function ParentDashboard() {
                       )}
                     </div>
                   </div>
-                  <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                  <span className={`text-xs md:text-sm font-semibold px-3 py-1 rounded-full ${
                     hasData ? `${prof.bg} ${prof.text}` : "bg-gray-100 text-gray-400"
                   }`}>
                     {hasData ? prof.label : "Not tested"}
@@ -206,7 +206,7 @@ export default function ParentDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-xl p-6 border border-gray-100"
+            className="bg-white rounded-xl p-6 lg:p-8 border border-gray-100"
           >
             <h2 className="text-lg font-semibold text-[#1A1A2E] mb-4">💪 Strengths</h2>
             {strengths.length > 0 ? (
@@ -233,7 +233,7 @@ export default function ParentDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-xl p-6 border border-gray-100"
+            className="bg-white rounded-xl p-6 lg:p-8 border border-gray-100"
           >
             <h2 className="text-lg font-semibold text-[#1A1A2E] mb-4">🎯 Areas to Focus On</h2>
             {gaps.length > 0 || untested.length > 0 ? (
@@ -272,7 +272,7 @@ export default function ParentDashboard() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100/50 mb-6"
+          className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 lg:p-8 border border-blue-100/50 mb-6"
         >
           <h2 className="text-lg font-semibold text-[#1A1A2E] mb-3">📋 What happens next?</h2>
           <div className="space-y-3 text-sm text-gray-600">
@@ -298,13 +298,13 @@ export default function ParentDashboard() {
         <div className="flex gap-4">
           <Link
             href="/dashboard"
-            className="flex-1 bg-[#4F8CF7] text-white font-semibold py-4 rounded-xl text-center hover:bg-[#3A6CD4] transition-all"
+            className="flex-1 bg-[#4F8CF7] text-white font-semibold py-4 lg:py-5 lg:text-lg rounded-xl text-center hover:bg-[#3A6CD4] transition-all"
           >
             Start {childName}&apos;s First Session
           </Link>
           <Link
             href="/start"
-            className="bg-white text-gray-600 font-semibold py-4 px-6 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all"
+            className="bg-white text-gray-600 font-semibold py-4 lg:py-5 lg:text-lg px-6 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all"
           >
             Add Another Child
           </Link>

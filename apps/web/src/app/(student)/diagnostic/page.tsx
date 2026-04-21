@@ -304,17 +304,17 @@ export default function DiagnosticPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-md"
+          className="text-center max-w-md lg:max-w-lg"
         >
           <motion.span
-            className="text-8xl block mb-6"
+            className="text-8xl lg:text-9xl block mb-6"
             initial={{ scale: 0 }}
             animate={{ scale: [0, 1.3, 1] }}
             transition={{ duration: 0.8 }}
           >
             🎉
           </motion.span>
-          <h1 className="font-display text-3xl font-bold text-gray-800 mb-3">
+          <h1 className="font-display text-3xl md:text-4xl font-bold text-gray-800 mb-3">
             Amazing work, {childName}!
           </h1>
           <p className="text-gray-500 mb-6">
@@ -432,7 +432,7 @@ export default function DiagnosticPage() {
 
       {/* Header bar with Upwise logo + controls */}
       <header className="relative z-20 px-4 py-3 flex items-center justify-between">
-        <a href="/" className="font-display text-xl font-bold text-[#4F8CF7]">
+        <a href="/" className="font-display text-xl md:text-2xl font-bold text-[#4F8CF7]">
           Upwise
         </a>
         <div className="flex items-center gap-1 sm:gap-2">
@@ -459,7 +459,7 @@ export default function DiagnosticPage() {
 
       {/* Progress bar */}
       <div className="relative z-10 px-6 pb-4">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto">
           <div className="h-2 bg-white/40 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-[var(--theme-primary)] rounded-full"
@@ -474,7 +474,7 @@ export default function DiagnosticPage() {
       </div>
 
       {/* Question */}
-      <div className="relative z-10 max-w-2xl mx-auto px-6">
+      <div className="relative z-10 max-w-2xl lg:max-w-3xl mx-auto px-6">
         <AnimatePresence mode="wait">
           {currentQuestion && !showTransition && (
             <QuestionCard
@@ -531,14 +531,14 @@ export default function DiagnosticPage() {
               transition={{ duration: 0.5, ease: "backOut" }}
             >
               <motion.span
-                className="text-7xl block"
+                className="text-7xl lg:text-9xl block"
                 animate={{ y: [0, -20, 0], rotate: [0, 8, -8, 0] }}
                 transition={{ duration: 0.8 }}
               >
                 {currentAnim.emoji}
               </motion.span>
               <motion.p
-                className="font-display text-xl font-bold text-[var(--theme-primary)] mt-3 drop-shadow-md"
+                className="font-display text-xl lg:text-2xl font-bold text-[var(--theme-primary)] mt-3 drop-shadow-md"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}

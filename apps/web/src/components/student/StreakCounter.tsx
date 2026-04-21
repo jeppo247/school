@@ -34,7 +34,7 @@ export function StreakCounter({ count }: StreakCounterProps) {
         🔥
       </motion.span>
       <div>
-        <p className="font-display font-bold text-orange-600 text-lg leading-tight">
+        <p className="font-display font-bold text-orange-600 text-lg md:text-xl leading-tight">
           {count}
         </p>
         <p className="text-xs text-orange-400">

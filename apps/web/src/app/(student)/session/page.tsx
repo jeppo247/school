@@ -83,13 +83,13 @@ export default function SessionPage() {
           className="text-center"
         >
           <motion.span
-            className="text-8xl block mb-6"
+            className="text-8xl lg:text-9xl block mb-6"
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
             🧠
           </motion.span>
-          <h1 className="font-display text-3xl font-bold text-teal-700 mb-4">
+          <h1 className="font-display text-3xl lg:text-4xl font-bold text-teal-700 mb-4">
             Brain Break!
           </h1>
           <p className="text-teal-600 mb-8 text-lg">
@@ -115,17 +115,17 @@ export default function SessionPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center max-w-md"
+          className="text-center max-w-md lg:max-w-lg"
         >
           <motion.span
-            className="text-8xl block mb-6"
+            className="text-8xl lg:text-9xl block mb-6"
             initial={{ scale: 0 }}
             animate={{ scale: [0, 1.3, 1] }}
             transition={{ duration: 0.6 }}
           >
             🌟
           </motion.span>
-          <h1 className="font-display text-3xl font-bold text-gray-800 mb-2">
+          <h1 className="font-display text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
             Amazing Work!
           </h1>
           <p className="text-gray-500 mb-8">You did a great job today!</p>
@@ -167,7 +167,7 @@ export default function SessionPage() {
       <AdventureBackground />
       {/* Session header */}
       <header className="px-6 py-4">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto">
           {/* Phase indicator */}
           <div className="flex items-center gap-2 mb-3">
             {(["warmup", "focus_1", "brain_break", "focus_2", "wrapup"] as SessionPhase[]).map((p) => (
@@ -187,8 +187,8 @@ export default function SessionPage() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xl">{phaseConfig.emoji}</span>
-              <span className="font-display font-semibold text-gray-700 text-sm">
+              <span className="text-xl md:text-2xl">{phaseConfig.emoji}</span>
+              <span className="font-display font-semibold text-gray-700 text-sm md:text-base">
                 {phaseConfig.label}
               </span>
             </div>
@@ -200,7 +200,7 @@ export default function SessionPage() {
       </header>
 
       {/* Question area */}
-      <div className="max-w-2xl mx-auto px-6 pt-4">
+      <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto px-6 pt-4">
         <AnimatePresence mode="wait">
           <QuestionCard
             key={questionNumber}
