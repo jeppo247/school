@@ -77,15 +77,15 @@ export function QuestionCard({
                 onClick={() => handleOptionClick(option)}
                 disabled={disabled}
                 className={`
-                  p-4 rounded-xl text-lg font-medium text-center transition-all
+                  p-4 rounded-2xl text-lg font-medium text-center transition-all shadow-clay
                   ${
                     showResult
                       ? feedback.isCorrect
                         ? "bg-green-100 border-2 border-green-500 text-green-700"
                         : "bg-red-100 border-2 border-red-500 text-red-700"
                       : isSelected
-                        ? "bg-[var(--theme-primary)] text-white border-2 border-[var(--theme-primary)]"
-                        : "bg-gray-50 border-2 border-gray-200 text-gray-700 hover:border-[var(--theme-primary)] hover:bg-blue-50"
+                        ? "bg-[var(--theme-primary)] text-white border-2 border-[var(--theme-primary)] shadow-clay-hover"
+                        : "bg-white border-2 border-[#E8E2D8] text-gray-700 hover:border-[var(--theme-primary)] hover:bg-blue-50 hover:-rotate-1 hover:-translate-y-0.5 hover:shadow-clay-hover"
                   }
                   ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer active:scale-95"}
                 `}

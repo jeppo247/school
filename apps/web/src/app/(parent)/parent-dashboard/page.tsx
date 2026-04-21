@@ -135,7 +135,7 @@ export default function ParentDashboard() {
               key={stat.label}
               variants={fadeUp}
               custom={i}
-              className="bg-white rounded-xl p-5 lg:p-6 border border-gray-100"
+              className="bg-white rounded-xl p-5 lg:p-6 border border-[#E8E2D8] shadow-clay"
             >
               <p className="text-xs text-gray-400 font-medium mb-1">{stat.label}</p>
               <p className={`text-2xl md:text-3xl font-bold ${stat.color}`}>{stat.value}</p>
@@ -149,7 +149,7 @@ export default function ParentDashboard() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-xl p-6 border border-gray-100 mb-6"
+          className="bg-white rounded-xl p-6 border border-[#E8E2D8] shadow-clay mb-6"
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg md:text-xl font-semibold text-[#1A1A2E]">NAPLAN Domain Projections</h2>
@@ -206,7 +206,7 @@ export default function ParentDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-xl p-6 lg:p-8 border border-gray-100"
+            className="bg-white rounded-xl p-6 lg:p-8 border border-[#E8E2D8] shadow-clay"
           >
             <h2 className="text-lg font-semibold text-[#1A1A2E] mb-4">💪 Strengths</h2>
             {strengths.length > 0 ? (
@@ -233,7 +233,7 @@ export default function ParentDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-xl p-6 lg:p-8 border border-gray-100"
+            className="bg-white rounded-xl p-6 lg:p-8 border border-[#E8E2D8] shadow-clay"
           >
             <h2 className="text-lg font-semibold text-[#1A1A2E] mb-4">🎯 Areas to Focus On</h2>
             {gaps.length > 0 || untested.length > 0 ? (

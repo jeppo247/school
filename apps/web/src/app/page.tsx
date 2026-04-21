@@ -32,7 +32,7 @@ function GapsExplainer() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: 0.1 }}
-      className="mt-10 bg-white rounded-2xl p-8 border border-gray-200 shadow-sm"
+      className="mt-10 bg-white rounded-2xl p-8 border border-[#E8E2D8] shadow-clay"
     >
       <h3 className="font-display text-lg font-bold text-gray-800 mb-2">
         Why gaps get bigger over time
@@ -279,7 +279,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm bg-white"
+            className="rounded-2xl border border-gray-200 overflow-hidden shadow-clay bg-white"
           >
             <table className="w-full hidden sm:table">
               <thead>
@@ -355,7 +355,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="mt-10 bg-white rounded-2xl p-8 border border-gray-200 shadow-sm"
+            className="mt-10 bg-white rounded-2xl p-8 border border-[#E8E2D8] shadow-clay"
           >
             <h3 className="font-display text-lg font-bold text-gray-800 mb-4">
               Backed by decades of research
@@ -483,7 +483,7 @@ export default function HomePage() {
                 viewport={{ once: true, margin: "-40px" }}
                 variants={scaleIn}
                 custom={i}
-                className="relative bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-lg hover:shadow-gray-100/80 transition-shadow duration-300 group"
+                className="relative bg-white rounded-3xl p-8 shadow-clay border border-[#E8E2D8] hover:shadow-clay-hover hover:-rotate-1 hover:-translate-y-0.5 transition-all duration-300 group"
               >
                 <div
                   className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
@@ -573,7 +573,7 @@ export default function HomePage() {
               transition={{ duration: 0.6 }}
               className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 border border-blue-100/50"
             >
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-4">
+              <div className="bg-white rounded-2xl p-6 shadow-clay border border-[#E8E2D8] mb-4">
                 <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
                   <span className="text-base">📋</span>
                   <span className="font-medium">Today&apos;s Briefing</span>
@@ -588,7 +588,7 @@ export default function HomePage() {
                   simpler problems to rebuild confidence.
                 </p>
               </div>
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="bg-white rounded-2xl p-6 shadow-clay border border-[#E8E2D8]">
                 <div className="flex items-center gap-2 text-sm text-gray-400 mb-3">
                   <span className="text-base">💡</span>
                   <span className="font-medium">If she gets stuck</span>
@@ -668,7 +668,7 @@ export default function HomePage() {
                 viewport={{ once: true, margin: "-30px" }}
                 variants={scaleIn}
                 custom={i}
-                className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-md transition-shadow"
+                className="bg-white rounded-2xl p-6 border border-[#E8E2D8] shadow-clay hover:shadow-clay-hover hover:-rotate-1 hover:-translate-y-0.5 transition-all"
               >
                 <span className="text-3xl mb-4 block">{feature.icon}</span>
                 <h3 className="font-display text-lg font-bold text-gray-900 mb-2">

@@ -58,8 +58,8 @@ export default function StudentDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl p-8 lg:p-12 border border-gray-100/50 text-center mb-8 lg:mb-0"
-          style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F0F7FF 100%)", boxShadow: "0 8px 32px rgba(79, 140, 247, 0.12)" }}
+          className="rounded-3xl p-8 lg:p-12 border border-[#E8E2D8] text-center mb-8 lg:mb-0"
+          style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F0F7FF 100%)", boxShadow: "rgba(0,0,0,0.1) 0px 2px 4px, rgba(0,0,0,0.04) 0px -1px 1px inset, 0 8px 32px rgba(79, 140, 247, 0.1)" }}
         >
           {/* Mascot */}
           <motion.div
@@ -98,7 +98,7 @@ export default function StudentDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-[#EFF6FF] rounded-2xl p-4 lg:p-6 border border-blue-100 flex flex-col items-center min-h-[160px] justify-center"
+            className="bg-[#EFF6FF] rounded-3xl p-4 lg:p-6 border border-[#E8E2D8] flex flex-col items-center min-h-[160px] justify-center shadow-clay"
           >
             <ProgressRing
               progress={(mockStudent.weeklySessionsCompleted / mockStudent.weeklySessionsTarget) * 100}
@@ -114,7 +114,7 @@ export default function StudentDashboard() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl p-4 lg:p-6 border border-gray-100 flex flex-col items-center justify-center gap-2 hover:shadow-md transition-shadow cursor-pointer h-full"
+              className="bg-white rounded-3xl p-4 lg:p-6 border border-[#E8E2D8] flex flex-col items-center justify-center gap-2 shadow-clay hover:shadow-clay-hover hover:-rotate-2 hover:-translate-y-0.5 transition-all cursor-pointer h-full"
             >
               <span className="text-3xl lg:text-5xl">🏆</span>
               <span className="text-xs font-medium text-gray-500">Rewards</span>
@@ -126,7 +126,7 @@ export default function StudentDashboard() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-white rounded-2xl p-4 lg:p-6 border border-gray-100 flex flex-col items-center justify-center gap-2 hover:shadow-md transition-shadow cursor-pointer h-full"
+              className="bg-white rounded-3xl p-4 lg:p-6 border border-[#E8E2D8] flex flex-col items-center justify-center gap-2 shadow-clay hover:shadow-clay-hover hover:-rotate-2 hover:-translate-y-0.5 transition-all cursor-pointer h-full"
             >
               <span className="text-3xl">🎨</span>
               <span className="text-xs font-medium text-gray-500">Theme</span>

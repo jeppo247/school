@@ -11,6 +11,14 @@
   --theme-surface: #F5F7FF;
   --theme-surface-elevated: #FFFFFF;
 
+  /* Clay-inspired shadows */
+  --shadow-clay: rgba(0,0,0,0.1) 0px 1px 1px, rgba(0,0,0,0.04) 0px -1px 1px inset, rgba(0,0,0,0.05) 0px -0.5px 1px;
+  --shadow-hover: -4px 4px 0px rgba(0,0,0,0.12);
+
+  /* Warm borders (oat-toned, not cold grey) */
+  --border-warm: #E8E2D8;
+  --border-warm-light: #EEE9DF;
+
   /* Spacing & layout */
   --content-max-width: 1200px;
   --sidebar-width: 280px;
@@ -83,17 +91,28 @@
 
 @layer components {
   .card {
-    @apply bg-[var(--theme-surface)] rounded-2xl shadow-sm border border-gray-100 p-6;
+    @apply bg-[var(--theme-surface)] rounded-3xl border border-[var(--border-warm)] p-6;
+    box-shadow: var(--shadow-clay);
   }
 
   .btn-primary {
-    @apply bg-[var(--theme-primary)] text-white font-semibold py-3 px-6 rounded-xl
-           hover:opacity-90 transition-all duration-200 active:scale-95;
+    @apply bg-[var(--theme-primary)] text-white font-semibold py-3 px-6 rounded-2xl
+           transition-all duration-200 active:scale-95;
+    box-shadow: var(--shadow-clay);
+  }
+  .btn-primary:hover {
+    transform: rotate(-3deg) translateY(-2px);
+    box-shadow: var(--shadow-hover);
   }
 
   .btn-secondary {
-    @apply bg-[var(--theme-surface)] text-[var(--theme-primary)] font-semibold py-3 px-6 rounded-xl
+    @apply bg-[var(--theme-surface)] text-[var(--theme-primary)] font-semibold py-3 px-6 rounded-2xl
            border-2 border-[var(--theme-primary)] hover:bg-[var(--theme-primary)] hover:text-white
            transition-all duration-200 active:scale-95;
+    box-shadow: var(--shadow-clay);
+  }
+  .btn-secondary:hover {
+    transform: rotate(-3deg) translateY(-2px);
+    box-shadow: var(--shadow-hover);
   }
 }

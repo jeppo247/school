@@ -41,6 +41,11 @@ const config: Config = {
         xl: "1rem",
         "2xl": "1.5rem",
         "3xl": "2rem",
+        "4xl": "2.5rem",
+      },
+      boxShadow: {
+        clay: "rgba(0,0,0,0.1) 0px 1px 1px, rgba(0,0,0,0.04) 0px -1px 1px inset, rgba(0,0,0,0.05) 0px -0.5px 1px",
+        "clay-hover": "-4px 4px 0px rgba(0,0,0,0.12)",
       },
       animation: {
         "bounce-in": "bounceIn 0.5s ease-out",
