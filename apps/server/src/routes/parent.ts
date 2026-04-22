@@ -3,6 +3,7 @@ import { db } from "../db/client.js";
 import {
   dailyBriefings, parentNudges, weeklyReports,
   learningSessions, students, domainStates,
+  studentPurchases, studentSkillStates,
 } from "../db/schema.js";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
 import { getDomainStates } from "../services/domain-service.js";
@@ -39,6 +40,23 @@ parentRoutes.get("/dashboard", async (req, res, next) => {
           .orderBy(desc(learningSessions.completedAt))
           .limit(7);
 
+        // Count owned items (purchases)
+        const [ownedItems] = await db
+          .select({ count: sql<number>`COUNT(*)` })
+          .from(studentPurchases)
+          .where(eq(studentPurchases.studentId, child.id));
+
+        // Count mastered skills
+        const [masteredCount] = await db
+          .select({ count: sql<number>`COUNT(*)` })
+          .from(studentSkillStates)
+          .where(
+            and(
+              eq(studentSkillStates.studentId, child.id),
+              sql`${studentSkillStates.masteryStatus} IN ('mastered', 'review')`,
+            ),
+          );
+
         return {
           id: child.id,
           name: child.name,
@@ -49,6 +67,8 @@ parentRoutes.get("/dashboard", async (req, res, next) => {
           diagnosticCompleted: child.diagnosticCompleted,
           domainProficiencies: domains,
           topMisconceptions: misconceptions,
+          ownedItemsCount: ownedItems?.count ?? 0,
+          masteredSkillsCount: masteredCount.count,
           recentAccuracy: recentSessions.length > 0
             ? Math.round(
                 (recentSessions.reduce((sum, s) => sum + (s.accuracy ?? 0), 0) / recentSessions.length) * 100,
