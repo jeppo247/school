@@ -25,7 +25,7 @@ export default function ProfilePage() {
             <span className="text-4xl lg:text-6xl">🦉</span>
           </div>
           <h2 className="font-display text-xl md:text-2xl font-bold text-gray-800 mb-1">Indigo</h2>
-          <p className="text-sm text-gray-400 mb-4">Year 3</p>
+          <p className="text-base text-gray-400 mb-4">Year 3</p>
 
           <div className="flex justify-center gap-6">
             <StreakCounter count={7} />
@@ -60,7 +60,7 @@ export default function ProfilePage() {
                   />
                   <span className="text-lg">{theme.emoji}</span>
                 </div>
-                <p className="font-display font-semibold text-sm text-gray-800">
+                <p className="font-display font-semibold text-base text-gray-800">
                   {theme.name}
                 </p>
                 <p className="text-xs text-gray-400 mt-0.5">{theme.description}</p>

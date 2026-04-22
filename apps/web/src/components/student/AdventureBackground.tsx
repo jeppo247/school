@@ -7,7 +7,14 @@ import { motion } from "framer-motion";
  * Cartoon-style scenery with sky, clouds, hills, trees, and animals.
  * Renders behind content as a fixed full-screen backdrop.
  */
-export function AdventureBackground() {
+interface AdventureBackgroundProps {
+  /** Set to true during active learning (diagnostic/sessions) to reduce distracting motion */
+  calm?: boolean;
+}
+
+export function AdventureBackground({ calm = false }: AdventureBackgroundProps) {
+  // When calm=true, disable all persistent animations so the background
+  // doesn't compete with the learning task (per cognitive-load research)
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
       {/* Sky gradient */}
@@ -49,6 +56,8 @@ export function AdventureBackground() {
         </svg>
       </motion.div>
 
+      {/* Clouds — hidden during active learning to reduce distraction */}
+      {!calm && (<>
       {/* Clouds */}
       <motion.div
         className="absolute top-16 left-[10%] w-[120px] h-[50px] md:w-[170px] md:h-[70px] lg:w-[220px] lg:h-[85px]"
@@ -85,6 +94,7 @@ export function AdventureBackground() {
           <ellipse cx="55" cy="19" rx="18" ry="10" fill="white" opacity="0.6" />
         </svg>
       </motion.div>
+      </>)}
 
       {/* Far hills */}
       <div className="absolute bottom-0 w-full h-[320px] md:h-[400px] lg:h-[480px]">
@@ -153,6 +163,8 @@ export function AdventureBackground() {
         </svg>
       </div>
 
+      {/* Flowers, koala, butterfly — hidden during active learning */}
+      {!calm && (<>
       {/* Flowers on ground */}
       {[
         { x: "12%", color: "#FF7043" },
@@ -221,6 +233,7 @@ export function AdventureBackground() {
           </motion.g>
         </svg>
       </motion.div>
+      </>)}
     </div>
   );
 }

@@ -9,6 +9,7 @@ interface QuestionCardProps {
     options?: string[];
     type: "multiple_choice" | "numeric_input" | "true_false";
     hint?: string;
+    hints?: string[];
     imageUrl?: string;
   };
   onAnswer: (answer: string | number) => void;
@@ -19,6 +20,12 @@ interface QuestionCardProps {
   } | null;
 }
 
+const HINT_LABELS = [
+  { emoji: "💡", label: "Hint" },
+  { emoji: "🔍", label: "More help" },
+  { emoji: "📝", label: "Show me" },
+];
+
 export function QuestionCard({
   question,
   onAnswer,
@@ -27,7 +34,15 @@ export function QuestionCard({
 }: QuestionCardProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [numericInput, setNumericInput] = useState("");
-  const [showHint, setShowHint] = useState(false);
+  const [hintLevel, setHintLevel] = useState(0);
+
+  // Build hint ladder: prefer hints array, fall back to single hint
+  const hintLadder = question.hints?.length
+    ? question.hints
+    : question.hint
+      ? [question.hint]
+      : [];
+  const hasHints = hintLadder.length > 0;
 
   function handleOptionClick(option: string) {
     if (disabled) return;
@@ -38,6 +53,10 @@ export function QuestionCard({
   function handleNumericSubmit() {
     if (disabled || !numericInput) return;
     onAnswer(Number(numericInput));
+  }
+
+  function showNextHint() {
+    setHintLevel((prev) => Math.min(prev + 1, hintLadder.length));
   }
 
   return (
@@ -175,30 +194,42 @@ export function QuestionCard({
               {feedback.isCorrect ? "Correct! ✓" : "Not quite — keep trying!"}
             </p>
             {feedback.explanation && (
-              <p className="text-sm mt-1">{feedback.explanation}</p>
+              <p className="text-base mt-1">{feedback.explanation}</p>
             )}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Hint */}
-      {question.hint && !feedback && (
-        <div className="mt-4 text-center">
-          {showHint ? (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg"
-            >
-              💡 {question.hint}
-            </motion.p>
-          ) : (
-            <button
-              onClick={() => setShowHint(true)}
-              className="text-sm text-[var(--theme-primary)] hover:underline"
-            >
-              Need a hint?
-            </button>
+      {/* Hint ladder */}
+      {hasHints && !feedback && (
+        <div className="mt-4">
+          <AnimatePresence>
+            {hintLadder.slice(0, hintLevel).map((hint, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gray-50 rounded-lg p-3 mb-2 text-center"
+              >
+                <p className="text-base text-gray-500">
+                  {HINT_LABELS[i]?.emoji ?? "💡"} {hint}
+                </p>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          {hintLevel < hintLadder.length && (
+            <div className="text-center">
+              <button
+                onClick={showNextHint}
+                className="text-base text-[var(--theme-primary)] hover:underline"
+              >
+                {hintLevel === 0
+                  ? "Need a hint?"
+                  : hintLevel < hintLadder.length
+                    ? "I need more help"
+                    : null}
+              </button>
+            </div>
           )}
         </div>
       )}

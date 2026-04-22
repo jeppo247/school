@@ -73,7 +73,7 @@ export default function StudentDashboard() {
           <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
             Ready for today&apos;s adventure?
           </h1>
-          <p className="text-gray-500 text-sm mb-6">
+          <p className="text-gray-500 text-base mb-6">
             {mockStudent.diagnosticCompleted
               ? "Your learning path is ready. Let's go!"
               : "Let's find out what you already know!"}

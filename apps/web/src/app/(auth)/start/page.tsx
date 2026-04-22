@@ -307,9 +307,12 @@ export default function StartPage() {
               <p className="text-gray-500 text-sm mb-2">
                 We&apos;re going to play some learning games to find out what you already know.
               </p>
-              <p className="text-gray-400 text-xs mb-6">
+              <p className="text-gray-400 text-xs mb-2">
                 There are no wrong answers — this helps us find the best starting point.
                 It takes about 15 minutes.
+              </p>
+              <p className="text-gray-300 text-xs mb-6">
+                Powered by AI — I&apos;m a learning helper, not a person.
               </p>
 
               <div className="bg-blue-50 rounded-2xl p-4 mb-6 text-left">

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import { QuestionCard } from "@/components/student/QuestionCard";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
+import { AskAdultButton, AskAdultModal } from "@/components/student/AskAdultModal";
 import { api } from "@/lib/api";
 
 type NaplanDomain = "numeracy" | "reading" | "spelling" | "grammar_punctuation" | "writing";
@@ -87,12 +88,15 @@ export default function DiagnosticPage() {
   const [studentId, setStudentId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [demoMode, setDemoMode] = useState(false);
+  const [showResume, setShowResume] = useState(false);
 
   const [started, setStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(null);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [showTransition, setShowTransition] = useState(false);
   const [answerLocked, setAnswerLocked] = useState(false);
+  const [showAskAdult, setShowAskAdult] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [complete, setComplete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [totalCorrect, setTotalCorrect] = useState(0);
@@ -117,12 +121,36 @@ export default function DiagnosticPage() {
     const yearLevel = yearStr ? Number(yearStr) : 3;
     if (name) setChildName(name);
 
+    // Check for saved progress to resume
+    const savedRaw = sessionStorage.getItem("upwise_diagnostic_progress");
+    if (savedRaw && name) {
+      try {
+        const saved = JSON.parse(savedRaw);
+        // Filter demo questions for restoration
+        const filtered = ALL_DEMO_QUESTIONS.filter((q) => q.maxYear === yearLevel);
+        setDemoQuestions(filtered);
+        setDemoMode(true);
+        // Restore saved state
+        setQuestionIndex(saved.questionIndex ?? 0);
+        setTotalAnswered(saved.totalAnswered ?? 0);
+        setTotalCorrect(saved.totalCorrect ?? 0);
+        if (saved.domainResults) setDomainResults(saved.domainResults);
+        setCurrentQuestion(filtered[saved.questionIndex ?? 0] ?? null);
+        setStarted(true);
+        setShowResume(true);
+        // Clear the saved progress so it doesn't keep showing
+        sessionStorage.removeItem("upwise_diagnostic_progress");
+        return;
+      } catch {
+        sessionStorage.removeItem("upwise_diagnostic_progress");
+      }
+    }
+
     if (sid && sessId) {
       setStudentId(sid);
       setSessionId(sessId);
       setStarted(true);
     } else if (name) {
-      // Filter demo questions to the child's year level
       const filtered = ALL_DEMO_QUESTIONS.filter((q) => q.maxYear === yearLevel);
       setDemoQuestions(filtered);
       setDemoMode(true);
@@ -152,7 +180,7 @@ export default function DiagnosticPage() {
     } catch {
       // API failed — switch to demo mode
       setDemoMode(true);
-      setCurrentQuestion(DEMO_QUESTIONS[questionIndex] ?? null);
+      setCurrentQuestion(demoQuestions[questionIndex] ?? null);
     } finally {
       setLoading(false);
     }
@@ -264,7 +292,7 @@ export default function DiagnosticPage() {
   if (!started) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6">
-        <AdventureBackground />
+        <AdventureBackground calm />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -300,7 +328,7 @@ export default function DiagnosticPage() {
 
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6">
-        <AdventureBackground />
+        <AdventureBackground calm />
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -359,7 +387,7 @@ export default function DiagnosticPage() {
   if (loading && !currentQuestion) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center">
-        <AdventureBackground />
+        <AdventureBackground calm />
         <motion.span
           className="text-6xl"
           animate={{ y: [0, -8, 0], rotate: [0, 5, -5, 0] }}
@@ -428,34 +456,70 @@ export default function DiagnosticPage() {
 
   return (
     <main className="min-h-screen pb-8">
-      <AdventureBackground />
+      <AdventureBackground calm />
 
       {/* Header bar with Upwise logo + controls */}
       <header className="relative z-20 px-4 py-3 flex items-center justify-between">
-        <a href="/" className="font-display text-xl md:text-2xl font-bold text-[#4F8CF7]">
-          Upwise
-        </a>
+        <div className="flex items-center gap-2">
+          <a href="/" className="font-display text-xl md:text-2xl font-bold text-[#4F8CF7]">
+            Upwise
+          </a>
+          <span className="text-[10px] text-gray-300 font-medium hidden sm:inline">Powered by AI</span>
+        </div>
         <div className="flex items-center gap-1 sm:gap-2">
-          <button
-            onClick={handleSaveForLater}
-            className="text-[10px] sm:text-xs text-gray-400 hover:text-gray-600 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
-          >
-            Save
-          </button>
-          <button
-            onClick={handleFinishEarly}
-            className="text-[10px] sm:text-xs text-gray-400 hover:text-gray-600 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
-          >
-            Finish
-          </button>
-          <button
-            onClick={handleStartAgain}
-            className="text-[10px] sm:text-xs text-gray-400 hover:text-gray-600 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-white/60 transition-colors"
-          >
-            Restart
-          </button>
+          <AskAdultButton onClick={() => setShowAskAdult(true)} />
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-white/60 transition-colors"
+              aria-label="More options"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                <circle cx="10" cy="4" r="2" />
+                <circle cx="10" cy="10" r="2" />
+                <circle cx="10" cy="16" r="2" />
+              </svg>
+            </button>
+            {showMenu && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setShowMenu(false)} />
+                <div className="absolute right-0 top-full mt-1 z-40 bg-white rounded-xl border border-[var(--border-warm)] py-1 min-w-[140px]" style={{ boxShadow: "var(--shadow-clay)" }}>
+                  <button onClick={() => { setShowMenu(false); handleSaveForLater(); }} className="w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                    Save for later
+                  </button>
+                  <button onClick={() => { setShowMenu(false); handleFinishEarly(); }} className="w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                    Finish early
+                  </button>
+                  <button onClick={() => { setShowMenu(false); handleStartAgain(); }} className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-50 transition-colors">
+                    Start again
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </header>
+
+      {/* Resume banner */}
+      <AnimatePresence>
+        {showResume && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="relative z-10 px-6 pb-2"
+          >
+            <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto">
+              <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center justify-between">
+                <p className="text-sm text-blue-600 font-medium">Welcome back! Picking up where you left off.</p>
+                <button onClick={() => setShowResume(false)} className="text-blue-400 hover:text-blue-600 ml-2">
+                  <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Progress bar */}
       <div className="relative z-10 px-6 pb-4">
@@ -467,7 +531,7 @@ export default function DiagnosticPage() {
               transition={{ duration: 0.5 }}
             />
           </div>
-          <p className="text-center text-xs text-gray-400 mt-2">
+          <p className="text-center text-sm text-gray-400 mt-2">
             Question {questionIndex + 1}{demoMode ? ` of ${demoQuestions.length}` : ""}
           </p>
         </div>
@@ -549,6 +613,13 @@ export default function DiagnosticPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AskAdultModal
+        open={showAskAdult}
+        onClose={() => setShowAskAdult(false)}
+        onSaveForLater={() => { setShowAskAdult(false); handleSaveForLater(); }}
+        onExit={() => { window.location.href = "/"; }}
+      />
     </main>
   );
 }

@@ -6,6 +6,7 @@ import { QuestionCard } from "@/components/student/QuestionCard";
 import { Celebration } from "@/components/student/Celebration";
 import { CoinEarnOverlay } from "@/components/student/CoinEarnOverlay";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
+import { AskAdultButton, AskAdultModal } from "@/components/student/AskAdultModal";
 
 type SessionPhase = "warmup" | "focus_1" | "brain_break" | "focus_2" | "wrapup";
 
@@ -35,6 +36,7 @@ export default function SessionPage() {
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [totalAnswered, setTotalAnswered] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
+  const [showAskAdult, setShowAskAdult] = useState(false);
 
   const phaseConfig = PHASE_CONFIG[phase];
 
@@ -76,7 +78,7 @@ export default function SessionPage() {
   if (phase === "brain_break") {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6">
-        <AdventureBackground />
+        <AdventureBackground calm />
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -111,7 +113,7 @@ export default function SessionPage() {
   if (phase === "wrapup" || sessionComplete) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6">
-        <AdventureBackground />
+        <AdventureBackground calm />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -164,7 +166,7 @@ export default function SessionPage() {
 
   return (
     <main className="min-h-screen pb-8">
-      <AdventureBackground />
+      <AdventureBackground calm />
       {/* Session header */}
       <header className="px-6 py-4">
         <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto">
@@ -192,9 +194,12 @@ export default function SessionPage() {
                 {phaseConfig.label}
               </span>
             </div>
-            <span className="text-xs text-gray-400 font-medium">
-              Question {questionNumber}
-            </span>
+            <div className="flex items-center gap-2">
+              <AskAdultButton onClick={() => setShowAskAdult(true)} />
+              <span className="text-xs text-gray-400 font-medium">
+                Q{questionNumber}
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -210,6 +215,7 @@ export default function SessionPage() {
             feedback={feedback}
           />
         </AnimatePresence>
+        <p className="text-center text-[10px] text-gray-300 mt-6">Powered by AI</p>
       </div>
 
       {/* Celebrations */}
@@ -217,6 +223,12 @@ export default function SessionPage() {
         trigger={showCelebration}
         type={celebrationType}
         onComplete={() => setShowCelebration(false)}
+      />
+
+      <AskAdultModal
+        open={showAskAdult}
+        onClose={() => setShowAskAdult(false)}
+        onExit={() => { window.location.href = "/"; }}
       />
     </main>
   );
