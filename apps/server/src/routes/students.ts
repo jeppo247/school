@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "../db/client.js";
-import { students, families, studentSkillStates } from "../db/schema.js";
-import { eq, sql } from "drizzle-orm";
+import { students, families, studentSkillStates, learningSessions } from "../db/schema.js";
+import { eq, and, sql } from "drizzle-orm";
 import { AppError } from "../middleware/error-handler.js";
 import { XP_PER_LEVEL } from "@upwise/shared";
 
@@ -25,6 +25,19 @@ studentRoutes.get("/:id", async (req, res, next) => {
       .from(studentSkillStates)
       .where(eq(studentSkillStates.studentId, student.id));
 
+    // Count completed sessions in the last 7 days
+    const weekAgo = new Date(Date.now() - 7 * 86400000);
+    const [sessionCount] = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(learningSessions)
+      .where(
+        and(
+          eq(learningSessions.studentId, student.id),
+          eq(learningSessions.status, "completed"),
+          sql`${learningSessions.completedAt} >= ${weekAgo.toISOString()}`,
+        ),
+      );
+
     res.json({
       ...student,
       level,
@@ -32,6 +45,7 @@ studentRoutes.get("/:id", async (req, res, next) => {
       xpInCurrentLevel: xpInLevel,
       masteryPercentage: masteryStats.total > 0 ? Math.round((masteryStats.mastered / masteryStats.total) * 100) : 0,
       totalSkillsAssessed: masteryStats.total,
+      sessionsThisWeek: sessionCount.count,
     });
   } catch (err) {
     next(err);
