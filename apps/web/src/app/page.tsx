@@ -573,86 +573,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="py-24 bg-[#F8FAFF]">
-        <div className="max-w-6xl mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            className="text-center mb-16"
-          >
-            <motion.p
-              variants={fadeUp}
-              custom={0}
-              className="text-sm font-semibold text-[#FF8C42] uppercase tracking-wider mb-3"
-            >
-              The Learning Experience
-            </motion.p>
-            <motion.h2
-              variants={fadeUp}
-              custom={1}
-              className="font-display text-4xl sm:text-5xl font-bold text-gray-900"
-            >
-              Designed for how children actually learn
-            </motion.h2>
-          </motion.div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                icon: "🎯",
-                title: "Right level, every time",
-                desc: "Questions match your child's exact level. Challenging enough to grow, easy enough to stay confident",
-              },
-              {
-                icon: "🧠",
-                title: "Built to remember",
-                desc: "Mastered skills return for review on a scientific schedule that builds long-term memory",
-              },
-              {
-                icon: "🇦🇺",
-                title: "100% Australian",
-                desc: "Every question, context, and example is written for Australian kids using AUD, km, and local references",
-              },
-              {
-                icon: "🎨",
-                title: "Their world, their way",
-                desc: "AFL, Bluey, Superheroes, Space. Your child picks their adventure",
-              },
-              {
-                icon: "🔥",
-                title: "Daily habits, lasting progress",
-                desc: "Short daily sessions build consistency and confidence over time",
-              },
-              {
-                icon: "🏆",
-                title: "Rewards for real learning",
-                desc: "Earn coins for mastering skills, not just showing up. Spend them on avatars and themes",
-              },
-            ].map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-30px" }}
-                variants={scaleIn}
-                custom={i}
-                className="bg-white rounded-2xl p-6 border border-[#E8E2D8] shadow-clay hover:shadow-clay-hover hover:-rotate-1 hover:-translate-y-0.5 transition-all"
-              >
-                <span className="text-3xl mb-4 block">{feature.icon}</span>
-                <h3 className="font-display text-lg font-bold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  {feature.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Pricing */}
       <section className="py-24 bg-white">
         <div className="max-w-5xl mx-auto px-6">
@@ -816,52 +736,6 @@ export default function HomePage() {
           <p className="text-center text-sm text-gray-400 mt-8">
             Annual pricing available: 20% off. Cancel anytime.
           </p>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 bg-white">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-          >
-            <motion.h2
-              variants={fadeUp}
-              custom={0}
-              className="font-display text-4xl sm:text-5xl font-bold text-gray-900 mb-6"
-            >
-              See where your child
-              <br />
-              <span className="text-[#4F8CF7]">can grow</span>
-            </motion.h2>
-            <motion.p
-              variants={fadeUp}
-              custom={1}
-              className="text-lg text-gray-500 mb-8 max-w-xl mx-auto"
-            >
-              The free diagnostic takes 15 minutes and shows your child&apos;s
-              strengths and the skills they&apos;re ready to master next. No credit card required.
-            </motion.p>
-            <motion.div variants={fadeUp} custom={2}>
-              <Link
-                href="/start"
-                className="inline-flex items-center gap-2 text-lg font-semibold text-white bg-[#4F8CF7] hover:bg-[#3A6CD4] px-10 py-4 rounded-2xl transition-all hover:shadow-xl hover:shadow-blue-200/50 active:scale-[0.98]"
-              >
-                Start Now
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-            </motion.div>
-          </motion.div>
         </div>
       </section>
 
