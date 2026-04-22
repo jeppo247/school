@@ -609,6 +609,20 @@ export const studentPurchases = pgTable(
 );
 
 // ============================================================
+// WAITLIST
+// ============================================================
+
+export const waitlist = pgTable("waitlist", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull(),
+  name: text("name"),
+  source: text("source"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  index("idx_waitlist_email").on(table.email),
+]);
+
+// ============================================================
 // RELATIONS
 // ============================================================
 

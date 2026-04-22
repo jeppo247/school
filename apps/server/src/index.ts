@@ -22,6 +22,7 @@ import { webhookRoutes } from "./routes/webhooks.js";
 import { coinRoutes } from "./routes/coins.js";
 import { shopRoutes } from "./routes/shop.js";
 import { subscriptionRoutes } from "./routes/subscriptions.js";
+import { waitlistRoutes } from "./routes/waitlist.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 4000;
@@ -48,6 +49,7 @@ app.use("/api/v1/admin/questions/generate", strictLimiter);
 app.use("/api/v1/subscriptions", checkoutLimiter);
 app.use("/api/v1/sessions", strictLimiter);
 app.use("/api/v1/families", strictLimiter);
+app.use("/api/v1/waitlist", strictLimiter);
 
 // Request logging
 app.use(requestLogger);
@@ -68,6 +70,7 @@ api.use("/webhooks", webhookRoutes);
 api.use("/coins", coinRoutes);
 api.use("/shop", shopRoutes);
 api.use("/subscriptions", subscriptionRoutes);
+api.use("/waitlist", waitlistRoutes);
 
 app.use("/api/v1", api);
 
