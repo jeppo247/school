@@ -29,11 +29,17 @@ const PORT = process.env.PORT ?? 4000;
 
 // Security middleware
 app.use(helmet());
+const PRODUCTION_ORIGINS = [
+  "https://upwise.com.au",
+  "https://www.upwise.com.au",
+  "https://upwiseweb-production.up.railway.app",
+];
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL
-      ? process.env.FRONTEND_URL.split(",")
-      : ["http://localhost:3000", "https://upwise.com.au", "https://www.upwise.com.au", "https://upwiseweb-production.up.railway.app"],
+    origin: [
+      ...PRODUCTION_ORIGINS,
+      ...(process.env.FRONTEND_URL?.split(",") ?? ["http://localhost:3000"]),
+    ],
     credentials: true,
   }),
 );
