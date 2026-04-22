@@ -1,14 +1,12 @@
 export type CoinRewardReason =
-  | "session_complete"
   | "diagnostic_complete"
   | "skill_mastery"
+  | "gap_closure"
+  | "due_review_success"
   | "sub_strand_complete"
   | "strand_complete"
   | "year_complete"
-  | "perfect_session"
-  | "weekly_return"
   | "level_up"
-  | "streak_milestone"
   | "shop_purchase";
 
 export interface CoinReward {

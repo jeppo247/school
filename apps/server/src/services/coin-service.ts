@@ -11,17 +11,16 @@ import {
 import { eq, and, sql, gte } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
 import {
-  COINS_SESSION_COMPLETE,
   COINS_DIAGNOSTIC_COMPLETE,
   COINS_SKILL_MASTERY,
+  COINS_GAP_CLOSURE,
+  COINS_DUE_REVIEW_SUCCESS,
   COINS_SUB_STRAND_COMPLETE,
   COINS_STRAND_COMPLETE,
   COINS_YEAR_COMPLETE,
-  COINS_PERFECT_SESSION,
-  COINS_PERFECT_SESSION_MIN_QUESTIONS,
-  COINS_WEEKLY_RETURN,
   COINS_LEVEL_UP,
-  COINS_STREAK_BONUS,
+  COINS_DAILY_CAP,
+  INDEPENDENCE_MULTIPLIER,
 } from "@upwise/shared";
 import type { CoinReward, CoinRewardReason } from "@upwise/shared";
 
@@ -156,32 +155,33 @@ export async function purchaseItem(
 
 /**
  * Calculates all coin rewards earned at end of a session.
+ * Research-aligned: only mastery events earn coins. No activity, login, or streak rewards.
  */
 export async function calculateSessionRewards(
   studentId: string,
   sessionId: string,
   sessionType: string,
-  totalQuestions: number,
-  correctAnswers: number,
-  skillsMastered: string[],
+  skillsMastered: { skillId: string; hintsUsed: number; wasGapClosure: boolean }[],
+  dueReviewsSucceeded: number,
   previousLevel: number,
   newLevel: number,
-  previousStreak: number,
-  newStreak: number,
 ): Promise<CoinReward[]> {
   const rewards: CoinReward[] = [];
 
-  // Session completion
-  rewards.push({
-    reason: "session_complete",
-    amount: COINS_SESSION_COMPLETE,
-    label: "Session complete",
-    referenceId: sessionId,
-  });
+  // Check daily cap
+  const todayEarned = await getDailyEarnings(studentId);
+  let remaining = Math.max(0, COINS_DAILY_CAP - todayEarned);
 
-  // Diagnostic completion
+  function addReward(reward: CoinReward) {
+    if (remaining <= 0) return;
+    const capped = Math.min(reward.amount, remaining);
+    rewards.push({ ...reward, amount: capped });
+    remaining -= capped;
+  }
+
+  // Diagnostic completion (one-time mastery benchmark)
   if (sessionType === "diagnostic") {
-    rewards.push({
+    addReward({
       reason: "diagnostic_complete",
       amount: COINS_DIAGNOSTIC_COMPLETE,
       label: "Diagnostic complete",
@@ -189,67 +189,80 @@ export async function calculateSessionRewards(
     });
   }
 
-  // Perfect session
-  if (
-    totalQuestions >= COINS_PERFECT_SESSION_MIN_QUESTIONS &&
-    correctAnswers === totalQuestions
-  ) {
-    rewards.push({
-      reason: "perfect_session",
-      amount: COINS_PERFECT_SESSION,
-      label: "Perfect session!",
-      referenceId: sessionId,
-    });
+  // Skill mastery rewards (with independence multiplier)
+  for (const skill of skillsMastered) {
+    const multiplier = skill.hintsUsed === 0
+      ? INDEPENDENCE_MULTIPLIER.noHints
+      : skill.hintsUsed === 1
+        ? INDEPENDENCE_MULTIPLIER.oneHint
+        : INDEPENDENCE_MULTIPLIER.twoOrMoreHints;
+
+    if (skill.wasGapClosure) {
+      addReward({
+        reason: "gap_closure",
+        amount: Math.ceil(COINS_GAP_CLOSURE * multiplier),
+        label: "Gap closed!",
+        referenceId: skill.skillId,
+      });
+    } else {
+      addReward({
+        reason: "skill_mastery",
+        amount: Math.ceil(COINS_SKILL_MASTERY * multiplier),
+        label: "Skill mastered",
+        referenceId: skill.skillId,
+      });
+    }
   }
 
-  // Skill mastery rewards
-  for (const skillId of skillsMastered) {
-    rewards.push({
-      reason: "skill_mastery",
-      amount: COINS_SKILL_MASTERY,
-      label: "Skill mastered",
-      referenceId: skillId,
+  // Due review successes (small, bounded reward for retention)
+  if (dueReviewsSucceeded > 0) {
+    addReward({
+      reason: "due_review_success",
+      amount: COINS_DUE_REVIEW_SUCCESS * dueReviewsSucceeded,
+      label: `${dueReviewsSucceeded} review${dueReviewsSucceeded > 1 ? "s" : ""} passed`,
+      referenceId: sessionId,
     });
   }
 
   // Check for sub-strand, strand, and year completion
   if (skillsMastered.length > 0) {
     const milestoneRewards = await checkMilestoneRewards(studentId);
-    rewards.push(...milestoneRewards);
+    for (const mr of milestoneRewards) {
+      addReward(mr);
+    }
   }
 
   // Level up
   if (newLevel > previousLevel) {
-    rewards.push({
+    addReward({
       reason: "level_up",
       amount: COINS_LEVEL_UP * (newLevel - previousLevel),
       label: `Level ${newLevel}!`,
     });
   }
 
-  // Streak milestones
-  for (const [milestone, coins] of Object.entries(COINS_STREAK_BONUS)) {
-    const m = Number(milestone);
-    if (newStreak >= m && previousStreak < m) {
-      rewards.push({
-        reason: "streak_milestone",
-        amount: coins,
-        label: `${m}-day streak!`,
-      });
-    }
-  }
-
-  // Weekly return (first session of the week)
-  const isFirstThisWeek = await checkFirstSessionOfWeek(studentId, sessionId);
-  if (isFirstThisWeek) {
-    rewards.push({
-      reason: "weekly_return",
-      amount: COINS_WEEKLY_RETURN,
-      label: "Welcome back this week!",
-    });
-  }
-
   return rewards;
+}
+
+/**
+ * Gets total coins earned today (for daily cap enforcement).
+ */
+async function getDailyEarnings(studentId: string): Promise<number> {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const [result] = await db
+    .select({ total: sql<number>`COALESCE(SUM(${coinTransactions.amount}), 0)` })
+    .from(coinTransactions)
+    .where(
+      and(
+        eq(coinTransactions.studentId, studentId),
+        eq(coinTransactions.type, "earn"),
+        gte(coinTransactions.createdAt, todayStart),
+      ),
+    );
+
+  return result?.total ?? 0;
 }
 
 /**
@@ -371,36 +384,6 @@ async function hasBeenAwarded(
     .limit(1);
 
   return !!existing;
-}
-
-/**
- * Checks if this is the student's first session of the current week (Mon-Sun).
- */
-async function checkFirstSessionOfWeek(
-  studentId: string,
-  currentSessionId: string,
-): Promise<boolean> {
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - mondayOffset);
-  monday.setHours(0, 0, 0, 0);
-
-  const [earlier] = await db
-    .select({ id: learningSessions.id })
-    .from(learningSessions)
-    .where(
-      and(
-        eq(learningSessions.studentId, studentId),
-        eq(learningSessions.status, "completed"),
-        gte(learningSessions.completedAt, monday),
-      ),
-    )
-    .limit(1);
-
-  // If the only completed session this week is the current one, it's the first
-  return !earlier || earlier.id === currentSessionId;
 }
 
 /**

@@ -69,14 +69,6 @@ export const XP_PER_CORRECT = 10;
 /** XP multiplier per difficulty level */
 export const XP_DIFFICULTY_MULTIPLIER = 5;
 
-/** Bonus XP for streak milestones */
-export const XP_STREAK_BONUS: Record<number, number> = {
-  5: 25,
-  10: 50,
-  20: 100,
-  50: 250,
-};
-
 /** XP required per level (level * this value) */
 export const XP_PER_LEVEL = 200;
 
@@ -90,15 +82,20 @@ export const IRT_THETA_MAX = 3;
 /** Theta grid step size */
 export const IRT_THETA_STEP = 0.1;
 
-// Gold coin rewards
-/** Coins for completing a session */
-export const COINS_SESSION_COMPLETE = 5;
+// Gold coin rewards — mastery-linked only (research: child-incentives.md)
+// Coins are ONLY awarded for verified mastery events, never for activity/login/streaks.
 
 /** Coins for completing the diagnostic assessment */
 export const COINS_DIAGNOSTIC_COMPLETE = 15;
 
-/** Coins for mastering a skill */
+/** Coins for first mastery of a skill (core earn event) */
 export const COINS_SKILL_MASTERY = 10;
+
+/** Coins for closing a previously-failed skill gap (highest-value learning event) */
+export const COINS_GAP_CLOSURE = 15;
+
+/** Coins for successful spaced review within the due window */
+export const COINS_DUE_REVIEW_SUCCESS = 3;
 
 /** Coins for completing all skills in a sub-strand */
 export const COINS_SUB_STRAND_COMPLETE = 25;
@@ -109,25 +106,21 @@ export const COINS_STRAND_COMPLETE = 50;
 /** Coins for completing all skills in a year level */
 export const COINS_YEAR_COMPLETE = 100;
 
-/** Coins for a perfect session (100% accuracy) */
-export const COINS_PERFECT_SESSION = 10;
-
-/** Minimum questions in a session to qualify for perfect session bonus */
-export const COINS_PERFECT_SESSION_MIN_QUESTIONS = 8;
-
-/** Coins for first session of the week */
-export const COINS_WEEKLY_RETURN = 3;
-
 /** Coins for leveling up (XP level) */
 export const COINS_LEVEL_UP = 5;
 
-/** Coins for streak milestones */
-export const COINS_STREAK_BONUS: Record<number, number> = {
-  5: 10,
-  10: 20,
-  20: 35,
-  50: 75,
+/** Maximum coins earnable in a single day (anti-gaming) */
+export const COINS_DAILY_CAP = 80;
+
+/** Independence multiplier: reduces award when hints are used */
+export const INDEPENDENCE_MULTIPLIER = {
+  noHints: 1.0,
+  oneHint: 0.75,
+  twoOrMoreHints: 0.5,
 };
+
+/** Days of inactivity before streak resets (grace period) */
+export const STREAK_GRACE_DAYS = 3;
 
 // Session structure
 /** Maximum focus block duration in minutes before a mandatory break */

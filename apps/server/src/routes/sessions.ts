@@ -16,7 +16,7 @@ import { recordMisconceptionIfPresent } from "../services/misconception-service.
 import { calculateSessionRewards, awardCoins } from "../services/coin-service.js";
 import {
   XP_PER_CORRECT, XP_DIFFICULTY_MULTIPLIER, XP_PER_LEVEL,
-  XP_STREAK_BONUS,
+  STREAK_GRACE_DAYS,
 } from "@upwise/shared";
 
 export const sessionRoutes = Router();
@@ -359,19 +359,25 @@ sessionRoutes.post("/:studentId/complete", async (req, res, next) => {
     const [student] = await db.select().from(students).where(eq(students.id, studentId));
     if (!student) throw new AppError(404, "NOT_FOUND", "Student not found");
 
-    // Update streak
+    // Update streak (3-day grace period — research: no loss-aversion pressure)
     const today = new Date().toISOString().split("T")[0];
     const lastSession = student.lastSessionDate;
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
     const previousStreak = student.currentStreak;
 
     let newStreak: number;
     if (lastSession === today) {
       newStreak = student.currentStreak; // Already did a session today
-    } else if (lastSession === yesterday) {
-      newStreak = student.currentStreak + 1; // Continuing streak
+    } else if (lastSession) {
+      const daysSinceLastSession = Math.floor(
+        (new Date(today).getTime() - new Date(lastSession).getTime()) / 86400000
+      );
+      if (daysSinceLastSession <= STREAK_GRACE_DAYS) {
+        newStreak = student.currentStreak + 1; // Within grace period
+      } else {
+        newStreak = 1; // Grace period exceeded
+      }
     } else {
-      newStreak = 1; // Streak broken or first session
+      newStreak = 1; // First session ever
     }
 
     // Calculate level
@@ -380,15 +386,15 @@ sessionRoutes.post("/:studentId/complete", async (req, res, next) => {
     const newLevel = Math.floor(newXpTotal / XP_PER_LEVEL);
 
     // Check for skills mastered in this session
-    const skillsMastered: string[] = [];
-    // (In a full implementation, compare pre/post mastery states)
+    // TODO: populate from actual mastery state changes during session
+    const skillsMastered: { skillId: string; hintsUsed: number; wasGapClosure: boolean }[] = [];
+    const dueReviewsSucceeded = 0;
 
-    // Calculate coin rewards
+    // Calculate coin rewards (mastery-only, with daily cap)
     const coinRewards = await calculateSessionRewards(
       studentId, sessionId, session.sessionType,
-      session.totalQuestions, session.correctAnswers,
-      skillsMastered, previousLevel, newLevel,
-      previousStreak, newStreak,
+      skillsMastered, dueReviewsSucceeded,
+      previousLevel, newLevel,
     );
 
     const totalCoins = coinRewards.reduce((sum, r) => sum + r.amount, 0);
@@ -426,16 +432,6 @@ sessionRoutes.post("/:studentId/complete", async (req, res, next) => {
 
     // Update domain states
     await updateDomainStates(studentId);
-
-    // Add streak XP bonus
-    for (const [milestone, bonus] of Object.entries(XP_STREAK_BONUS)) {
-      if (newStreak >= Number(milestone) && previousStreak < Number(milestone)) {
-        await db
-          .update(students)
-          .set({ xpTotal: sql`${students.xpTotal} + ${bonus}` })
-          .where(eq(students.id, studentId));
-      }
-    }
 
     res.json({
       summary: {

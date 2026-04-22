@@ -9,16 +9,14 @@ interface CoinHistoryProps {
 }
 
 const REASON_LABELS: Record<string, string> = {
-  session_complete: "Session complete",
   diagnostic_complete: "Diagnostic complete",
   skill_mastery: "Skill mastered",
+  gap_closure: "Gap closed",
+  due_review_success: "Review passed",
   sub_strand_complete: "Sub-strand complete",
   strand_complete: "Strand complete",
   year_complete: "Year level complete",
-  perfect_session: "Perfect session",
-  weekly_return: "Weekly return",
   level_up: "Level up",
-  streak_milestone: "Streak milestone",
   shop_purchase: "Shop purchase",
 };
 

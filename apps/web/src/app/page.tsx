@@ -172,9 +172,7 @@ export default function HomePage() {
               custom={2}
               className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed"
             >
-              When the class moves on, gaps grow. Upwise makes sure your child
-              truly understands before moving forward.
-              <span className="text-gray-700 font-medium"> Personalised, mastery-based learning for Prep to Year 7.</span>
+              A smarter alternative to traditional tutoring — personalised, evidence-based, outcome-led.
             </motion.p>
 
             <motion.div
