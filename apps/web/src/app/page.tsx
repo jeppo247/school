@@ -150,10 +150,9 @@ export default function HomePage() {
               custom={1}
               className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight"
             >
-              <span className="text-gray-900">Every child can build</span>
-              <br />
+              <span className="text-gray-900">A </span>
               <span className="relative inline-block">
-                <span className="relative z-10 text-[#4F8CF7]">strong foundations</span>
+                <span className="relative z-10 text-[#4F8CF7]">smarter alternative</span>
                 <motion.span
                   className="absolute -bottom-1 left-0 right-0 h-3 bg-[#4F8CF7]/10 rounded-full -z-0"
                   initial={{ scaleX: 0 }}
@@ -162,6 +161,8 @@ export default function HomePage() {
                   style={{ originX: 0 }}
                 />
               </span>
+              <br />
+              <span className="text-gray-900">to traditional tutoring</span>
             </motion.h1>
 
             <motion.p
@@ -169,7 +170,7 @@ export default function HomePage() {
               custom={2}
               className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed"
             >
-              A smarter alternative to traditional tutoring — personalised, evidence-based, outcome-led.
+              Every child can build strong foundations — personalised, evidence-based, outcome-led.
             </motion.p>
 
             <motion.div

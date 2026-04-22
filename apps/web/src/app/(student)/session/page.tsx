@@ -1,79 +1,235 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { QuestionCard } from "@/components/student/QuestionCard";
 import { Celebration } from "@/components/student/Celebration";
-import { CoinEarnOverlay } from "@/components/student/CoinEarnOverlay";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
 import { AskAdultButton, AskAdultModal } from "@/components/student/AskAdultModal";
+import { api } from "@/lib/api";
 
 type SessionPhase = "warmup" | "focus_1" | "brain_break" | "focus_2" | "wrapup";
 
-const PHASE_CONFIG: Record<SessionPhase, { label: string; emoji: string; bg: string }> = {
-  warmup: { label: "Warm Up", emoji: "☀️", bg: "from-amber-50 to-orange-50" },
-  focus_1: { label: "Focus Time", emoji: "🎯", bg: "from-blue-50 to-indigo-50" },
-  brain_break: { label: "Brain Break!", emoji: "🧠", bg: "from-teal-50 to-emerald-50" },
-  focus_2: { label: "Focus Time", emoji: "💪", bg: "from-purple-50 to-pink-50" },
-  wrapup: { label: "Great Job!", emoji: "🌟", bg: "from-amber-50 to-yellow-50" },
+const PHASE_CONFIG: Record<SessionPhase, { label: string; emoji: string }> = {
+  warmup: { label: "Warm Up", emoji: "☀️" },
+  focus_1: { label: "Focus Time", emoji: "🎯" },
+  brain_break: { label: "Brain Break!", emoji: "🧠" },
+  focus_2: { label: "Focus Time", emoji: "💪" },
+  wrapup: { label: "Great Job!", emoji: "🌟" },
 };
 
-// Mock question — will be replaced with API
-const mockQuestion = {
-  stem: "A farmer has 342 sheep. He sells 178 sheep at the market. How many sheep does the farmer have left?",
-  options: ["164", "174", "236", "264"],
-  type: "multiple_choice" as const,
-  hint: "Try starting from the ones column: 2 minus 8. You'll need to borrow from the tens.",
-};
+interface QuestionPayload {
+  id: string;
+  type: "multiple_choice" | "numeric_input" | "true_false";
+  content: {
+    stem: string;
+    answer: string | number;
+    options?: string[];
+    hint?: string;
+    hints?: string[];
+    explanation?: string;
+  };
+}
+
+interface NextQuestionResponse {
+  complete: boolean;
+  questionNumber?: number;
+  phase?: SessionPhase;
+  question?: QuestionPayload;
+  sessionProgress?: { questionsAnswered: number; accuracy: number };
+}
+
+interface AnswerResponse {
+  isCorrect: boolean;
+  correctAnswer: string | number;
+  explanation?: string;
+  xpEarned: number;
+  misconception: string | null;
+  masteryUpdate: {
+    skillId: string;
+    newStatus: string;
+    newProbability: number;
+  };
+}
+
+interface SessionStartResponse {
+  sessionId: string;
+  plan: {
+    phases: { phase: string; durationMinutes: number; questionCount: number }[];
+    estimatedDurationMinutes: number;
+    focusSkills: { name: string; yearLevel: number }[];
+    reviewCount: number;
+  };
+}
 
 export default function SessionPage() {
+  const [studentId, setStudentId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [phase, setPhase] = useState<SessionPhase>("warmup");
-  const [questionNumber, setQuestionNumber] = useState(1);
+  const [questionNumber, setQuestionNumber] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionPayload | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationType, setCelebrationType] = useState<"correct" | "streak" | "levelUp" | "mastery">("correct");
   const [feedback, setFeedback] = useState<{ isCorrect: boolean; explanation?: string } | null>(null);
   const [correctInARow, setCorrectInARow] = useState(0);
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [totalAnswered, setTotalAnswered] = useState(0);
+  const [totalXp, setTotalXp] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [showAskAdult, setShowAskAdult] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const phaseConfig = PHASE_CONFIG[phase];
 
-  const handleAnswer = useCallback((answer: string | number) => {
-    const isCorrect = String(answer) === "164";
+  // Start session on mount
+  useEffect(() => {
+    const sid = sessionStorage.getItem("upwise_student_id");
+    if (!sid) {
+      setError("No student session found. Please go back to the dashboard.");
+      return;
+    }
+    setStudentId(sid);
 
-    setFeedback({
-      isCorrect,
-      explanation: isCorrect
-        ? "342 - 178 = 164. Great work!"
-        : "Not quite. Try borrowing from the tens column: 12 - 8 = 4, then 3 - 7 needs borrowing too.",
-    });
-
-    setTotalAnswered((prev) => prev + 1);
-
-    if (isCorrect) {
-      setTotalCorrect((prev) => prev + 1);
-      const newStreak = correctInARow + 1;
-      setCorrectInARow(newStreak);
-
-      if (newStreak >= 5) {
-        setCelebrationType("streak");
-      } else {
-        setCelebrationType("correct");
+    async function startSession() {
+      setLoading(true);
+      try {
+        const result = await api.post<SessionStartResponse>(`/sessions/${sid}/start`);
+        setSessionId(result.sessionId);
+      } catch {
+        setError("Could not start session. Please try again.");
+      } finally {
+        setLoading(false);
       }
-      setShowCelebration(true);
-    } else {
-      setCorrectInARow(0);
     }
 
-    // Auto-advance after delay
-    setTimeout(() => {
-      setFeedback(null);
-      setShowCelebration(false);
-      setQuestionNumber((prev) => prev + 1);
-    }, 2500);
-  }, [correctInARow]);
+    startSession();
+  }, []);
+
+  // Fetch next question when session starts or after answering
+  const fetchNextQuestion = useCallback(async () => {
+    if (!studentId || !sessionId) return;
+    setLoading(true);
+    try {
+      const result = await api.get<NextQuestionResponse>(
+        `/sessions/${studentId}/next-question?sessionId=${sessionId}`,
+      );
+
+      if (result.complete) {
+        await api.post(`/sessions/${studentId}/complete`, { sessionId });
+        setSessionComplete(true);
+      } else {
+        if (result.question) setCurrentQuestion(result.question);
+        if (result.questionNumber) setQuestionNumber(result.questionNumber);
+        if (result.phase) setPhase(result.phase as SessionPhase);
+      }
+    } catch {
+      setError("Could not load question. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [studentId, sessionId]);
+
+  // Trigger first question fetch once sessionId is set
+  useEffect(() => {
+    if (sessionId && !currentQuestion && !sessionComplete) {
+      fetchNextQuestion();
+    }
+  }, [sessionId, currentQuestion, sessionComplete, fetchNextQuestion]);
+
+  const handleAnswer = useCallback(async (answer: string | number) => {
+    if (!studentId || !sessionId || !currentQuestion) return;
+
+    try {
+      const result = await api.post<AnswerResponse>(`/sessions/${studentId}/respond`, {
+        sessionId,
+        questionId: currentQuestion.id,
+        answer,
+        timeTakenMs: 0,
+      });
+
+      setFeedback({
+        isCorrect: result.isCorrect,
+        explanation: result.explanation,
+      });
+
+      setTotalAnswered((prev) => prev + 1);
+      setTotalXp((prev) => prev + result.xpEarned);
+
+      if (result.isCorrect) {
+        setTotalCorrect((prev) => prev + 1);
+        const newStreak = correctInARow + 1;
+        setCorrectInARow(newStreak);
+
+        if (result.masteryUpdate.newStatus === "mastered") {
+          setCelebrationType("mastery");
+        } else if (newStreak >= 5) {
+          setCelebrationType("streak");
+        } else {
+          setCelebrationType("correct");
+        }
+        setShowCelebration(true);
+      } else {
+        setCorrectInARow(0);
+      }
+
+      // Advance to next question after delay
+      setTimeout(() => {
+        setFeedback(null);
+        setShowCelebration(false);
+        setCurrentQuestion(null); // triggers fetchNextQuestion via useEffect
+      }, 2500);
+    } catch {
+      setError("Could not submit answer. Please try again.");
+    }
+  }, [studentId, sessionId, currentQuestion, correctInARow]);
+
+  // Trigger fetch when currentQuestion is cleared after answering
+  useEffect(() => {
+    if (sessionId && !currentQuestion && !sessionComplete && !loading && !error && !feedback && studentId) {
+      fetchNextQuestion();
+    }
+  }, [currentQuestion, sessionId, sessionComplete, loading, error, feedback, studentId, fetchNextQuestion]);
+
+  // Error state
+  if (error) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center px-6">
+        <AdventureBackground calm />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md"
+        >
+          <span className="text-6xl block mb-4">😕</span>
+          <h1 className="font-display text-2xl font-bold text-gray-800 mb-3">{error}</h1>
+          <a
+            href="/dashboard"
+            className="inline-block bg-[var(--theme-primary)] text-white font-display font-bold text-lg px-8 py-3 rounded-2xl mt-4"
+          >
+            Back to Dashboard
+          </a>
+        </motion.div>
+      </main>
+    );
+  }
+
+  // Loading (initial)
+  if (loading && !currentQuestion) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center">
+        <AdventureBackground calm />
+        <motion.span
+          className="text-6xl"
+          animate={{ y: [0, -8, 0], rotate: [0, 5, -5, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        >
+          🦉
+        </motion.span>
+        <p className="text-gray-400 mt-4 font-display">Getting your questions ready...</p>
+      </main>
+    );
+  }
 
   if (phase === "brain_break") {
     return (
@@ -98,7 +254,10 @@ export default function SessionPage() {
             Time for a quick rest. Do 10 star jumps! ⭐
           </p>
           <motion.button
-            onClick={() => setPhase("focus_2")}
+            onClick={() => {
+              setPhase("focus_2");
+              setCurrentQuestion(null); // fetch next question for focus_2
+            }}
             className="bg-teal-500 text-white font-display font-bold text-xl px-10 py-4 rounded-2xl shadow-lg"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -143,11 +302,7 @@ export default function SessionPage() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-500">XP Earned</span>
-              <span className="font-display font-bold text-[var(--theme-primary)]">+{totalCorrect * 12}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-500">Coins Earned</span>
-              <span className="font-display font-bold text-amber-600">+5</span>
+              <span className="font-display font-bold text-[var(--theme-primary)]">+{totalXp}</span>
             </div>
           </div>
 
@@ -207,13 +362,21 @@ export default function SessionPage() {
       {/* Question area */}
       <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto px-6 pt-4">
         <AnimatePresence mode="wait">
-          <QuestionCard
-            key={questionNumber}
-            question={mockQuestion}
-            onAnswer={handleAnswer}
-            disabled={feedback !== null}
-            feedback={feedback}
-          />
+          {currentQuestion && (
+            <QuestionCard
+              key={currentQuestion.id}
+              question={{
+                stem: currentQuestion.content.stem,
+                options: currentQuestion.content.options,
+                type: currentQuestion.type,
+                hint: currentQuestion.content.hint,
+                hints: currentQuestion.content.hints,
+              }}
+              onAnswer={handleAnswer}
+              disabled={feedback !== null}
+              feedback={feedback}
+            />
+          )}
         </AnimatePresence>
         <p className="text-center text-[10px] text-gray-300 mt-6">Powered by AI</p>
       </div>
