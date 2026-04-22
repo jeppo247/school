@@ -5,6 +5,7 @@ import helmet from "helmet";
 import { logger } from "./lib/logger.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { requestLogger } from "./middleware/request-logger.js";
+import { globalLimiter, strictLimiter, checkoutLimiter } from "./middleware/rate-limit.js";
 
 // Route imports
 import { authRoutes } from "./routes/auth.js";
@@ -39,6 +40,12 @@ app.use("/api/v1/webhooks", express.raw({ type: "application/json" }));
 
 // Parse JSON for all other routes
 app.use(express.json({ limit: "10mb" }));
+
+// Rate limiting
+app.use(globalLimiter);
+app.use("/api/v1/diagnostic", strictLimiter);
+app.use("/api/v1/admin/questions/generate", strictLimiter);
+app.use("/api/v1/subscriptions", checkoutLimiter);
 
 // Request logging
 app.use(requestLogger);
