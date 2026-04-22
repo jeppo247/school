@@ -113,18 +113,9 @@ export default function HomePage() {
             >
               FAQ
             </Link>
-            <Link
-              href="/sign-in"
-              className="text-sm font-medium text-gray-600 hover:text-[#4F8CF7] transition-colors px-4 py-2"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/start"
-              className="text-sm font-semibold text-white bg-[#4F8CF7] hover:bg-[#3A6CD4] px-5 py-2.5 rounded-full transition-all hover:shadow-lg hover:shadow-blue-200 active:scale-95"
-            >
-              Get Started Free
-            </Link>
+            <span className="text-sm font-semibold text-white bg-[#4F8CF7] px-5 py-2.5 rounded-full cursor-default opacity-90">
+              Coming Soon
+            </span>
           </div>
         </div>
       </nav>
@@ -178,21 +169,9 @@ export default function HomePage() {
               custom={3}
               className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
             >
-              <Link
-                href="/start"
-                className="group inline-flex items-center justify-center gap-2 text-lg font-semibold text-white bg-[#4F8CF7] hover:bg-[#3A6CD4] px-8 py-4 rounded-2xl transition-all hover:shadow-xl hover:shadow-blue-200/50 active:scale-[0.98]"
-              >
-                Start Now
-                <svg
-                  className="w-5 h-5 group-hover:translate-x-1 transition-transform"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
+              <span className="inline-flex items-center justify-center text-lg font-semibold text-white bg-[#4F8CF7] px-8 py-4 rounded-2xl cursor-default opacity-90">
+                Coming Soon
+              </span>
               <Link
                 href="#how-it-works"
                 className="inline-flex items-center justify-center gap-2 text-lg font-semibold text-gray-700 bg-white hover:bg-gray-50 px-8 py-4 rounded-2xl border border-gray-200 transition-all hover:shadow-md active:scale-[0.98]"
@@ -206,7 +185,7 @@ export default function HomePage() {
               custom={4}
               className="text-sm text-gray-400 pt-2"
             >
-              Free diagnostic included. No credit card required.
+              Launching soon. Join the waitlist.
             </motion.p>
           </motion.div>
 
@@ -719,16 +698,15 @@ export default function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href={plan.name === "Free Trial" ? "/start" : "/subscribe"}
-                  className={`block text-center font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] ${
+                <span
+                  className={`block text-center font-semibold py-3.5 rounded-xl cursor-default opacity-90 ${
                     plan.popular
-                      ? "bg-white text-[#4F8CF7] hover:bg-blue-50 shadow-md"
-                      : "bg-[#4F8CF7] text-white hover:bg-[#3A6CD4] hover:shadow-lg hover:shadow-blue-100"
+                      ? "bg-white text-[#4F8CF7]"
+                      : "bg-[#4F8CF7] text-white"
                   }`}
                 >
-                  {plan.cta}
-                </Link>
+                  Coming Soon
+                </span>
               </motion.div>
             ))}
           </div>

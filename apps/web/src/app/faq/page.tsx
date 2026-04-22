@@ -287,12 +287,9 @@ export default function FAQPage() {
           <Link href="/" className="font-display text-2xl font-bold text-[#4F8CF7]">
             Upwise
           </Link>
-          <Link
-            href="/start"
-            className="text-sm font-semibold text-white bg-[#4F8CF7] hover:bg-[#3A6CD4] px-5 py-2.5 rounded-full transition-all"
-          >
-            Start Free Diagnostic
-          </Link>
+          <span className="text-sm font-semibold text-white bg-[#4F8CF7] px-5 py-2.5 rounded-full cursor-default opacity-90">
+            Coming Soon
+          </span>
         </div>
       </nav>
 
@@ -394,15 +391,9 @@ export default function FAQPage() {
                 ? <>It&apos;s about doing the <em>right work</em>, at the right time, for your child.</>
                 : <>Upwise handles targeted practice so you can focus on what matters most — teaching.</>}
             </p>
-            <Link
-              href="/start"
-              className="inline-flex items-center gap-2 bg-[#4F8CF7] text-white font-semibold px-8 py-4 rounded-2xl hover:bg-[#3A6CD4] transition-all hover:shadow-xl hover:shadow-blue-200/50 active:scale-[0.98]"
-            >
-              {audience === "parents" ? "Start Free Diagnostic" : "Try It Yourself"}
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
+            <span className="inline-flex items-center bg-[#4F8CF7] text-white font-semibold px-8 py-4 rounded-2xl cursor-default opacity-90">
+              Coming Soon
+            </span>
           </div>
         </div>
       </section>

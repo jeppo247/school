@@ -9,12 +9,9 @@ export default function TermsOfServicePage() {
           <Link href="/" className="font-display text-2xl font-bold text-[#4F8CF7]">
             Upwise
           </Link>
-          <Link
-            href="/start"
-            className="text-sm font-semibold text-white bg-[#4F8CF7] hover:bg-[#3A6CD4] px-5 py-2.5 rounded-full transition-all"
-          >
-            Get Started Free
-          </Link>
+          <span className="text-sm font-semibold text-white bg-[#4F8CF7] px-5 py-2.5 rounded-full cursor-default opacity-90">
+            Coming Soon
+          </span>
         </div>
       </nav>
 
