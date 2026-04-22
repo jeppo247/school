@@ -71,7 +71,7 @@ function GapsExplainer() {
             <p className="text-sm text-gray-600 leading-relaxed mt-3">
               Mastery learning works differently. Your child doesn&apos;t move on until they&apos;ve genuinely understood
               the basics. Once those foundations are solid, everything built on top is stronger. Gaps are closed
-              at the source — so learning accelerates instead of slowing down.
+              at the source, so learning accelerates instead of slowing down.
             </p>
             <button
               onClick={() => setExpanded(false)}
@@ -170,7 +170,7 @@ export default function HomePage() {
               custom={2}
               className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed"
             >
-              Every child can build strong foundations — personalised, evidence-based, outcome-led.
+              Every child can build strong foundations. Personalised, evidence-based, outcome-led.
             </motion.p>
 
             <motion.div
@@ -226,7 +226,7 @@ export default function HomePage() {
               { value: "167", label: "Core skills covered" },
               { value: "ACARA", label: "Curriculum aligned" },
               { value: "30 min", label: "Daily sessions" },
-              { value: "Prep–Y7", label: "Year levels" },
+              { value: "Prep to Y7", label: "Year levels" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -299,18 +299,18 @@ export default function HomePage() {
                 {[
                   {
                     feature: "Eliminates knowledge gaps",
-                    mastery: "Can't progress until they truly understand — no gaps stack up",
-                    traditional: "Class moves on regardless — missed concepts compound over time",
+                    mastery: "Can't progress until they truly understand, so no gaps stack up",
+                    traditional: "Class moves on regardless. Missed concepts compound over time",
                   },
                   {
                     feature: "Matches pace to the individual",
-                    mastery: "Progress based on competence — every child in their optimal zone",
-                    traditional: "Progress based on group timing — top students bored, struggling students fall behind",
+                    mastery: "Progress based on competence. Every child in their optimal zone",
+                    traditional: "Progress based on group timing. Top students bored, struggling students fall behind",
                   },
                   {
                     feature: "Tight feedback loops",
-                    mastery: "Instant feedback, targeted practice on weak areas — faster learning cycles",
-                    traditional: "Delayed feedback, broad correction — errors become embedded habits",
+                    mastery: "Instant feedback, targeted practice on weak areas. Faster learning cycles",
+                    traditional: "Delayed feedback, broad correction. Errors become embedded habits",
                   },
                 ].map((row, i) => (
                   <tr key={row.feature} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
@@ -324,9 +324,9 @@ export default function HomePage() {
             {/* Mobile card view */}
             <div className="sm:hidden divide-y divide-gray-100">
               {[
-                { feature: "Eliminates knowledge gaps", mastery: "Can't progress until they truly understand — no gaps stack up", traditional: "Class moves on regardless — missed concepts compound over time" },
-                { feature: "Matches pace to the individual", mastery: "Progress based on competence — every child in their optimal zone", traditional: "Progress based on group timing — top students bored, struggling students fall behind" },
-                { feature: "Tight feedback loops", mastery: "Instant feedback, targeted practice on weak areas — faster learning cycles", traditional: "Delayed feedback, broad correction — errors become embedded habits" },
+                { feature: "Eliminates knowledge gaps", mastery: "Can't progress until they truly understand, so no gaps stack up", traditional: "Class moves on regardless. Missed concepts compound over time" },
+                { feature: "Matches pace to the individual", mastery: "Progress based on competence. Every child in their optimal zone", traditional: "Progress based on group timing. Top students bored, struggling students fall behind" },
+                { feature: "Tight feedback loops", mastery: "Instant feedback, targeted practice on weak areas. Faster learning cycles", traditional: "Delayed feedback, broad correction. Errors become embedded habits" },
               ].map((row) => (
                 <div key={row.feature} className="p-4">
                   <p className="text-sm font-semibold text-gray-800 mb-2">{row.feature}</p>
@@ -348,7 +348,7 @@ export default function HomePage() {
             </div>
           </motion.div>
 
-          {/* Compounding gaps — short with expand */}
+          {/* Compounding gaps */}
           <GapsExplainer />
 
           {/* Research citations */}
@@ -369,7 +369,7 @@ export default function HomePage() {
                 </a>
                 <p className="text-gray-500 text-xs leading-relaxed">
                   The landmark study that proved 1:1 mastery-based tutoring produces 2 standard deviations
-                  of improvement — equivalent to outperforming 98% of classroom-taught peers. Bloom concluded
+                  of improvement, equivalent to outperforming 98% of classroom-taught peers. Bloom concluded
                   the bottleneck was the delivery model, not student ability.
                 </p>
               </div>
@@ -397,12 +397,12 @@ export default function HomePage() {
                 </a>
                 <p className="text-gray-500 text-xs leading-relaxed">
                   Comprehensive review found AI tutoring systems often outperform traditional teaching,
-                  with strongest gains when AI is paired with human guidance — the exact model Upwise uses.
+                  with strongest gains when AI is paired with human guidance, the exact model Upwise uses.
                 </p>
               </div>
             </div>
             <p className="text-[11px] text-gray-400 mt-5">
-              Upwise builds on these foundations: mastery learning (proven over 40 years), personalised practice at scale, and the parent as guide — the human layer research shows is essential.
+              Upwise builds on these foundations: mastery learning (proven over 40 years), personalised practice at scale, and the parent as guide. The human layer research shows is essential.
             </p>
           </motion.div>
         </div>
@@ -446,7 +446,7 @@ export default function HomePage() {
                 ),
                 title: "Diagnose",
                 description:
-                  "Your child completes a short assessment. We pinpoint exactly which skills they've mastered and where the gaps are — so learning starts in the right place.",
+                  "Your child completes a short assessment. We pinpoint exactly which skills they've mastered and where the gaps are, so learning starts in the right place.",
                 color: "#4F8CF7",
                 bg: "#EEF4FF",
               },
@@ -459,7 +459,7 @@ export default function HomePage() {
                 ),
                 title: "Learn",
                 description:
-                  "Daily 20-minute sessions adapt in real-time to your child's level. Questions stay in the sweet spot — challenging enough to grow, easy enough to stay confident.",
+                  "Daily 20-minute sessions adapt in real time to your child's level. Questions stay in the sweet spot: challenging enough to grow, easy enough to stay confident.",
                 color: "#FF8C42",
                 bg: "#FFF4EC",
               },
@@ -539,7 +539,7 @@ export default function HomePage() {
                 className="text-lg text-gray-500 mb-8 leading-relaxed"
               >
                 Research shows children learn 2.6x faster with a personal guide.
-                Upwise makes you that guide — with daily briefings, real-time nudges, and
+                Upwise makes you that guide, with daily briefings, real-time nudges and
                 conversation scripts. No teaching degree required.
               </motion.p>
               <motion.div variants={fadeUp} custom={3} className="space-y-4">
@@ -634,7 +634,7 @@ export default function HomePage() {
               {
                 icon: "🎯",
                 title: "Right level, every time",
-                desc: "Questions match your child's exact level — challenging enough to grow, easy enough to stay confident",
+                desc: "Questions match your child's exact level. Challenging enough to grow, easy enough to stay confident",
               },
               {
                 icon: "🧠",
@@ -649,7 +649,7 @@ export default function HomePage() {
               {
                 icon: "🎨",
                 title: "Their world, their way",
-                desc: "AFL, Bluey, Superheroes, Space — your child picks their adventure",
+                desc: "AFL, Bluey, Superheroes, Space. Your child picks their adventure",
               },
               {
                 icon: "🔥",
@@ -659,7 +659,7 @@ export default function HomePage() {
               {
                 icon: "🏆",
                 title: "Rewards for real learning",
-                desc: "Earn coins for mastering skills — not just showing up — and spend them on avatars and themes",
+                desc: "Earn coins for mastering skills, not just showing up. Spend them on avatars and themes",
               },
             ].map((feature, i) => (
               <motion.div
