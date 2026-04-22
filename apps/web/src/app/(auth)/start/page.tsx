@@ -64,8 +64,8 @@ export default function StartPage() {
 
       sessionStorage.setItem("upwise_student_id", child.id);
       sessionStorage.setItem("upwise_session_id", session.sessionId);
-    } catch (err) {
-      console.error("API not available — running diagnostic in demo mode:", err);
+    } catch {
+      sessionStorage.setItem("upwise_demo_mode", "true");
     }
 
     setLoading(false);
