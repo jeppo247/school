@@ -361,7 +361,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div>
-                <a href="https://nhsjs.com/2024/a-literature-review-of-ai-based-tutoring-systems/" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
+                <a href="https://scholar.google.com/scholar?q=literature+review+AI+based+tutoring+systems+effectiveness" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
                   AI Tutoring Literature Review (48 studies) &rarr;
                 </a>
                 <p className="text-gray-500 text-xs leading-relaxed">
