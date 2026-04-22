@@ -3,30 +3,25 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
+import { api } from "@/lib/api";
 
 export default function SubscribePage() {
   const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleCheckout(tier: "standard" | "family") {
     setLoading(tier);
+    setError(null);
     try {
       const familyId = sessionStorage.getItem("upwise_family_id");
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL ?? "https://upwiseserver-production.up.railway.app/api/v1"}/subscriptions/checkout`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ familyId, tier }),
-        },
-      );
-      const data = await res.json();
+      const data = await api.post<{ url: string | null }>("/subscriptions/checkout", { familyId, tier });
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert("Unable to start checkout. Please try again.");
+        setError("Unable to start checkout. Please try again.");
       }
     } catch {
-      alert("Something went wrong. Please try again.");
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(null);
     }
@@ -55,6 +50,16 @@ export default function SubscribePage() {
             Continue your child&apos;s learning journey. Cancel anytime.
           </p>
         </motion.div>
+
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto mb-6 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-sm text-center"
+          >
+            {error}
+          </motion.div>
+        )}
 
         <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-2xl mx-auto">
           {/* Standard */}
