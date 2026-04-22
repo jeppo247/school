@@ -297,7 +297,7 @@ export default function FAQPage() {
       </nav>
 
       {/* Header */}
-      <section className="pt-16 pb-8 px-6">
+      <section className="pt-16 pb-8 px-6" style={{ background: "linear-gradient(180deg, #E8EEFF 0%, #F8FAFF 100%)" }}>
         <div className="max-w-4xl mx-auto text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -345,7 +345,7 @@ export default function FAQPage() {
       </section>
 
       {/* FAQ sections */}
-      <section className="pb-24 px-6">
+      <section className="pb-24 px-6" style={{ background: "linear-gradient(180deg, #F8FAFF 0%, #F0F0FF 30%, #F8FAFF 60%, #EEF2FF 100%)" }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={audience}
