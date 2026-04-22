@@ -462,7 +462,7 @@ export default function HomePage() {
                   {item.icon}
                 </div>
                 <div
-                  className="absolute top-8 right-8 font-display text-6xl font-bold opacity-[0.06]"
+                  className="absolute top-8 right-8 font-display text-6xl font-bold opacity-[0.15]"
                   style={{ color: item.color }}
                 >
                   {item.step}
