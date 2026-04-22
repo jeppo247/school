@@ -98,6 +98,27 @@ studentRoutes.put("/:id/theme", async (req, res, next) => {
   }
 });
 
+// PUT /students/:id/rewards-mode — Set rewards mode (parent control)
+studentRoutes.put("/:id/rewards-mode", async (req, res, next) => {
+  try {
+    const { rewardsMode } = req.body;
+    if (!["full", "feedback_only", "off"].includes(rewardsMode)) {
+      throw new AppError(400, "VALIDATION_ERROR", "rewardsMode must be 'full', 'feedback_only', or 'off'");
+    }
+
+    const [updated] = await db
+      .update(students)
+      .set({ rewardsMode, updatedAt: new Date() })
+      .where(eq(students.id, req.params.id as string))
+      .returning();
+
+    if (!updated) throw new AppError(404, "NOT_FOUND", "Student not found");
+    res.json({ rewardsMode: updated.rewardsMode });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PUT /students/:id/interests — Update interests
 studentRoutes.put("/:id/interests", validate(updateInterestsSchema), async (req, res, next) => {
   try {

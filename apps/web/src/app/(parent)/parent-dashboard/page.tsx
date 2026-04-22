@@ -33,6 +33,7 @@ const PROFICIENCY_COLORS: Record<string, { bg: string; text: string; label: stri
 interface ChildSummary {
   id: string; name: string; yearLevel: number; currentStreak: number;
   xpTotal: number; coinBalance: number; diagnosticCompleted: boolean;
+  rewardsMode: string;
   sessionsThisWeek: number; ownedItemsCount: number; masteredSkillsCount: number;
   domainProficiencies: { domain: string; proficiency: number; status: string }[];
 }
@@ -64,12 +65,15 @@ export default function ParentDashboard() {
     if (stored) {
       try { setResults(JSON.parse(stored)); } catch { /* ignore */ }
     }
-    setRewardsMode(sessionStorage.getItem("upwise_rewards_mode") ?? "full");
-
     const familyId = sessionStorage.getItem("upwise_family_id");
     if (familyId) {
       api.get<{ children: ChildSummary[] }>(`/parent/dashboard?familyId=${familyId}`)
-        .then((data) => { if (data.children.length > 0) setChildData(data.children[0]); })
+        .then((data) => {
+          if (data.children.length > 0) {
+            setChildData(data.children[0]);
+            setRewardsMode(data.children[0].rewardsMode ?? "full");
+          }
+        })
         .catch(() => {});
     }
 
@@ -322,10 +326,13 @@ export default function ParentDashboard() {
               <span className="text-xs text-gray-400">Rewards</span>
               <button
                 onClick={() => {
-                  const current = sessionStorage.getItem("upwise_rewards_mode") ?? "full";
-                  const next = current === "full" ? "feedback_only" : current === "feedback_only" ? "off" : "full";
-                  sessionStorage.setItem("upwise_rewards_mode", next);
+                  const next = rewardsMode === "full" ? "feedback_only" : rewardsMode === "feedback_only" ? "off" : "full";
                   setRewardsMode(next);
+                  if (childData?.id) {
+                    api.put(`/students/${childData.id}/rewards-mode`, { rewardsMode: next }).catch(() => {
+                      setRewardsMode(rewardsMode);
+                    });
+                  }
                 }}
                 className={`relative w-20 h-7 rounded-full transition-colors ${
                   rewardsMode === "full" ? "bg-emerald-400" : rewardsMode === "feedback_only" ? "bg-amber-400" : "bg-gray-300"

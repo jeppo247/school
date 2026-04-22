@@ -62,6 +62,7 @@ export const students = pgTable(
     currentStreak: integer("current_streak").default(0).notNull(),
     longestStreak: integer("longest_streak").default(0).notNull(),
     lastSessionDate: date("last_session_date"),
+    rewardsMode: text("rewards_mode").default("full").notNull(),
     diagnosticCompleted: boolean("diagnostic_completed").default(false).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),

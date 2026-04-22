@@ -65,6 +65,7 @@ parentRoutes.get("/dashboard", async (req, res, next) => {
           xpTotal: child.xpTotal,
           coinBalance: child.coinBalance,
           diagnosticCompleted: child.diagnosticCompleted,
+          rewardsMode: child.rewardsMode,
           domainProficiencies: domains,
           topMisconceptions: misconceptions,
           ownedItemsCount: ownedItems?.count ?? 0,

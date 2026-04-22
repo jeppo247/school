@@ -21,6 +21,7 @@ interface StudentData {
   coinBalance: number;
   themeId: string;
   diagnosticCompleted: boolean;
+  rewardsMode: string;
   sessionsThisWeek: number;
   masteryPercentage: number;
 }
@@ -32,7 +33,6 @@ export default function StudentDashboard() {
   const [rewardsMode, setRewardsMode] = useState("full");
 
   useEffect(() => {
-    setRewardsMode(sessionStorage.getItem("upwise_rewards_mode") ?? "full");
     const studentId = sessionStorage.getItem("upwise_student_id");
     if (!studentId) {
       setError("No student session found.");
@@ -40,7 +40,10 @@ export default function StudentDashboard() {
       return;
     }
     api.get<StudentData>(`/students/${studentId}`)
-      .then(setStudent)
+      .then((data) => {
+        setStudent(data);
+        setRewardsMode(data.rewardsMode ?? "full");
+      })
       .catch(() => setError("Could not load your data. Please try again."))
       .finally(() => setLoading(false));
   }, []);
