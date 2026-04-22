@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "echo 'build ok'",
+    "build": "tsc --project tsconfig.json",
     "start": "tsx src/index.ts",
     "lint": "eslint src/",
     "db:generate": "drizzle-kit generate",

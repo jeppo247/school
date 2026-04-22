@@ -28,8 +28,8 @@ export async function recordAudit(
  */
 export function auditMiddleware(entityType: string, action: string) {
   return (req: Request, _res: Response, next: NextFunction) => {
-    const actorId = (req as Record<string, unknown>).userId as string ?? "anonymous";
-    const entityId = req.params.id ?? req.params.studentId ?? "unknown";
+    const actorId = (req as unknown as Record<string, unknown>).userId as string ?? "anonymous";
+    const entityId = (req.params.id ?? req.params.studentId ?? "unknown") as string;
 
     // Fire and forget — don't block the request
     recordAudit(actorId, entityType, entityId, action, {

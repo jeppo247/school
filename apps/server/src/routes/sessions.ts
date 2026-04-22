@@ -26,7 +26,7 @@ export const sessionRoutes = Router();
 // POST /sessions/:studentId/start — Start a daily learning session
 sessionRoutes.post("/:studentId/start", async (req, res, next) => {
   try {
-    const { studentId } = req.params;
+    const studentId = req.params.studentId as string;
 
     const [student] = await db.select().from(students).where(eq(students.id, studentId));
     if (!student) throw new AppError(404, "NOT_FOUND", "Student not found");
@@ -121,7 +121,7 @@ sessionRoutes.post("/:studentId/start", async (req, res, next) => {
 // GET /sessions/:studentId/next-question — Get next question in session
 sessionRoutes.get("/:studentId/next-question", async (req, res, next) => {
   try {
-    const { studentId } = req.params;
+    const studentId = req.params.studentId as string;
     const sessionId = req.query.sessionId as string;
     if (!sessionId) throw new AppError(400, "VALIDATION_ERROR", "sessionId required");
 
@@ -216,7 +216,7 @@ sessionRoutes.get("/:studentId/next-question", async (req, res, next) => {
 // POST /sessions/:studentId/respond — Submit answer
 sessionRoutes.post("/:studentId/respond", validate(submitAnswerSchema), async (req, res, next) => {
   try {
-    const { studentId } = req.params;
+    const studentId = req.params.studentId as string;
     const { sessionId, questionId, answer, timeTakenMs, hintUsed } = req.body;
 
     if (!sessionId || !questionId || answer === undefined) {
@@ -353,7 +353,7 @@ sessionRoutes.post("/:studentId/respond", validate(submitAnswerSchema), async (r
 // POST /sessions/:studentId/complete — End the session
 sessionRoutes.post("/:studentId/complete", async (req, res, next) => {
   try {
-    const { studentId } = req.params;
+    const studentId = req.params.studentId as string;
     const { sessionId } = req.body;
 
     const [session] = await db
@@ -552,7 +552,7 @@ sessionRoutes.post("/:studentId/complete", async (req, res, next) => {
 // GET /sessions/:studentId/history — Session history
 sessionRoutes.get("/:studentId/history", async (req, res, next) => {
   try {
-    const { studentId } = req.params;
+    const studentId = req.params.studentId as string;
     const limit = Math.min(Number(req.query.limit) || 20, 50);
     const offset = Number(req.query.offset) || 0;
 

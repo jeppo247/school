@@ -12,7 +12,8 @@ export const studentRoutes = Router();
 // GET /students/:id — Get student profile
 studentRoutes.get("/:id", async (req, res, next) => {
   try {
-    const [student] = await db.select().from(students).where(eq(students.id, req.params.id));
+    const studentId = req.params.id as string;
+    const [student] = await db.select().from(students).where(eq(students.id, studentId));
     if (!student) throw new AppError(404, "NOT_FOUND", "Student not found");
 
     const level = Math.floor(student.xpTotal / XP_PER_LEVEL);
@@ -68,7 +69,7 @@ studentRoutes.put("/:id", async (req, res, next) => {
     const [updated] = await db
       .update(students)
       .set(updates)
-      .where(eq(students.id, req.params.id))
+      .where(eq(students.id, req.params.id as string))
       .returning();
 
     if (!updated) throw new AppError(404, "NOT_FOUND", "Student not found");
@@ -87,7 +88,7 @@ studentRoutes.put("/:id/theme", async (req, res, next) => {
     const [updated] = await db
       .update(students)
       .set({ themeId, updatedAt: new Date() })
-      .where(eq(students.id, req.params.id))
+      .where(eq(students.id, req.params.id as string))
       .returning();
 
     if (!updated) throw new AppError(404, "NOT_FOUND", "Student not found");
@@ -106,7 +107,7 @@ studentRoutes.put("/:id/interests", validate(updateInterestsSchema), async (req,
     const [updated] = await db
       .update(students)
       .set({ interests, updatedAt: new Date() })
-      .where(eq(students.id, req.params.id))
+      .where(eq(students.id, req.params.id as string))
       .returning();
 
     if (!updated) throw new AppError(404, "NOT_FOUND", "Student not found");

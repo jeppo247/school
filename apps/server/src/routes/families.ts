@@ -25,7 +25,8 @@ familyRoutes.post("/", validate(createFamilySchema), async (req, res, next) => {
 // GET /families/:id — Get family with children
 familyRoutes.get("/:id", async (req, res, next) => {
   try {
-    const [family] = await db.select().from(families).where(eq(families.id, req.params.id));
+    const familyId = req.params.id as string;
+    const [family] = await db.select().from(families).where(eq(families.id, familyId));
     if (!family) throw new AppError(404, "NOT_FOUND", "Family not found");
 
     const children = await db.select().from(students).where(eq(students.familyId, family.id));
@@ -46,13 +47,14 @@ familyRoutes.get("/:id", async (req, res, next) => {
 // POST /families/:id/children — Add a child to the family
 familyRoutes.post("/:id/children", validate(addChildSchema), async (req, res, next) => {
   try {
+    const familyId = req.params.id as string;
     const { name, yearLevel, dateOfBirth, themeId } = req.body;
     if (!name || !yearLevel) throw new AppError(400, "VALIDATION_ERROR", "name and yearLevel required");
 
     const [child] = await db
       .insert(students)
       .values({
-        familyId: req.params.id,
+        familyId,
         name,
         yearLevel,
         dateOfBirth,
@@ -69,13 +71,14 @@ familyRoutes.post("/:id/children", validate(addChildSchema), async (req, res, ne
 // POST /families/:id/parents — Add a parent to the family
 familyRoutes.post("/:id/parents", validate(addParentSchema), async (req, res, next) => {
   try {
+    const familyId = req.params.id as string;
     const { name, email, clerkUserId } = req.body;
     if (!name || !email) throw new AppError(400, "VALIDATION_ERROR", "name and email required");
 
     const [parent] = await db
       .insert(parents)
       .values({
-        familyId: req.params.id,
+        familyId,
         name,
         email,
         clerkUserId: clerkUserId ?? null,
@@ -95,7 +98,7 @@ familyRoutes.put("/:id", async (req, res, next) => {
     const [updated] = await db
       .update(families)
       .set({ ...updates, updatedAt: new Date() })
-      .where(eq(families.id, req.params.id))
+      .where(eq(families.id, req.params.id as string))
       .returning();
 
     if (!updated) throw new AppError(404, "NOT_FOUND", "Family not found");

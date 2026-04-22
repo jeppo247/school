@@ -14,7 +14,7 @@ export const coinRoutes = Router();
 // GET /api/v1/coins/:studentId — Get coin balance and recent transactions
 coinRoutes.get("/:studentId", async (req, res, next) => {
   try {
-    const { studentId } = req.params;
+    const studentId = req.params.studentId as string;
     const [balance, transactions, ownedItems] = await Promise.all([
       getBalance(studentId),
       getTransactionHistory(studentId, 10),
@@ -30,7 +30,7 @@ coinRoutes.get("/:studentId", async (req, res, next) => {
 // GET /api/v1/coins/:studentId/history — Paginated transaction history
 coinRoutes.get("/:studentId/history", async (req, res, next) => {
   try {
-    const { studentId } = req.params;
+    const studentId = req.params.studentId as string;
     const limit = Math.min(Number(req.query.limit) || 20, 100);
     const offset = Number(req.query.offset) || 0;
 
@@ -44,7 +44,7 @@ coinRoutes.get("/:studentId/history", async (req, res, next) => {
 // POST /api/v1/coins/:studentId/purchase — Purchase a shop item
 coinRoutes.post("/:studentId/purchase", validate(purchaseItemSchema), async (req, res, next) => {
   try {
-    const { studentId } = req.params;
+    const studentId = req.params.studentId as string;
     const { itemId } = req.body;
 
     if (!itemId || typeof itemId !== "string") {
