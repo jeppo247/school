@@ -657,7 +657,7 @@ export default function HomePage() {
                   "Weekly reports",
                 ],
                 cta: "Subscribe",
-                popular: true,
+                popular: false,
               },
               {
                 name: "Family",
