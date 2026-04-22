@@ -39,3 +39,16 @@ coverage/
 
 # Misc
 *.tsbuildinfo
+
+# Dev artifacts & data exports
+all_questions.json
+questions_export.csv
+audit_*.json
+audit_questions.py
+validate_questions.py
+flag_questions.py
+all_dup_ids.json
+duplicate_ids.json
+final_report.json
+question_validation_report.xlsx
+GapFinder_Product_Spec.docx
