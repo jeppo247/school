@@ -182,7 +182,7 @@ export default function StartPage() {
                     type="text"
                     value={childName}
                     onChange={(e) => setChildName(e.target.value)}
-                    placeholder="e.g. Indigo"
+                    placeholder="e.g. Mia"
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#4F8CF7] focus:ring-2 focus:ring-blue-100 outline-none transition-all text-gray-800"
                   />
                 </div>

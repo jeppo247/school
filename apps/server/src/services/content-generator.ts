@@ -64,7 +64,7 @@ export async function generateQuestion(
  * reflecting the diversity of Australian classrooms.
  */
 const DIVERSE_NAMES = [
-  "Ava", "Liam", "Aroha", "Kai", "Zara", "Noah", "Indigo", "Mateo",
+  "Ava", "Liam", "Aroha", "Kai", "Zara", "Noah", "Isla", "Mateo",
   "Lily", "Oliver", "Maya", "Jack", "Priya", "Tom", "Aisha", "Finn",
   "Ruby", "Leo", "Jade", "Sam", "Amara", "Max", "Sienna", "Ravi",
   "Grace", "Hugo", "Willow", "Ari", "Chloe", "Taj", "Sophie", "Ethan",

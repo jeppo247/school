@@ -572,7 +572,7 @@ export default function HomePage() {
                   </span>
                 </div>
                 <p className="text-gray-700 text-sm leading-relaxed">
-                  Today <strong>Indigo</strong> is working on{" "}
+                  Today <strong>Mia</strong> is working on{" "}
                   <strong>3-digit subtraction with regrouping</strong>. She&apos;s
                   been getting about 72% correct, so the system will start with
                   simpler problems to rebuild confidence.
