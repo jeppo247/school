@@ -13,7 +13,7 @@ const PRICE_IDS: Record<string, string> = {
   family: process.env.STRIPE_PRICE_FAMILY ?? "",
 };
 
-const FRONTEND_URL = process.env.FRONTEND_URL ?? "https://upwiseweb-production.up.railway.app";
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 // POST /subscriptions/checkout — Create a Stripe Checkout session
 subscriptionRoutes.post("/checkout", async (req, res, next) => {
@@ -28,6 +28,10 @@ subscriptionRoutes.post("/checkout", async (req, res, next) => {
     const priceId = PRICE_IDS[tier];
     if (!priceId) {
       throw new AppError(500, "PRICE_NOT_CONFIGURED", `Stripe price ID not configured for ${tier}. Set STRIPE_PRICE_STANDARD and STRIPE_PRICE_FAMILY env vars.`);
+    }
+
+    if (!FRONTEND_URL) {
+      throw new AppError(500, "CONFIG_ERROR", "FRONTEND_URL environment variable is required for checkout");
     }
 
     // Get or create Stripe customer
@@ -106,6 +110,10 @@ subscriptionRoutes.post("/:familyId/portal", async (req, res, next) => {
 
     if (!family?.stripeCustomerId) {
       throw new AppError(400, "NO_CUSTOMER", "No Stripe customer found for this family");
+    }
+
+    if (!FRONTEND_URL) {
+      throw new AppError(500, "CONFIG_ERROR", "FRONTEND_URL environment variable is required");
     }
 
     const session = await stripe.billingPortal.sessions.create({

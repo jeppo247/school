@@ -35,7 +35,7 @@ export const parents = pgTable("parents", {
   familyId: uuid("family_id")
     .notNull()
     .references(() => families.id, { onDelete: "cascade" }),
-  clerkUserId: text("clerk_user_id").unique().notNull(),
+  clerkUserId: text("clerk_user_id").unique(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   notificationPrefs: jsonb("notification_prefs")

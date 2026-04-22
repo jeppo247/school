@@ -76,7 +76,7 @@ familyRoutes.post("/:id/parents", async (req, res, next) => {
         familyId: req.params.id,
         name,
         email,
-        clerkUserId: clerkUserId ?? `temp_${Date.now()}`,
+        clerkUserId: clerkUserId ?? null,
       })
       .returning();
 
