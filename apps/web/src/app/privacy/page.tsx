@@ -213,7 +213,7 @@ export default function PrivacyPolicyPage() {
               If you have questions about this privacy policy or how we handle your data:
             </p>
             <ul className="list-none space-y-1 mt-3">
-              <li><strong>Email:</strong> privacy@upwise.com.au</li>
+              <li><strong>Email:</strong> admin@upwise.com.au</li>
               <li><strong>Company:</strong> Techne AI Pty Ltd</li>
               <li><strong>Location:</strong> Adelaide, South Australia</li>
             </ul>

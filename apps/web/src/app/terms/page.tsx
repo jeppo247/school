@@ -219,7 +219,7 @@ export default function TermsOfServicePage() {
               If you have questions about these terms:
             </p>
             <ul className="list-none space-y-1 mt-3">
-              <li><strong>Email:</strong> hello@upwise.com.au</li>
+              <li><strong>Email:</strong> admin@upwise.com.au</li>
               <li><strong>Company:</strong> Techne AI Pty Ltd</li>
               <li><strong>Location:</strong> Adelaide, South Australia</li>
             </ul>
