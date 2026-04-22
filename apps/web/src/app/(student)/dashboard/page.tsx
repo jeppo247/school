@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { ProgressRing } from "@/components/student/ProgressRing";
 import { StreakCounter } from "@/components/student/StreakCounter";
 import { XPBar } from "@/components/student/XPBar";
@@ -23,6 +24,14 @@ const mockStudent = {
 };
 
 export default function StudentDashboard() {
+  const [rewardsMode, setRewardsMode] = useState("full");
+
+  useEffect(() => {
+    setRewardsMode(sessionStorage.getItem("upwise_rewards_mode") ?? "full");
+  }, []);
+
+  const showCoins = rewardsMode === "full";
+
   return (
     <main className="min-h-screen pb-24 md:ml-[220px]">
       <AdventureBackground />
@@ -46,7 +55,7 @@ export default function StudentDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <StreakCounter count={mockStudent.currentStreak} />
-            <CoinCounter balance={mockStudent.coinBalance} />
+            {showCoins && <CoinCounter balance={mockStudent.coinBalance} />}
           </div>
         </div>
       </header>

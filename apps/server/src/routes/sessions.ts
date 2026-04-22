@@ -2,9 +2,9 @@ import { Router } from "express";
 import { db } from "../db/client.js";
 import {
   students, learningSessions, questionResponses, questions,
-  studentSkillStates, skillNodes, skillPrerequisites,
+  studentSkillStates, skillNodes, skillPrerequisites, coinTransactions,
 } from "../db/schema.js";
-import { eq, and, sql, desc, lte } from "drizzle-orm";
+import { eq, and, sql, desc, lte, inArray } from "drizzle-orm";
 import { selectSessionQuestion, selectReviewQuestion } from "../engine/question-selector.js";
 import { adjustDifficulty, calculateXP } from "../engine/difficulty-adjuster.js";
 import { updateKnowledgeState } from "../engine/knowledge-state.js";
@@ -385,10 +385,95 @@ sessionRoutes.post("/:studentId/complete", async (req, res, next) => {
     const newXpTotal = student.xpTotal + session.xpEarned;
     const newLevel = Math.floor(newXpTotal / XP_PER_LEVEL);
 
-    // Check for skills mastered in this session
-    // TODO: populate from actual mastery state changes during session
+    // Detect skills mastered in this session by checking which skills
+    // transitioned to "mastered" status during this session's responses
+    const sessionResponses = await db
+      .select({
+        skillId: questionResponses.skillId,
+        hintUsed: questionResponses.hintUsed,
+      })
+      .from(questionResponses)
+      .where(eq(questionResponses.sessionId, sessionId));
+
+    // Get unique skills touched in this session with hint counts
+    const skillHintCounts = new Map<string, number>();
+    for (const r of sessionResponses) {
+      const prev = skillHintCounts.get(r.skillId) ?? 0;
+      skillHintCounts.set(r.skillId, prev + (r.hintUsed ? 1 : 0));
+    }
+
+    const touchedSkillIds = [...skillHintCounts.keys()];
     const skillsMastered: { skillId: string; hintsUsed: number; wasGapClosure: boolean }[] = [];
-    const dueReviewsSucceeded = 0;
+    let dueReviewsSucceeded = 0;
+
+    if (touchedSkillIds.length > 0) {
+      // Get current mastery status for all touched skills
+      const currentStates = await db
+        .select({
+          skillId: studentSkillStates.skillId,
+          masteryStatus: studentSkillStates.masteryStatus,
+          nextReview: studentSkillStates.nextReview,
+        })
+        .from(studentSkillStates)
+        .where(
+          and(
+            eq(studentSkillStates.studentId, studentId),
+            inArray(studentSkillStates.skillId, touchedSkillIds),
+          ),
+        );
+
+      // Check which skills are now mastered and weren't previously rewarded
+      for (const state of currentStates) {
+        if (state.masteryStatus === "mastered") {
+          // Check if we already awarded skill_mastery or gap_closure for this skill
+          const [alreadyAwarded] = await db
+            .select({ id: coinTransactions.id })
+            .from(coinTransactions)
+            .where(
+              and(
+                eq(coinTransactions.studentId, studentId),
+                eq(coinTransactions.referenceId, state.skillId),
+                sql`${coinTransactions.reason} IN ('skill_mastery', 'gap_closure')`,
+              ),
+            )
+            .limit(1);
+
+          if (!alreadyAwarded) {
+            // Check if this was a gap closure (skill had attempts before this session
+            // but wasn't mastered — meaning the child struggled and now closed the gap)
+            const [priorAttempts] = await db
+              .select({ count: sql<number>`count(*)` })
+              .from(questionResponses)
+              .where(
+                and(
+                  eq(questionResponses.skillId, state.skillId),
+                  sql`${questionResponses.sessionId} != ${sessionId}`,
+                  sql`${questionResponses.sessionId} IN (
+                    SELECT id FROM learning_sessions WHERE student_id = ${studentId}
+                  )`,
+                ),
+              );
+
+            const wasGapClosure = (priorAttempts?.count ?? 0) > 0;
+
+            skillsMastered.push({
+              skillId: state.skillId,
+              hintsUsed: skillHintCounts.get(state.skillId) ?? 0,
+              wasGapClosure,
+            });
+          }
+        }
+
+        // Count successful due reviews (skill was already mastered and review was due)
+        if (
+          state.masteryStatus === "mastered" &&
+          state.nextReview &&
+          new Date(state.nextReview) <= new Date()
+        ) {
+          dueReviewsSucceeded++;
+        }
+      }
+    }
 
     // Calculate coin rewards (mastery-only, with daily cap)
     const coinRewards = await calculateSessionRewards(

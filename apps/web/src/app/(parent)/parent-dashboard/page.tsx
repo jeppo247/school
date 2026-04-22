@@ -48,6 +48,7 @@ const fadeUp = {
 export default function ParentDashboard() {
   const [results, setResults] = useState<DiagnosticResults | null>(null);
   const [loading, setLoading] = useState(true);
+  const [rewardsMode, setRewardsMode] = useState("full");
 
   useEffect(() => {
     const stored = sessionStorage.getItem("upwise_diagnostic_results");
@@ -58,6 +59,7 @@ export default function ParentDashboard() {
         // Invalid data
       }
     }
+    setRewardsMode(sessionStorage.getItem("upwise_rewards_mode") ?? "full");
     setLoading(false);
   }, []);
 
@@ -290,6 +292,61 @@ export default function ParentDashboard() {
             <p>
               Each session is 10–20 minutes. {childName} will work through adaptive questions
               that stay in the optimal difficulty zone — challenging enough to learn, easy enough to stay confident.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Rewards & Coins */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-white rounded-xl p-6 lg:p-8 border border-[#E8E2D8] shadow-clay mb-6"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-[#1A1A2E]">🪙 Rewards & Coins</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400">Rewards</span>
+              <button
+                onClick={() => {
+                  const current = sessionStorage.getItem("upwise_rewards_mode") ?? "full";
+                  const next = current === "full" ? "feedback_only" : current === "feedback_only" ? "off" : "full";
+                  sessionStorage.setItem("upwise_rewards_mode", next);
+                  setRewardsMode(next);
+                }}
+                className={`relative w-20 h-7 rounded-full transition-colors ${
+                  rewardsMode === "full" ? "bg-emerald-400" : rewardsMode === "feedback_only" ? "bg-amber-400" : "bg-gray-300"
+                }`}
+              >
+                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-white">
+                  {rewardsMode === "full" ? "Full" : rewardsMode === "feedback_only" ? "Feedback" : "Off"}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-4 mb-4">
+            <div className="bg-amber-50 rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-amber-600">142</p>
+              <p className="text-xs text-amber-500 mt-1">Coin balance</p>
+            </div>
+            <div className="bg-blue-50 rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-blue-600">3</p>
+              <p className="text-xs text-blue-500 mt-1">Items owned</p>
+            </div>
+            <div className="bg-emerald-50 rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-emerald-600">5</p>
+              <p className="text-xs text-emerald-500 mt-1">Skills rewarded</p>
+            </div>
+          </div>
+
+          <div className="text-xs text-gray-400 space-y-1">
+            <p>Coins are earned only for mastering skills, closing gaps, and passing reviews — never for just showing up.</p>
+            <p>
+              <strong>Rewards mode:</strong>{" "}
+              {rewardsMode === "full" && "Full — coins, shop, and celebrations visible to your child."}
+              {rewardsMode === "feedback_only" && "Feedback only — celebrations shown, coins and shop hidden."}
+              {rewardsMode === "off" && "Off — all reward UI hidden. Learning continues without gamification."}
             </p>
           </div>
         </motion.div>
