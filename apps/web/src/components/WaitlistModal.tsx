@@ -131,41 +131,46 @@ export function WaitlistModal({ open, onClose }: WaitlistModalProps) {
             </button>
 
             {modalState === "success" ? (
-              <div className="text-center py-6 relative overflow-hidden">
-                {/* Confetti explosion */}
-                {Array.from({ length: 40 }, (_, i) => (
-                  <motion.span
-                    key={i}
-                    className="absolute text-2xl pointer-events-none"
-                    style={{ left: "50%", top: "40%" }}
-                    initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
-                    animate={{
-                      opacity: [1, 1, 0],
-                      scale: [0, 1.2, 0.8],
-                      x: (Math.cos((i / 40) * Math.PI * 2 + Math.random()) * (120 + Math.random() * 80)),
-                      y: (Math.sin((i / 40) * Math.PI * 2 + Math.random()) * (100 + Math.random() * 60)),
-                      rotate: [0, Math.random() * 360],
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      delay: i * 0.02,
-                      ease: "easeOut",
-                    }}
-                  >
-                    {["🎉", "🎊", "✨", "⭐", "🌟", "💫", "🥳", "🎈"][i % 8]}
-                  </motion.span>
-                ))}
+              <div className="text-center py-10 relative">
+                {/* Full-screen confetti explosion */}
+                <div className="fixed inset-0 pointer-events-none z-[200]">
+                  {Array.from({ length: 80 }, (_, i) => (
+                    <motion.span
+                      key={i}
+                      className="absolute text-3xl sm:text-4xl"
+                      style={{
+                        left: `${30 + Math.random() * 40}%`,
+                        top: `${30 + Math.random() * 30}%`,
+                      }}
+                      initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
+                      animate={{
+                        opacity: [1, 1, 1, 0],
+                        scale: [0, 1.5, 1],
+                        x: (Math.cos((i / 80) * Math.PI * 2 + Math.random() * 2) * (200 + Math.random() * 300)),
+                        y: (Math.sin((i / 80) * Math.PI * 2 + Math.random() * 2) * (200 + Math.random() * 300)),
+                        rotate: [0, Math.random() * 720 - 360],
+                      }}
+                      transition={{
+                        duration: 2.5,
+                        delay: i * 0.015,
+                        ease: "easeOut",
+                      }}
+                    >
+                      {["🎉", "🎊", "✨", "⭐", "🌟", "💫", "🥳", "🎈", "🎆", "🪅", "🎇", "🍾"][i % 12]}
+                    </motion.span>
+                  ))}
+                </div>
 
                 <motion.span
-                  className="text-7xl block mb-4"
+                  className="text-9xl block mb-6"
                   initial={{ scale: 0 }}
-                  animate={{ scale: [0, 1.4, 1] }}
-                  transition={{ duration: 0.5, ease: "backOut" }}
+                  animate={{ scale: [0, 1.6, 1] }}
+                  transition={{ duration: 0.6, ease: "backOut" }}
                 >
                   🎉
                 </motion.span>
                 <motion.h2
-                  className="font-display text-2xl font-bold text-gray-900 mb-3"
+                  className="font-display text-3xl font-bold text-gray-900 mb-4"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
@@ -173,13 +178,22 @@ export function WaitlistModal({ open, onClose }: WaitlistModalProps) {
                   Thank you!
                 </motion.h2>
                 <motion.p
-                  className="text-gray-500 leading-relaxed"
+                  className="text-lg text-gray-500 leading-relaxed"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
                   We will be in contact shortly when your free trial is available.
                 </motion.p>
+                <motion.button
+                  onClick={onClose}
+                  className="mt-8 bg-[#4F8CF7] hover:bg-[#3B7AE8] active:scale-[0.98] text-white font-semibold px-10 py-3.5 rounded-xl transition-all text-lg"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  Close
+                </motion.button>
               </div>
             ) : (
               <>
