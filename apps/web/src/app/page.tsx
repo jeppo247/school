@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
+import { WaitlistModal } from "@/components/WaitlistModal";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -90,6 +91,7 @@ function GapsExplainer() {
 }
 
 export default function HomePage() {
+  const [showWaitlist, setShowWaitlist] = useState(false);
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -113,9 +115,12 @@ export default function HomePage() {
             >
               FAQ
             </Link>
-            <span className="text-sm font-semibold text-white bg-[#4F8CF7] px-5 py-2.5 rounded-full cursor-default opacity-90">
-              Coming Soon
-            </span>
+            <button
+              onClick={() => setShowWaitlist(true)}
+              className="text-sm font-semibold text-white bg-[#4F8CF7] hover:bg-[#3B7AE8] active:scale-[0.97] px-5 py-2.5 rounded-full transition-all"
+            >
+              Join the Waitlist
+            </button>
           </div>
         </div>
       </nav>
@@ -169,9 +174,12 @@ export default function HomePage() {
               custom={3}
               className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
             >
-              <span className="inline-flex items-center justify-center text-lg font-semibold text-white bg-[#4F8CF7] px-8 py-4 rounded-2xl cursor-default opacity-90">
-                Coming Soon
-              </span>
+              <button
+                onClick={() => setShowWaitlist(true)}
+                className="inline-flex items-center justify-center text-lg font-semibold text-white bg-[#4F8CF7] hover:bg-[#3B7AE8] active:scale-[0.98] px-8 py-4 rounded-2xl transition-all"
+              >
+                Join the Waitlist
+              </button>
               <Link
                 href="#how-it-works"
                 className="inline-flex items-center justify-center gap-2 text-lg font-semibold text-gray-700 bg-white hover:bg-gray-50 px-8 py-4 rounded-2xl border border-gray-200 transition-all hover:shadow-md active:scale-[0.98]"
@@ -353,6 +361,39 @@ export default function HomePage() {
               Upwise builds on these foundations: mastery learning (proven over 40 years), personalised practice at scale, and the parent as guide. The human layer research shows is essential.
             </p>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Mid-page CTA */}
+      <section className="py-16 bg-white">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4"
+          >
+            Ready to give your child the advantage?
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-lg text-gray-500 mb-8 max-w-xl mx-auto"
+          >
+            Join the waitlist and be the first to access personalised, mastery-based learning for your child.
+          </motion.p>
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            onClick={() => setShowWaitlist(true)}
+            className="inline-flex items-center justify-center text-lg font-semibold text-white bg-[#4F8CF7] hover:bg-[#3B7AE8] active:scale-[0.98] px-8 py-4 rounded-2xl transition-all shadow-md hover:shadow-lg"
+          >
+            Register Your Interest
+          </motion.button>
         </div>
       </section>
 
@@ -698,15 +739,16 @@ export default function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <span
-                  className={`block text-center font-semibold py-3.5 rounded-xl cursor-default opacity-90 ${
+                <button
+                  onClick={() => setShowWaitlist(true)}
+                  className={`block w-full text-center font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] ${
                     plan.popular
-                      ? "bg-white text-[#4F8CF7]"
-                      : "bg-[#4F8CF7] text-white"
+                      ? "bg-white text-[#4F8CF7] hover:bg-blue-50"
+                      : "bg-[#4F8CF7] text-white hover:bg-[#3B7AE8]"
                   }`}
                 >
-                  Coming Soon
-                </span>
+                  Join Waitlist
+                </button>
               </motion.div>
             ))}
           </div>
@@ -764,6 +806,8 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      <WaitlistModal open={showWaitlist} onClose={() => setShowWaitlist(false)} />
     </main>
   );
 }

@@ -1,6 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { WaitlistModal } from "@/components/WaitlistModal";
 
 export default function PrivacyPolicyPage() {
+  const [showWaitlist, setShowWaitlist] = useState(false);
+
   return (
     <main className="min-h-screen bg-white">
       {/* Navigation */}
@@ -9,9 +15,12 @@ export default function PrivacyPolicyPage() {
           <Link href="/" className="font-display text-2xl font-bold text-[#4F8CF7]">
             Upwise
           </Link>
-          <span className="text-sm font-semibold text-white bg-[#4F8CF7] px-5 py-2.5 rounded-full cursor-default opacity-90">
-            Coming Soon
-          </span>
+          <button
+            onClick={() => setShowWaitlist(true)}
+            className="text-sm font-semibold text-white bg-[#4F8CF7] hover:bg-[#3B7AE8] active:scale-[0.97] px-5 py-2.5 rounded-full transition-all"
+          >
+            Join the Waitlist
+          </button>
         </div>
       </nav>
 
@@ -231,6 +240,8 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
       </footer>
+
+      <WaitlistModal open={showWaitlist} onClose={() => setShowWaitlist(false)} />
     </main>
   );
 }

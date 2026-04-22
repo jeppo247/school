@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
+import { WaitlistModal } from "@/components/WaitlistModal";
 
 interface FAQItem {
   question: string;
@@ -276,6 +277,7 @@ function FAQAccordion({ item }: { item: FAQItem }) {
 }
 
 export default function FAQPage() {
+  const [showWaitlist, setShowWaitlist] = useState(false);
   const [audience, setAudience] = useState<Audience>("parents");
   const sections = audience === "parents" ? PARENT_SECTIONS : TEACHER_SECTIONS;
 
@@ -287,9 +289,12 @@ export default function FAQPage() {
           <Link href="/" className="font-display text-2xl font-bold text-[#4F8CF7]">
             Upwise
           </Link>
-          <span className="text-sm font-semibold text-white bg-[#4F8CF7] px-5 py-2.5 rounded-full cursor-default opacity-90">
-            Coming Soon
-          </span>
+          <button
+            onClick={() => setShowWaitlist(true)}
+            className="text-sm font-semibold text-white bg-[#4F8CF7] hover:bg-[#3B7AE8] active:scale-[0.97] px-5 py-2.5 rounded-full transition-all"
+          >
+            Join the Waitlist
+          </button>
         </div>
       </nav>
 
@@ -391,9 +396,12 @@ export default function FAQPage() {
                 ? <>It&apos;s about doing the <em>right work</em>, at the right time, for your child.</>
                 : <>Upwise handles targeted practice so you can focus on what matters most — teaching.</>}
             </p>
-            <span className="inline-flex items-center bg-[#4F8CF7] text-white font-semibold px-8 py-4 rounded-2xl cursor-default opacity-90">
-              Coming Soon
-            </span>
+            <button
+              onClick={() => setShowWaitlist(true)}
+              className="inline-flex items-center bg-[#4F8CF7] hover:bg-[#3B7AE8] active:scale-[0.98] text-white font-semibold px-8 py-4 rounded-2xl transition-all"
+            >
+              Register Your Interest
+            </button>
           </div>
         </div>
       </section>
@@ -405,6 +413,8 @@ export default function FAQPage() {
           <p>Australian owned and operated</p>
         </div>
       </footer>
+
+      <WaitlistModal open={showWaitlist} onClose={() => setShowWaitlist(false)} />
     </main>
   );
 }
