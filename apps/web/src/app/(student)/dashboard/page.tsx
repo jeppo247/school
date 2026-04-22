@@ -27,7 +27,7 @@ export default function StudentDashboard() {
     <main className="min-h-screen pb-24 md:ml-[220px]">
       <AdventureBackground />
       {/* Header bar */}
-      <header className="sticky top-0 z-30 bg-[#F5F7FF]/90 backdrop-blur-md border-b border-[#E0E7EF] px-6 py-3">
+      <header className="sticky top-0 z-30 bg-[#F5F7FF]/90 backdrop-blur-md border-b border-[var(--border-warm)] px-6 py-3" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)" }}>
         <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[var(--theme-primary)]/10 flex items-center justify-center">
@@ -137,7 +137,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Sidebar nav — visible md+ */}
-      <aside className="hidden md:flex md:flex-col md:fixed md:left-0 md:top-0 md:w-[220px] md:h-full border-r border-[#E0E7EF] py-8 px-4 z-40" style={{ background: "linear-gradient(180deg, #EEF2FF 0%, #F5F7FF 100%)" }}>
+      <aside className="hidden md:flex md:flex-col md:fixed md:left-0 md:top-0 md:w-[220px] md:h-full border-r border-[var(--border-warm)] py-8 px-4 z-40" style={{ background: "linear-gradient(180deg, rgba(238,242,255,0.92) 0%, rgba(245,247,255,0.92) 100%)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", boxShadow: "1px 0 4px rgba(0,0,0,0.04), 1px 0 1px rgba(0,0,0,0.02)" }}>
         <div className="mb-8">
           <span className="font-display font-bold text-lg text-gray-800">Upwise</span>
         </div>
@@ -165,7 +165,7 @@ export default function StudentDashboard() {
       </aside>
 
       {/* Bottom nav — mobile only */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-[var(--theme-surface)] border-t border-gray-100 px-6 py-3 z-30 md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 bg-[var(--theme-surface)]/95 backdrop-blur-md border-t border-[var(--border-warm-light)] px-6 py-3 z-30 md:hidden" style={{ boxShadow: "0 -1px 3px rgba(0,0,0,0.03)" }}>
         <div className="max-w-2xl mx-auto flex items-center justify-around">
           {[
             { icon: "🏠", label: "Home", href: "/dashboard", active: true },
