@@ -27,7 +27,7 @@ export default function StudentDashboard() {
     <main className="min-h-screen pb-24 md:ml-[220px]">
       <AdventureBackground />
       {/* Header bar */}
-      <header className="sticky top-0 z-30 bg-[#F5F7FF]/90 backdrop-blur-md border-b border-[var(--border-warm)] px-6 py-3" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)" }}>
+      <header className="sticky top-0 z-30 bg-[#F5F7FF]/95 backdrop-blur-md border-b border-[var(--border-warm)] px-6 py-3" style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.03)" }}>
         <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[var(--theme-primary)]/10 flex items-center justify-center">
@@ -137,7 +137,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Sidebar nav — visible md+ */}
-      <aside className="hidden md:flex md:flex-col md:fixed md:left-0 md:top-0 md:w-[220px] md:h-full border-r border-[var(--border-warm)] py-8 px-4 z-40" style={{ background: "linear-gradient(180deg, rgba(238,242,255,0.92) 0%, rgba(245,247,255,0.92) 100%)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", boxShadow: "1px 0 4px rgba(0,0,0,0.04), 1px 0 1px rgba(0,0,0,0.02)" }}>
+      <aside className="hidden md:flex md:flex-col md:fixed md:left-0 md:top-0 md:w-[220px] md:h-full border-r border-[var(--border-warm)] py-8 px-4 z-40" style={{ background: "linear-gradient(180deg, rgba(245,247,255,0.95) 0%, rgba(240,243,255,0.95) 100%)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", boxShadow: "2px 0 8px rgba(0,0,0,0.06), 1px 0 2px rgba(0,0,0,0.03)" }}>
         <div className="mb-8">
           <span className="font-display font-bold text-lg text-gray-800">Upwise</span>
         </div>
