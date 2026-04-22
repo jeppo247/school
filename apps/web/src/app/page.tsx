@@ -182,7 +182,7 @@ export default function HomePage() {
                 href="/start"
                 className="group inline-flex items-center justify-center gap-2 text-lg font-semibold text-white bg-[#4F8CF7] hover:bg-[#3A6CD4] px-8 py-4 rounded-2xl transition-all hover:shadow-xl hover:shadow-blue-200/50 active:scale-[0.98]"
               >
-                Start Free Diagnostic
+                Start Now
                 <svg
                   className="w-5 h-5 group-hover:translate-x-1 transition-transform"
                   fill="none"
@@ -880,7 +880,7 @@ export default function HomePage() {
                 href="/start"
                 className="inline-flex items-center gap-2 text-lg font-semibold text-white bg-[#4F8CF7] hover:bg-[#3A6CD4] px-10 py-4 rounded-2xl transition-all hover:shadow-xl hover:shadow-blue-200/50 active:scale-[0.98]"
               >
-                Start Free Diagnostic
+                Start Now
                 <svg
                   className="w-5 h-5"
                   fill="none"
