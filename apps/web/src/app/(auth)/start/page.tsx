@@ -62,6 +62,7 @@ export default function StartPage() {
 
       const session = await api.post<{ sessionId: string }>(`/diagnostic/${child.id}/start`, {});
 
+      sessionStorage.setItem("upwise_family_id", family.id);
       sessionStorage.setItem("upwise_student_id", child.id);
       sessionStorage.setItem("upwise_session_id", session.sessionId);
     } catch {

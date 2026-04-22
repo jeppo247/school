@@ -3,21 +3,33 @@ import { ZodSchema } from "zod";
 
 export function validate(schema: ZodSchema) {
   return (req: Request, _res: Response, next: NextFunction) => {
-    schema.parse(req.body);
-    next();
+    try {
+      schema.parse(req.body);
+      next();
+    } catch (err) {
+      next(err);
+    }
   };
 }
 
 export function validateQuery(schema: ZodSchema) {
   return (req: Request, _res: Response, next: NextFunction) => {
-    schema.parse(req.query);
-    next();
+    try {
+      schema.parse(req.query);
+      next();
+    } catch (err) {
+      next(err);
+    }
   };
 }
 
 export function validateParams(schema: ZodSchema) {
   return (req: Request, _res: Response, next: NextFunction) => {
-    schema.parse(req.params);
-    next();
+    try {
+      schema.parse(req.params);
+      next();
+    } catch (err) {
+      next(err);
+    }
   };
 }

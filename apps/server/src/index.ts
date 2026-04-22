@@ -46,6 +46,8 @@ app.use(globalLimiter);
 app.use("/api/v1/diagnostic", strictLimiter);
 app.use("/api/v1/admin/questions/generate", strictLimiter);
 app.use("/api/v1/subscriptions", checkoutLimiter);
+app.use("/api/v1/sessions", strictLimiter);
+app.use("/api/v1/families", strictLimiter);
 
 // Request logging
 app.use(requestLogger);
