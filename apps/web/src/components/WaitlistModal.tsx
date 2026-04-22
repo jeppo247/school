@@ -58,16 +58,31 @@ export function WaitlistModal({ open, onClose }: WaitlistModalProps) {
       const params = new URLSearchParams(window.location.search);
       const source = params.get("ref") ?? undefined;
 
-      await api.post("/waitlist", {
-        email: email.trim(),
-        name: name.trim() || undefined,
-        source,
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL
+        ?? (typeof window !== "undefined" && !window.location.hostname.includes("localhost")
+          ? "https://upwiseserver-production.up.railway.app/api/v1"
+          : "http://localhost:4000/api/v1");
+
+      const res = await fetch(`${apiUrl}/waitlist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          name: name.trim() || undefined,
+          source,
+        }),
       });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(`${res.status}: ${data.error?.message ?? res.statusText} [${apiUrl}]`);
+      }
 
       setModalState("success");
     } catch (err) {
       setModalState("error");
-      setErrorMessage("Something went wrong. Please try again shortly.");
+      const msg = err instanceof Error ? err.message : String(err);
+      setErrorMessage(`${msg}`);
     }
   }
 
