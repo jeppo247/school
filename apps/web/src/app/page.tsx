@@ -213,37 +213,6 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Social Proof Bar */}
-      <section className="py-12 border-y border-gray-100 bg-white">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16"
-          >
-            {[
-              { value: "167", label: "Core skills covered" },
-              { value: "ACARA", label: "Curriculum aligned" },
-              { value: "30 min", label: "Daily sessions" },
-              { value: "Prep to Y7", label: "Year levels" },
-            ].map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                variants={fadeUp}
-                custom={i}
-                className="text-center"
-              >
-                <p className="font-display text-3xl font-bold text-[#4F8CF7]">
-                  {stat.value}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
       {/* Mastery vs Traditional Comparison */}
       <section
         className="py-20 relative overflow-hidden"
