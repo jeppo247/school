@@ -158,7 +158,7 @@ export default function StudentDashboard() {
               }`}
             >
               <span className="text-2xl">{item.icon}</span>
-              <span className="text-sm font-medium">{item.label}</span>
+              <span className="text-sm font-medium font-display">{item.label}</span>
             </Link>
           ))}
         </nav>
@@ -183,7 +183,7 @@ export default function StudentDashboard() {
               }`}
             >
               <span className="text-2xl">{tab.icon}</span>
-              <span className="text-[10px] font-medium">{tab.label}</span>
+              <span className="text-[10px] font-medium font-display">{tab.label}</span>
             </Link>
           ))}
         </div>

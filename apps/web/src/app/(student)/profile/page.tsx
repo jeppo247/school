@@ -102,7 +102,7 @@ export default function ProfilePage() {
               }`}
             >
               <span className="text-2xl">{tab.icon}</span>
-              <span className="text-[10px] font-medium">{tab.label}</span>
+              <span className="text-[10px] font-medium font-display">{tab.label}</span>
             </a>
           ))}
         </div>
