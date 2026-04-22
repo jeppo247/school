@@ -352,7 +352,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div>
-                <a href="https://arxiv.org/abs/2303.04634" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
+                <a href="https://scholar.google.com/scholar?q=Carnegie+Learning+Cognitive+Tutor+randomized+controlled+trial+algebra" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
                   Carnegie Cognitive Tutor Trials &rarr;
                 </a>
                 <p className="text-gray-500 text-xs leading-relaxed">
