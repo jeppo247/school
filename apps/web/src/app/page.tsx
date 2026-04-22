@@ -343,7 +343,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div>
-                <a href="https://www.cambridge.org/core/journals/journal-of-educational-research/article/effectiveness-of-mastery-learning-programs/abs" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
+                <a href="https://scholar.google.com/scholar?q=Kulik+Kulik+Bangert-Drowns+effectiveness+mastery+learning+1990" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#4F8CF7] hover:underline mb-1 inline-block">
                   Kulik Meta-Analysis (1990) &rarr;
                 </a>
                 <p className="text-gray-500 text-xs leading-relaxed">
