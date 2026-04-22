@@ -135,6 +135,8 @@ webhookRoutes.post("/stripe", async (req: Request, res: Response) => {
     }
   } catch (err) {
     logger.error("Webhook processing error", { type: event.type, error: (err as Error).message });
+    res.status(500).json({ error: "Webhook processing failed" });
+    return;
   }
 
   res.json({ received: true });
