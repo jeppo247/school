@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { api } from "@/lib/api";
 
 interface DomainScore {
   domain: string;
@@ -29,6 +30,13 @@ const PROFICIENCY_COLORS: Record<string, { bg: string; text: string; label: stri
   needs_additional_support: { bg: "bg-red-100", text: "text-red-700", label: "Needs Support", bar: "bg-red-300" },
 };
 
+interface ChildSummary {
+  id: string; name: string; yearLevel: number; currentStreak: number;
+  xpTotal: number; coinBalance: number; diagnosticCompleted: boolean;
+  sessionsThisWeek: number; ownedItemsCount: number; masteredSkillsCount: number;
+  domainProficiencies: { domain: string; proficiency: number; status: string }[];
+}
+
 const DOMAIN_LABELS: Record<string, string> = {
   numeracy: "Numeracy",
   reading: "Reading",
@@ -49,17 +57,22 @@ export default function ParentDashboard() {
   const [results, setResults] = useState<DiagnosticResults | null>(null);
   const [loading, setLoading] = useState(true);
   const [rewardsMode, setRewardsMode] = useState("full");
+  const [childData, setChildData] = useState<ChildSummary | null>(null);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("upwise_diagnostic_results");
     if (stored) {
-      try {
-        setResults(JSON.parse(stored));
-      } catch {
-        // Invalid data
-      }
+      try { setResults(JSON.parse(stored)); } catch { /* ignore */ }
     }
     setRewardsMode(sessionStorage.getItem("upwise_rewards_mode") ?? "full");
+
+    const familyId = sessionStorage.getItem("upwise_family_id");
+    if (familyId) {
+      api.get<{ children: ChildSummary[] }>(`/parent/dashboard?familyId=${familyId}`)
+        .then((data) => { if (data.children.length > 0) setChildData(data.children[0]); })
+        .catch(() => {});
+    }
+
     setLoading(false);
   }, []);
 
@@ -327,16 +340,16 @@ export default function ParentDashboard() {
 
           <div className="grid sm:grid-cols-3 gap-4 mb-4">
             <div className="bg-amber-50 rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-amber-600">142</p>
+              <p className="text-2xl font-bold text-amber-600">{childData?.coinBalance ?? "—"}</p>
               <p className="text-xs text-amber-500 mt-1">Coin balance</p>
             </div>
             <div className="bg-blue-50 rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-blue-600">3</p>
+              <p className="text-2xl font-bold text-blue-600">{childData?.ownedItemsCount ?? "—"}</p>
               <p className="text-xs text-blue-500 mt-1">Items owned</p>
             </div>
             <div className="bg-emerald-50 rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-emerald-600">5</p>
-              <p className="text-xs text-emerald-500 mt-1">Skills rewarded</p>
+              <p className="text-2xl font-bold text-emerald-600">{childData?.masteredSkillsCount ?? "—"}</p>
+              <p className="text-xs text-emerald-500 mt-1">Skills mastered</p>
             </div>
           </div>
 
