@@ -77,7 +77,7 @@ export default function SubscribePage() {
             <ul className="space-y-3 mb-8">
               {[
                 "Unlimited daily sessions",
-                "All 5 NAPLAN domains",
+                "Maths, reading, writing, spelling & grammar",
                 "Full parent dashboard",
                 "Daily briefings & nudges",
                 "Weekly progress reports",
@@ -120,7 +120,7 @@ export default function SubscribePage() {
               {[
                 "Everything in Standard",
                 "Up to 4 children",
-                "All 5 NAPLAN domains",
+                "Maths, reading, writing, spelling & grammar",
                 "Term reports",
                 "Teacher-shareable reports",
               ].map((f) => (

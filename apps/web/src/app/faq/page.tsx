@@ -55,7 +55,7 @@ const PARENT_SECTIONS: FAQSection[] = [
     items: [
       {
         question: "What is Upwise?",
-        answer: `An AI-powered learning system that helps your child build genuine mastery in literacy and numeracy.\n\nIt identifies exactly where your child's gaps are, guides them through personalised learning at their own pace, and gives you clear visibility into their progress.\n\nAligned to the Australian Curriculum (ACARA) and designed to build the foundational skills assessed by NAPLAN.`,
+        answer: `A personalised learning system that helps your child build genuine mastery in literacy and numeracy.\n\nIt identifies exactly where your child's gaps are, guides them through personalised learning at their own pace, and gives you clear visibility into their progress.\n\nAligned to the Australian Curriculum (ACARA) and designed to build the foundational skills assessed by NAPLAN.`,
       },
       {
         question: "How does the AI personalise my child's learning?",

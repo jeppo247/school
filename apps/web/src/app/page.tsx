@@ -150,10 +150,10 @@ export default function HomePage() {
               custom={1}
               className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight"
             >
-              <span className="text-gray-900">Every child can</span>
+              <span className="text-gray-900">Every child can build</span>
               <br />
               <span className="relative inline-block">
-                <span className="relative z-10 text-[#4F8CF7]">master</span>
+                <span className="relative z-10 text-[#4F8CF7]">strong foundations</span>
                 <motion.span
                   className="absolute -bottom-1 left-0 right-0 h-3 bg-[#4F8CF7]/10 rounded-full -z-0"
                   initial={{ scaleX: 0 }}
@@ -162,9 +162,6 @@ export default function HomePage() {
                   style={{ originX: 0 }}
                 />
               </span>
-              <span className="text-gray-900"> what school</span>
-              <br />
-              <span className="text-gray-900">moves past</span>
             </motion.h1>
 
             <motion.p
@@ -225,7 +222,7 @@ export default function HomePage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16"
           >
             {[
-              { value: "150+", label: "Skill nodes mapped" },
+              { value: "167", label: "Core skills covered" },
               { value: "ACARA", label: "Curriculum aligned" },
               { value: "30 min", label: "Daily sessions" },
               { value: "Prep–Y7", label: "Year levels" },
@@ -404,8 +401,7 @@ export default function HomePage() {
               </div>
             </div>
             <p className="text-[11px] text-gray-400 mt-5">
-              Upwise builds on these foundations: mastery learning (proven over 40 years) + adaptive AI (first
-              credible attempt to deliver 1:1 mastery at scale) + parent as guide (the human layer research shows is essential).
+              Upwise builds on these foundations: mastery learning (proven over 40 years), personalised practice at scale, and the parent as guide — the human layer research shows is essential.
             </p>
           </motion.div>
         </div>
@@ -449,7 +445,7 @@ export default function HomePage() {
                 ),
                 title: "Diagnose",
                 description:
-                  "Your child completes a 15-minute adaptive assessment. Our AI pinpoints exactly which skills they've mastered and where the gaps are hiding.",
+                  "Your child completes a short assessment. We pinpoint exactly which skills they've mastered and where the gaps are — so learning starts in the right place.",
                 color: "#4F8CF7",
                 bg: "#EEF4FF",
               },
@@ -541,9 +537,9 @@ export default function HomePage() {
                 custom={2}
                 className="text-lg text-gray-500 mb-8 leading-relaxed"
               >
-                Research shows AI-powered learning is 2.6x faster with a human guide.
-                Upwise makes you that guide with daily briefings, real-time nudges, and
-                conversation scripts — no teaching degree required.
+                Research shows children learn 2.6x faster with a personal guide.
+                Upwise makes you that guide — with daily briefings, real-time nudges, and
+                conversation scripts. No teaching degree required.
               </motion.p>
               <motion.div variants={fadeUp} custom={3} className="space-y-4">
                 {[
@@ -621,48 +617,48 @@ export default function HomePage() {
               custom={0}
               className="text-sm font-semibold text-[#FF8C42] uppercase tracking-wider mb-3"
             >
-              Built for Kids
+              The Learning Experience
             </motion.p>
             <motion.h2
               variants={fadeUp}
               custom={1}
               className="font-display text-4xl sm:text-5xl font-bold text-gray-900"
             >
-              Learning that feels like play
+              Designed for how children actually learn
             </motion.h2>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                icon: "🎨",
-                title: "Themeable",
-                desc: "AFL, Bluey, Superheroes, Space — your child picks their adventure",
-              },
-              {
-                icon: "🏆",
-                title: "Gold Coins & Rewards",
-                desc: "Earn coins for milestones, spend them in the shop on avatars and themes",
-              },
-              {
                 icon: "🎯",
-                title: "Adaptive Difficulty",
-                desc: "Questions automatically adjust to your child's level — challenging enough to grow, easy enough to stay confident",
-              },
-              {
-                icon: "🔥",
-                title: "Streaks & XP",
-                desc: "Daily streaks and experience points keep motivation high day after day",
+                title: "Right level, every time",
+                desc: "Questions match your child's exact level — challenging enough to grow, easy enough to stay confident",
               },
               {
                 icon: "🧠",
-                title: "Spaced Repetition",
+                title: "Built to remember",
                 desc: "Mastered skills return for review on a scientific schedule that builds long-term memory",
               },
               {
                 icon: "🇦🇺",
                 title: "100% Australian",
                 desc: "Every question, context, and example is written for Australian kids using AUD, km, and local references",
+              },
+              {
+                icon: "🎨",
+                title: "Their world, their way",
+                desc: "AFL, Bluey, Superheroes, Space — your child picks their adventure",
+              },
+              {
+                icon: "🔥",
+                title: "Daily habits, lasting progress",
+                desc: "Short daily sessions build consistency and confidence over time",
+              },
+              {
+                icon: "🏆",
+                title: "Rewards for real learning",
+                desc: "Earn coins for mastering skills — not just showing up — and spend them on avatars and themes",
               },
             ].map((feature, i) => (
               <motion.div
@@ -708,7 +704,7 @@ export default function HomePage() {
               custom={1}
               className="font-display text-4xl sm:text-5xl font-bold text-gray-900 mb-4"
             >
-              Less than a single tutoring session
+              Invest in their foundations
             </motion.h2>
             <motion.p
               variants={fadeUp}
@@ -729,7 +725,7 @@ export default function HomePage() {
                 features: [
                   "7 days of full access",
                   "Unlimited sessions",
-                  "All 5 NAPLAN domains",
+                  "Maths, reading, writing, spelling & grammar",
                   "1 child",
                   "Full parent dashboard",
                 ],
@@ -744,7 +740,7 @@ export default function HomePage() {
                 features: [
                   "Unlimited diagnostics",
                   "Unlimited daily sessions",
-                  "All 5 NAPLAN domains",
+                  "Maths, reading, writing, spelling & grammar",
                   "1 child",
                   "Full parent dashboard",
                   "Daily briefings & nudges",
@@ -761,7 +757,7 @@ export default function HomePage() {
                 features: [
                   "Everything in Standard",
                   "Up to 4 children",
-                  "All 5 NAPLAN domains",
+                  "Maths, reading, writing, spelling & grammar",
                   "Term reports",
                   "Teacher-shareable reports",
                 ],
@@ -866,17 +862,17 @@ export default function HomePage() {
               custom={0}
               className="font-display text-4xl sm:text-5xl font-bold text-gray-900 mb-6"
             >
-              Find out what your child
+              See where your child
               <br />
-              <span className="text-[#4F8CF7]">already knows</span>
+              <span className="text-[#4F8CF7]">can grow</span>
             </motion.h2>
             <motion.p
               variants={fadeUp}
               custom={1}
               className="text-lg text-gray-500 mb-8 max-w-xl mx-auto"
             >
-              The free diagnostic takes 15 minutes and reveals a complete gap map
-              of your child&apos;s maths knowledge. No credit card required.
+              The free diagnostic takes 15 minutes and shows your child&apos;s
+              strengths and the skills they&apos;re ready to master next. No credit card required.
             </motion.p>
             <motion.div variants={fadeUp} custom={2}>
               <Link
@@ -908,7 +904,7 @@ export default function HomePage() {
                 Upwise
               </span>
               <p className="text-sm mt-3 leading-relaxed">
-                AI-powered adaptive learning for Australian primary students.
+                Personalised learning that helps children build strong foundations in maths and English.
               </p>
             </div>
             <div>

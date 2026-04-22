@@ -16,9 +16,9 @@ const fontDisplay = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Upwise — Learn Smarter",
+  title: "Upwise — Strong foundations in maths and English",
   description:
-    "AI-powered adaptive learning for Australian primary students. Find gaps, build mastery, and learn with confidence.",
+    "Personalised learning that helps Australian primary students build strong foundations in maths and English. Evidence-based, outcome-led, works alongside school.",
   keywords: [
     "Australian curriculum",
     "ACARA",
