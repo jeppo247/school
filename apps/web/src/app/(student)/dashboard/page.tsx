@@ -8,29 +8,64 @@ import { StreakCounter } from "@/components/student/StreakCounter";
 import { XPBar } from "@/components/student/XPBar";
 import { CoinCounter } from "@/components/student/CoinCounter";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
+import { api } from "@/lib/api";
 
-// Mock data — will be replaced with API calls
-const mockStudent = {
-  name: "Indigo",
-  level: 5,
-  xpInLevel: 120,
-  xpForLevel: 200,
-  currentStreak: 7,
-  coinBalance: 142,
-  themeId: "default",
-  diagnosticCompleted: true,
-  weeklySessionsCompleted: 3,
-  weeklySessionsTarget: 5,
-};
+interface StudentData {
+  id: string;
+  name: string;
+  yearLevel: number;
+  level: number;
+  xpInCurrentLevel: number;
+  xpForNextLevel: number;
+  currentStreak: number;
+  coinBalance: number;
+  themeId: string;
+  diagnosticCompleted: boolean;
+  sessionsThisWeek: number;
+  masteryPercentage: number;
+}
 
 export default function StudentDashboard() {
+  const [student, setStudent] = useState<StudentData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [rewardsMode, setRewardsMode] = useState("full");
 
   useEffect(() => {
     setRewardsMode(sessionStorage.getItem("upwise_rewards_mode") ?? "full");
+    const studentId = sessionStorage.getItem("upwise_student_id");
+    if (!studentId) {
+      setError("No student session found.");
+      setLoading(false);
+      return;
+    }
+    api.get<StudentData>(`/students/${studentId}`)
+      .then(setStudent)
+      .catch(() => setError("Could not load your data. Please try again."))
+      .finally(() => setLoading(false));
   }, []);
 
   const showCoins = rewardsMode === "full";
+
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <AdventureBackground calm />
+        <motion.span className="text-6xl" animate={{ y: [0, -8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>🦉</motion.span>
+      </main>
+    );
+  }
+
+  if (error || !student) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center px-6">
+        <AdventureBackground calm />
+        <span className="text-6xl block mb-4">😕</span>
+        <p className="font-display text-xl text-gray-700 mb-4">{error ?? "Something went wrong."}</p>
+        <a href="/start" className="inline-block bg-[var(--theme-primary)] text-white font-display font-bold px-8 py-3 rounded-2xl">Start Again</a>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen pb-24 md:ml-[220px]">
@@ -44,18 +79,18 @@ export default function StudentDashboard() {
             </div>
             <div>
               <p className="font-display font-bold text-gray-800 text-sm md:text-base">
-                Hi, {mockStudent.name}!
+                Hi, {student.name}!
               </p>
               <XPBar
-                currentXP={mockStudent.xpInLevel}
-                levelXP={mockStudent.xpForLevel}
-                level={mockStudent.level}
+                currentXP={student.xpInCurrentLevel}
+                levelXP={student.xpForNextLevel}
+                level={student.level}
               />
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <StreakCounter count={mockStudent.currentStreak} />
-            {showCoins && <CoinCounter balance={mockStudent.coinBalance} />}
+            <StreakCounter count={student.currentStreak} />
+            {showCoins && <CoinCounter balance={student.coinBalance} />}
           </div>
         </div>
       </header>
@@ -83,20 +118,20 @@ export default function StudentDashboard() {
             Ready for today&apos;s adventure?
           </h1>
           <p className="text-gray-500 text-base mb-6">
-            {mockStudent.diagnosticCompleted
+            {student.diagnosticCompleted
               ? "Your learning path is ready. Let's go!"
               : "Let's find out what you already know!"}
           </p>
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Link
-              href={mockStudent.diagnosticCompleted ? "/session" : "/diagnostic"}
+              href={student.diagnosticCompleted ? "/session" : "/diagnostic"}
               className="inline-flex items-center gap-3 bg-[var(--theme-primary)] text-white font-display font-bold text-xl px-10 py-5 rounded-2xl shadow-lg shadow-[var(--theme-primary)]/20 hover:opacity-95 transition-all lg:w-full lg:py-6 lg:text-2xl lg:justify-center"
             >
               <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
-              {mockStudent.diagnosticCompleted ? "Start Today's Session" : "Start Diagnostic"}
+              {student.diagnosticCompleted ? "Start Today's Session" : "Start Diagnostic"}
             </Link>
           </motion.div>
         </motion.div>
@@ -110,7 +145,7 @@ export default function StudentDashboard() {
             className="bg-[#EFF6FF] rounded-3xl p-4 lg:p-6 border border-[#E8E2D8] flex flex-col items-center min-h-[160px] justify-center shadow-clay"
           >
             <ProgressRing
-              progress={(mockStudent.weeklySessionsCompleted / mockStudent.weeklySessionsTarget) * 100}
+              progress={(student.sessionsThisWeek / 5) * 100}
               size={100}
               strokeWidth={10}
               label="This week"
