@@ -1,14 +1,57 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { THEMES } from "@/lib/themes";
 import { XPBar } from "@/components/student/XPBar";
 import { StreakCounter } from "@/components/student/StreakCounter";
 import { CoinCounter } from "@/components/student/CoinCounter";
+import { api } from "@/lib/api";
 
 export default function ProfilePage() {
   const [selectedTheme, setSelectedTheme] = useState("default");
+  const [student, setStudent] = useState<{
+    name: string; yearLevel: number; currentStreak: number; coinBalance: number;
+    level: number; xpInCurrentLevel: number; xpForNextLevel: number;
+    interests: string[] | null; themeId: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+
+  useEffect(() => {
+    const studentId = sessionStorage.getItem("upwise_student_id");
+    if (!studentId) { setLoading(false); return; }
+    api.get<typeof student & { id: string }>(`/students/${studentId}`)
+      .then((data) => {
+        setStudent(data);
+        setSelectedTheme(data.themeId ?? "default");
+        setSelectedInterests(data.interests ?? []);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const toggleInterest = useCallback(async (interest: string) => {
+    const studentId = sessionStorage.getItem("upwise_student_id");
+    if (!studentId) return;
+    const updated = selectedInterests.includes(interest)
+      ? selectedInterests.filter((i) => i !== interest)
+      : [...selectedInterests, interest];
+    setSelectedInterests(updated);
+    try {
+      await api.put(`/students/${studentId}/interests`, { interests: updated });
+    } catch {
+      setSelectedInterests(selectedInterests);
+    }
+  }, [selectedInterests]);
+
+  if (loading || !student) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <motion.span className="text-6xl" animate={{ y: [0, -8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>🦉</motion.span>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[var(--theme-bg)] pb-24 md:ml-[220px]">
@@ -24,16 +67,16 @@ export default function ProfilePage() {
           <div className="w-20 h-20 rounded-full bg-[var(--theme-primary)]/10 flex items-center justify-center mx-auto mb-4">
             <span className="text-4xl lg:text-6xl">🦉</span>
           </div>
-          <h2 className="font-display text-xl md:text-2xl font-bold text-gray-800 mb-1">Indigo</h2>
-          <p className="text-base text-gray-400 mb-4">Year 3</p>
+          <h2 className="font-display text-xl md:text-2xl font-bold text-gray-800 mb-1">{student.name}</h2>
+          <p className="text-base text-gray-400 mb-4">{`Year ${student.yearLevel}`}</p>
 
           <div className="flex justify-center gap-6">
-            <StreakCounter count={7} />
-            <CoinCounter balance={142} />
+            <StreakCounter count={student.currentStreak} />
+            <CoinCounter balance={student.coinBalance} />
           </div>
 
           <div className="mt-4 max-w-xs mx-auto">
-            <XPBar currentXP={120} levelXP={200} level={5} />
+            <XPBar currentXP={student.xpInCurrentLevel} levelXP={student.xpForNextLevel} level={student.level} />
           </div>
         </div>
 
@@ -76,7 +119,12 @@ export default function ProfilePage() {
             {["AFL", "Animals", "Space", "Cooking", "Music", "Art", "Gaming", "Nature"].map((interest) => (
               <button
                 key={interest}
-                className="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-gray-100 text-sm md:text-base font-medium text-gray-600 hover:bg-[var(--theme-primary)]/10 hover:text-[var(--theme-primary)] transition-colors"
+                onClick={() => toggleInterest(interest)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedInterests.includes(interest)
+                    ? "bg-[var(--theme-primary)] text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
               >
                 {interest}
               </button>
