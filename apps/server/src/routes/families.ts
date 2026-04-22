@@ -3,11 +3,13 @@ import { db } from "../db/client.js";
 import { families, parents, students } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import { AppError } from "../middleware/error-handler.js";
+import { validate } from "../middleware/validate.js";
+import { createFamilySchema, addParentSchema, addChildSchema } from "../schemas/validation.js";
 
 export const familyRoutes = Router();
 
 // POST /families — Create a new family (onboarding step 1)
-familyRoutes.post("/", async (req, res, next) => {
+familyRoutes.post("/", validate(createFamilySchema), async (req, res, next) => {
   try {
     const { name, email } = req.body;
     if (!name || !email) throw new AppError(400, "VALIDATION_ERROR", "name and email required");
@@ -42,7 +44,7 @@ familyRoutes.get("/:id", async (req, res, next) => {
 });
 
 // POST /families/:id/children — Add a child to the family
-familyRoutes.post("/:id/children", async (req, res, next) => {
+familyRoutes.post("/:id/children", validate(addChildSchema), async (req, res, next) => {
   try {
     const { name, yearLevel, dateOfBirth, themeId } = req.body;
     if (!name || !yearLevel) throw new AppError(400, "VALIDATION_ERROR", "name and yearLevel required");
@@ -65,7 +67,7 @@ familyRoutes.post("/:id/children", async (req, res, next) => {
 });
 
 // POST /families/:id/parents — Add a parent to the family
-familyRoutes.post("/:id/parents", async (req, res, next) => {
+familyRoutes.post("/:id/parents", validate(addParentSchema), async (req, res, next) => {
   try {
     const { name, email, clerkUserId } = req.body;
     if (!name || !email) throw new AppError(400, "VALIDATION_ERROR", "name and email required");

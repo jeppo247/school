@@ -18,6 +18,8 @@ import {
   XP_PER_CORRECT, XP_DIFFICULTY_MULTIPLIER, XP_PER_LEVEL,
   STREAK_GRACE_DAYS,
 } from "@upwise/shared";
+import { validate } from "../middleware/validate.js";
+import { submitAnswerSchema } from "../schemas/validation.js";
 
 export const sessionRoutes = Router();
 
@@ -140,7 +142,10 @@ sessionRoutes.get("/:studentId/next-question", async (req, res, next) => {
 
     const askedIds = new Set(responses.map((r) => r.questionId));
 
-    // Get available questions
+    const [student] = await db.select().from(students).where(eq(students.id, studentId));
+    if (!student) throw new AppError(404, "NOT_FOUND", "Student not found");
+
+    // Get available questions — only at or below the student's year level
     const available = await db
       .select({
         id: questions.id,
@@ -151,7 +156,14 @@ sessionRoutes.get("/:studentId/next-question", async (req, res, next) => {
         content: questions.content,
         questionType: questions.questionType,
       })
-      .from(questions);
+      .from(questions)
+      .innerJoin(skillNodes, eq(questions.skillId, skillNodes.id))
+      .where(
+        and(
+          eq(questions.isValidated, true),
+          lte(skillNodes.yearLevel, student.yearLevel),
+        ),
+      );
 
     const plan = session.metadata as { plan?: { focusSkills: string[] } } | null;
     const targetSkills = plan?.plan?.focusSkills ?? session.skillsTargeted ?? [];
@@ -202,7 +214,7 @@ sessionRoutes.get("/:studentId/next-question", async (req, res, next) => {
 });
 
 // POST /sessions/:studentId/respond — Submit answer
-sessionRoutes.post("/:studentId/respond", async (req, res, next) => {
+sessionRoutes.post("/:studentId/respond", validate(submitAnswerSchema), async (req, res, next) => {
   try {
     const { studentId } = req.params;
     const { sessionId, questionId, answer, timeTakenMs, hintUsed } = req.body;

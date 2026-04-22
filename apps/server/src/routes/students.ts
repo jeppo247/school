@@ -3,6 +3,8 @@ import { db } from "../db/client.js";
 import { students, families, studentSkillStates, learningSessions } from "../db/schema.js";
 import { eq, and, sql } from "drizzle-orm";
 import { AppError } from "../middleware/error-handler.js";
+import { validate } from "../middleware/validate.js";
+import { updateInterestsSchema } from "../schemas/validation.js";
 import { XP_PER_LEVEL } from "@upwise/shared";
 
 export const studentRoutes = Router();
@@ -96,7 +98,7 @@ studentRoutes.put("/:id/theme", async (req, res, next) => {
 });
 
 // PUT /students/:id/interests — Update interests
-studentRoutes.put("/:id/interests", async (req, res, next) => {
+studentRoutes.put("/:id/interests", validate(updateInterestsSchema), async (req, res, next) => {
   try {
     const { interests } = req.body;
     if (!Array.isArray(interests)) throw new AppError(400, "VALIDATION_ERROR", "interests must be an array");

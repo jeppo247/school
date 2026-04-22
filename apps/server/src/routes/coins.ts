@@ -6,6 +6,8 @@ import {
   getOwnedItems,
 } from "../services/coin-service.js";
 import { AppError } from "../middleware/error-handler.js";
+import { validate } from "../middleware/validate.js";
+import { purchaseItemSchema } from "../schemas/validation.js";
 
 export const coinRoutes = Router();
 
@@ -40,7 +42,7 @@ coinRoutes.get("/:studentId/history", async (req, res, next) => {
 });
 
 // POST /api/v1/coins/:studentId/purchase — Purchase a shop item
-coinRoutes.post("/:studentId/purchase", async (req, res, next) => {
+coinRoutes.post("/:studentId/purchase", validate(purchaseItemSchema), async (req, res, next) => {
   try {
     const { studentId } = req.params;
     const { itemId } = req.body;
