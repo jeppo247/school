@@ -67,11 +67,7 @@ export function WaitlistModal({ open, onClose }: WaitlistModalProps) {
       setModalState("success");
     } catch (err) {
       setModalState("error");
-      setErrorMessage(
-        err instanceof Error
-          ? err.message
-          : "Something went wrong. Please try again.",
-      );
+      setErrorMessage("Something went wrong. Please try again shortly.");
     }
   }
 
@@ -120,28 +116,55 @@ export function WaitlistModal({ open, onClose }: WaitlistModalProps) {
             </button>
 
             {modalState === "success" ? (
-              <div className="text-center py-6">
-                <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-green-50 flex items-center justify-center">
-                  <svg
-                    className="w-8 h-8 text-green-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
+              <div className="text-center py-6 relative overflow-hidden">
+                {/* Confetti explosion */}
+                {Array.from({ length: 40 }, (_, i) => (
+                  <motion.span
+                    key={i}
+                    className="absolute text-2xl pointer-events-none"
+                    style={{ left: "50%", top: "40%" }}
+                    initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
+                    animate={{
+                      opacity: [1, 1, 0],
+                      scale: [0, 1.2, 0.8],
+                      x: (Math.cos((i / 40) * Math.PI * 2 + Math.random()) * (120 + Math.random() * 80)),
+                      y: (Math.sin((i / 40) * Math.PI * 2 + Math.random()) * (100 + Math.random() * 60)),
+                      rotate: [0, Math.random() * 360],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      delay: i * 0.02,
+                      ease: "easeOut",
+                    }}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <h2 className="font-display text-2xl font-bold text-gray-900 mb-2">
-                  You&apos;re on the list!
-                </h2>
-                <p className="text-gray-500">
-                  We&apos;ll be in touch.
-                </p>
+                    {["🎉", "🎊", "✨", "⭐", "🌟", "💫", "🥳", "🎈"][i % 8]}
+                  </motion.span>
+                ))}
+
+                <motion.span
+                  className="text-7xl block mb-4"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: [0, 1.4, 1] }}
+                  transition={{ duration: 0.5, ease: "backOut" }}
+                >
+                  🎉
+                </motion.span>
+                <motion.h2
+                  className="font-display text-2xl font-bold text-gray-900 mb-3"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  Thank you!
+                </motion.h2>
+                <motion.p
+                  className="text-gray-500 leading-relaxed"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  We will be in contact shortly when your free trial is available.
+                </motion.p>
               </div>
             ) : (
               <>
