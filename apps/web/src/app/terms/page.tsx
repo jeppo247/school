@@ -26,10 +26,6 @@ export default function TermsOfServicePage() {
 
       {/* Content */}
       <article className="max-w-3xl mx-auto px-6 py-16">
-        <p className="text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-8 inline-block">
-          Draft for review. Not yet reviewed by a solicitor.
-        </p>
-
         <h1 className="font-display text-4xl font-bold text-gray-900 mb-2">Terms of Service</h1>
         <p className="text-sm text-gray-400 mb-12">Last updated: 22 April 2026</p>
 

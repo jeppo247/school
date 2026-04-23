@@ -1,0 +1,42 @@
+# Upwise — AI-powered mastery learning for Australian primary students
+
+> Upwise is a personalised learning platform built by Techne AI Pty Ltd
+> (Adelaide, Australia) that uses adaptive AI and mastery learning to help
+> Australian primary school students (Prep-Year 7) build strong foundations
+> in maths and English. Aligned to the Australian Curriculum (ACARA) and
+> the five NAPLAN domains. Launching 2026.
+
+## Key pages
+
+- [Home](https://upwise.com.au/): Product overview, methodology, pricing
+- [FAQ](https://upwise.com.au/faq): Evidence base, how it works, safety, privacy, pricing details
+- [Privacy Policy](https://upwise.com.au/privacy): Australian Privacy Principles compliance, children's data protection
+- [Terms of Service](https://upwise.com.au/terms): Usage terms, AI-generated content disclosure
+- [Contact](https://upwise.com.au/contact): Get in touch with the team
+
+## About
+
+Upwise uses mastery-based learning — students must demonstrate proficiency
+before advancing. The platform covers 167 micro-skills with mapped
+prerequisites across maths and English for Prep through Year 7.
+
+The approach is grounded in peer-reviewed research:
+- Bloom's 2 Sigma Problem (1984): 1-on-1 tutoring produces 2 standard deviations of improvement
+- Kestin et al. (2025), Nature Scientific Reports: AI tutoring produced effect sizes of 0.63-1.3 SD
+- Bastani et al. (2025), PNAS: Guardrailed AI improved learning 127% vs unguarded AI
+- Letourneau et al. (2025), NPJ Science of Learning: 87.5% of ITS studies outperformed traditional teaching
+
+## Pricing
+
+- Free tier: Limited access
+- Standard ($39 AUD/month): One child, all subjects, 7-day free trial
+- Family ($59 AUD/month): Up to 3 children, all subjects, teacher-shareable reports
+
+## Preferred citation
+
+Upwise (2026). Personalised mastery learning for Australian primary students. https://upwise.com.au
+
+## Licensing
+
+Content on this site may be cited for informational purposes.
+Commercial reproduction requires written permission from Techne AI Pty Ltd.

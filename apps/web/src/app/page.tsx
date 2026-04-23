@@ -527,7 +527,8 @@ export default function HomePage() {
                 custom={2}
                 className="text-lg text-gray-500 mb-8 leading-relaxed"
               >
-                Research shows children learn 2.6x faster with a personal guide.
+                Research consistently shows children learn significantly faster with
+                a personal guide — up to 2 standard deviations above classroom averages.
                 Upwise makes you that guide, with daily briefings, real-time nudges and
                 conversation scripts. No teaching degree required.
               </motion.p>
@@ -595,7 +596,7 @@ export default function HomePage() {
 
       {/* Pricing */}
       <section className="py-24 bg-white">
-        <div className="max-w-5xl mx-auto px-6">
+        <div id="pricing" className="max-w-5xl mx-auto px-6">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -775,15 +776,13 @@ export default function HomePage() {
               <p className="text-sm font-semibold text-gray-300 mb-3">Product</p>
               <ul className="space-y-2 text-sm">
                 <li><Link href="#how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                 <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
               </ul>
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-300 mb-3">Company</p>
               <ul className="space-y-2 text-sm">
-                <li><Link href="#" className="hover:text-white transition-colors">About</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Blog</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
               </ul>
             </div>
@@ -792,7 +791,6 @@ export default function HomePage() {
               <ul className="space-y-2 text-sm">
                 <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
                 <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Data Protection</Link></li>
               </ul>
             </div>
           </div>
