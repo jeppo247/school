@@ -132,37 +132,23 @@ export default function HomeClientPage() {
           className="relative z-10 max-w-4xl mx-auto px-6 text-center bg-white/70 backdrop-blur-sm rounded-3xl py-12"
         >
           <div className="space-y-6">
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
+            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight animate-[fadeUp_0.6s_ease-out_both]">
               <span className="text-gray-900">A </span>
               <span className="relative inline-block">
                 <span className="relative z-10 text-[#4F8CF7]">smarter alternative</span>
-                <motion.span
-                  className="absolute -bottom-1 left-0 right-0 h-3 bg-[#4F8CF7]/10 rounded-full -z-0"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ originX: 0 }}
+                <span
+                  className="absolute -bottom-1 left-0 right-0 h-3 bg-[#4F8CF7]/10 rounded-full -z-0 origin-left animate-[scaleX_0.8s_ease-out_0.8s_both]"
                 />
               </span>
               <br />
               <span className="text-gray-900">to traditional tutoring</span>
             </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed"
-            >
+            <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed animate-[fadeUp_0.6s_ease-out_0.3s_both]">
               Every child can build strong foundations. Personalised, evidence-based, outcome-led.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
-            >
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 animate-[fadeUp_0.6s_ease-out_0.5s_both]">
               <button
                 onClick={() => setShowWaitlist(true)}
                 className="inline-flex items-center justify-center text-lg font-semibold text-white bg-[#4F8CF7] hover:bg-[#3B7AE8] active:scale-[0.98] px-8 py-4 rounded-2xl transition-all"
@@ -175,9 +161,9 @@ export default function HomeClientPage() {
               >
                 See How It Works
               </Link>
-            </motion.div>
+            </div>
 
-            <p className="text-sm text-gray-400 pt-2">
+            <p className="text-sm text-gray-400 pt-2 animate-[fadeUp_0.6s_ease-out_0.7s_both]">
               Launching soon. Join the waitlist.
             </p>
           </div>

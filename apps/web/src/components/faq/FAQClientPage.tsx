@@ -4,18 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
 import { WaitlistModal } from "@/components/WaitlistModal";
-
-interface FAQItem {
-  question: string;
-  answer: string;
-  source?: { label: string; url: string };
-}
-
-interface FAQSection {
-  title: string;
-  icon: string;
-  items: FAQItem[];
-}
+import type { FAQItem, FAQSection } from "@/data/faqData";
 
 type Audience = "parents" | "teachers";
 

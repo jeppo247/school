@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getAllFAQItems } from "@/data/faqData";
 
 export const metadata: Metadata = {
   title: "FAQ — Upwise",
@@ -10,5 +11,28 @@ export const metadata: Metadata = {
 };
 
 export default function FaqLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  const faqItems = getAllFAQItems();
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      {children}
+    </>
+  );
 }
