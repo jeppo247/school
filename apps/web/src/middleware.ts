@@ -5,6 +5,14 @@ const PUBLIC_PATHS = ["/", "/faq", "/privacy", "/terms", "/contact"];
 const PUBLIC_PREFIXES = ["/compare/"];
 
 export function middleware(request: NextRequest) {
+  // Redirect www → apex (301 permanent)
+  const host = request.headers.get("host") ?? "";
+  if (host === "www.upwise.com.au") {
+    const url = new URL(request.url);
+    url.host = "upwise.com.au";
+    return NextResponse.redirect(url, 301);
+  }
+
   const { pathname } = request.nextUrl;
 
   if (

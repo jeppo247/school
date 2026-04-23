@@ -28,7 +28,9 @@ const app = express();
 const PORT = process.env.PORT ?? 4000;
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  hsts: { maxAge: 63072000, includeSubDomains: true, preload: true },
+}));
 const PRODUCTION_ORIGINS = [
   "https://upwise.com.au",
   "https://www.upwise.com.au",
