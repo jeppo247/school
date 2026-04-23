@@ -5,12 +5,17 @@ const PUBLIC_PATHS = ["/", "/faq", "/privacy", "/terms", "/contact"];
 const PUBLIC_PREFIXES = ["/compare/"];
 
 export function middleware(request: NextRequest) {
-  // Redirect www → apex (301 permanent)
-  const host = request.headers.get("host") ?? "";
+  // Redirect www → apex (301 permanent).
+  // Build the target from a fixed canonical base — do NOT mutate request.url,
+  // because behind Railway's proxy it carries the internal port ($PORT=8080),
+  // which would leak into the Location header (e.g. https://upwise.com.au:8080/).
+  const host = request.headers.get("host")?.split(":")[0] ?? "";
   if (host === "www.upwise.com.au") {
-    const url = new URL(request.url);
-    url.host = "upwise.com.au";
-    return NextResponse.redirect(url, 301);
+    const { pathname, search } = request.nextUrl;
+    return NextResponse.redirect(
+      `https://upwise.com.au${pathname}${search}`,
+      301,
+    );
   }
 
   const { pathname } = request.nextUrl;
