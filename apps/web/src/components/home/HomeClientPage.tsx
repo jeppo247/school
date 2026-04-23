@@ -752,8 +752,11 @@ export default function HomeClientPage() {
               </ul>
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-300 mb-3">Company</p>
+              <p className="text-sm font-semibold text-gray-300 mb-3">Compare</p>
               <ul className="space-y-2 text-sm">
+                <li><Link href="/compare/upwise-vs-cluey" className="hover:text-white transition-colors">Upwise vs Cluey</Link></li>
+                <li><Link href="/compare/upwise-vs-mathletics" className="hover:text-white transition-colors">Upwise vs Mathletics</Link></li>
+                <li><Link href="/compare/upwise-vs-ixl" className="hover:text-white transition-colors">Upwise vs IXL</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
               </ul>
             </div>
