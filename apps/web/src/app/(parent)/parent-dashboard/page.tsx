@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/api";
-import { AppIcon, IconBadge } from "@/components/ui/AppIcon";
+import { AppIcon, IconBadge, type AppIconName } from "@/components/ui/AppIcon";
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 /* Types                                                                        */
@@ -12,10 +12,11 @@ import { AppIcon, IconBadge } from "@/components/ui/AppIcon";
 
 interface DomainProficiency {
   domain: string;
-  proficiency: number;
-  status: string;
-  theta: number;
-  thetaSe: number;
+  proficiency?: number;
+  status?: string;
+  projectedProficiency?: string;
+  theta?: number;
+  thetaSe?: number;
 }
 
 interface ChildSummary {
@@ -261,6 +262,35 @@ const DIFFICULTY_COLORS: Record<string, { bg: string; text: string; label: strin
   moderate: { bg: "bg-amber-50", text: "text-amber-700", label: "Moderate" },
   challenging: { bg: "bg-red-50", text: "text-red-700", label: "Challenging" },
 };
+
+const PROFICIENCY_SCORES: Record<string, number> = {
+  exceeding: 92,
+  strong: 76,
+  developing: 56,
+  needs_additional_support: 34,
+};
+
+function normalisePercent(value: number | null | undefined): number | null {
+  if (value === null || value === undefined || !Number.isFinite(value)) return null;
+  return Math.round(value <= 1 ? value * 100 : value);
+}
+
+function getDomainStatus(domain: DomainProficiency | DomainState): string {
+  if ("status" in domain && domain.status) return domain.status;
+  if ("projectedProficiency" in domain && domain.projectedProficiency) {
+    return domain.projectedProficiency;
+  }
+  return "developing";
+}
+
+function getDomainScore(domain: DomainProficiency | DomainState): number {
+  if ("proficiency" in domain) {
+    const score = normalisePercent(domain.proficiency);
+    if (score !== null) return Math.min(100, Math.max(0, score));
+  }
+
+  return PROFICIENCY_SCORES[getDomainStatus(domain)] ?? PROFICIENCY_SCORES.developing;
+}
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 /* Animation variants                                                           */
@@ -699,7 +729,7 @@ function OverviewTab({
           <div className="space-y-4">
             {activeDomainProfs.map((dp) => {
               const prof =
-                PROFICIENCY_COLORS[dp.status] ?? PROFICIENCY_COLORS.developing;
+                PROFICIENCY_COLORS[getDomainStatus(dp)] ?? PROFICIENCY_COLORS.developing;
               return (
                 <div key={dp.domain}>
                   <div className="flex items-center justify-between mb-1.5">
@@ -716,7 +746,7 @@ function OverviewTab({
                     <motion.div
                       className={`h-full rounded-full ${prof.bar}`}
                       initial={{ width: 0 }}
-                      animate={{ width: `${Math.min(100, Math.max(0, dp.proficiency * 100))}%` }}
+                      animate={{ width: `${getDomainScore(dp)}%` }}
                       transition={{ duration: 0.8, delay: 0.4 }}
                     />
                   </div>
@@ -751,7 +781,7 @@ function OverviewTab({
             {ACTIVE_DOMAINS.map((domain) => {
               const state = trends.domainStates.find((s) => s.domain === domain);
               if (!state) return null;
-              const status = state.projectedProficiency;
+              const status = getDomainStatus(state);
               const prof =
                 PROFICIENCY_COLORS[status] ?? PROFICIENCY_COLORS.developing;
               const position = proficiencyPosition(status);
@@ -1198,17 +1228,382 @@ function ReportsTab({
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
+/* Tab: Risk                                                                    */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+type RiskSeverity = "high" | "medium" | "low";
+
+interface RiskSignal {
+  id: string;
+  title: string;
+  area: string;
+  severity: RiskSeverity;
+  evidence: string;
+  nextStep: string;
+  icon: AppIconName;
+}
+
+const RISK_STYLES: Record<RiskSeverity, {
+  label: string;
+  badge: string;
+  card: string;
+  icon: string;
+  bar: string;
+}> = {
+  high: {
+    label: "High",
+    badge: "bg-red-50 text-red-700 border-red-100",
+    card: "border-red-100 bg-red-50/60",
+    icon: "bg-red-100 text-red-600",
+    bar: "bg-red-500",
+  },
+  medium: {
+    label: "Watch",
+    badge: "bg-amber-50 text-amber-700 border-amber-100",
+    card: "border-amber-100 bg-amber-50/60",
+    icon: "bg-amber-100 text-amber-600",
+    bar: "bg-amber-400",
+  },
+  low: {
+    label: "Low",
+    badge: "bg-blue-50 text-blue-700 border-blue-100",
+    card: "border-blue-100 bg-blue-50/60",
+    icon: "bg-blue-100 text-blue-600",
+    bar: "bg-blue-400",
+  },
+};
+
+function average(values: number[]): number | null {
+  if (values.length === 0) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function buildRiskSignals(
+  child: ChildSummary,
+  trends: TrendsData | null,
+  reports: WeeklyReport[],
+): RiskSignal[] {
+  const signals: RiskSignal[] = [];
+
+  if (!child.diagnosticCompleted) {
+    signals.push({
+      id: "diagnostic-missing",
+      title: "Diagnostic not completed",
+      area: "Starting point",
+      severity: "high",
+      evidence: "Upwise has not mapped the starting skill gaps yet.",
+      nextStep: "Run the diagnostic before relying on progress or risk signals.",
+      icon: "clipboard",
+    });
+  }
+
+  if (child.sessionsThisWeek === 0) {
+    signals.push({
+      id: "no-sessions",
+      title: "No sessions this week",
+      area: "Practice rhythm",
+      severity: "high",
+      evidence: "There are no completed sessions in the last 7 days.",
+      nextStep: "Aim for one short session today, then rebuild the weekly rhythm.",
+      icon: "clock",
+    });
+  } else if (child.sessionsThisWeek < 3) {
+    signals.push({
+      id: "low-sessions",
+      title: "Practice is light this week",
+      area: "Practice rhythm",
+      severity: "medium",
+      evidence: `${child.sessionsThisWeek} session${child.sessionsThisWeek === 1 ? "" : "s"} completed this week.`,
+      nextStep: "Add two short sessions before the end of the week.",
+      icon: "clock",
+    });
+  }
+
+  const recentAccuracy = normalisePercent(child.recentAccuracy);
+  if (recentAccuracy !== null && recentAccuracy < 60) {
+    signals.push({
+      id: "low-accuracy",
+      title: "Recent accuracy is low",
+      area: "Confidence",
+      severity: "high",
+      evidence: `Recent accuracy is ${recentAccuracy}%.`,
+      nextStep: "Use today's briefing and encourage slower working before adding difficulty.",
+      icon: "target",
+    });
+  } else if (recentAccuracy !== null && recentAccuracy < 70) {
+    signals.push({
+      id: "soft-accuracy",
+      title: "Accuracy needs watching",
+      area: "Confidence",
+      severity: "medium",
+      evidence: `Recent accuracy is ${recentAccuracy}%.`,
+      nextStep: "Keep the next session short and review any missed examples together.",
+      icon: "target",
+    });
+  }
+
+  for (const domain of ACTIVE_DOMAINS) {
+    const proficiency = child.domainProficiencies.find((p) => p.domain === domain);
+    if (!proficiency) continue;
+
+    const status = getDomainStatus(proficiency);
+    const score = getDomainScore(proficiency);
+    const label = DOMAIN_LABELS[domain] ?? domain;
+
+    if (status === "needs_additional_support" || score < 45) {
+      signals.push({
+        id: `domain-${domain}-high`,
+        title: `${label} needs support`,
+        area: "Domain mastery",
+        severity: "high",
+        evidence: `${label} is tracking at ${score}%.`,
+        nextStep: `Prioritise the next ${label.toLowerCase()} focus skill before extension work.`,
+        icon: "alert",
+      });
+    } else if (status === "developing" || score < 65) {
+      signals.push({
+        id: `domain-${domain}-medium`,
+        title: `${label} is still developing`,
+        area: "Domain mastery",
+        severity: "medium",
+        evidence: `${label} is tracking at ${score}%.`,
+        nextStep: `Keep ${label.toLowerCase()} in the weekly practice mix.`,
+        icon: "barChart",
+      });
+    }
+  }
+
+  const accuracyValues = (trends?.dailyTrends ?? [])
+    .map((trend) => normalisePercent(trend.avgAccuracy))
+    .filter((value): value is number => value !== null);
+
+  if (accuracyValues.length >= 6) {
+    const previous = average(accuracyValues.slice(-6, -3));
+    const latest = average(accuracyValues.slice(-3));
+    if (previous !== null && latest !== null) {
+      const drop = Math.round(previous - latest);
+      if (drop >= 10) {
+        signals.push({
+          id: "trend-drop-high",
+          title: "Accuracy has dropped",
+          area: "Trend",
+          severity: "high",
+          evidence: `The last 3 sessions are down ${drop} points against the previous 3.`,
+          nextStep: "Reduce difficulty for one session and check the recurring misconception.",
+          icon: "barChart",
+        });
+      } else if (drop >= 5) {
+        signals.push({
+          id: "trend-drop-medium",
+          title: "Progress has softened",
+          area: "Trend",
+          severity: "medium",
+          evidence: `The last 3 sessions are down ${drop} points against the previous 3.`,
+          nextStep: "Watch the next session before changing the plan.",
+          icon: "barChart",
+        });
+      }
+    }
+  }
+
+  for (const misconception of child.topMisconceptions.slice(0, 2)) {
+    if (misconception.count >= 5) {
+      signals.push({
+        id: `misconception-${misconception.misconceptionCode}`,
+        title: "Repeated misconception",
+        area: "Error pattern",
+        severity: "high",
+        evidence: `${misconception.description} has appeared ${misconception.count} times.`,
+        nextStep: "Use concrete examples and ask your child to explain the step before answering.",
+        icon: "brain",
+      });
+    } else if (misconception.count >= 3) {
+      signals.push({
+        id: `misconception-${misconception.misconceptionCode}`,
+        title: "Misconception emerging",
+        area: "Error pattern",
+        severity: "medium",
+        evidence: `${misconception.description} has appeared ${misconception.count} times.`,
+        nextStep: "Bring this into the next parent conversation script.",
+        icon: "brain",
+      });
+    }
+  }
+
+  const latestReport = reports[0];
+  for (const gap of latestReport?.content.activeGaps.slice(0, 3) ?? []) {
+    const progress = normalisePercent(gap.progress) ?? gap.progress;
+    if (progress < 50) {
+      signals.push({
+        id: `gap-${gap.id}`,
+        title: `${gap.name} is an active gap`,
+        area: "Skill gap",
+        severity: "medium",
+        evidence: `${Math.round(progress)}% progress on this gap in the latest report.`,
+        nextStep: "Keep this gap in the next two sessions before moving to harder work.",
+        icon: "map",
+      });
+    }
+  }
+
+  return signals;
+}
+
+function RiskTab({
+  child,
+  trends,
+  reports,
+  trendsLoading,
+  reportsLoading,
+  trendsError,
+  reportsError,
+}: {
+  child: ChildSummary;
+  trends: TrendsData | null;
+  reports: WeeklyReport[];
+  trendsLoading: boolean;
+  reportsLoading: boolean;
+  trendsError: string | null;
+  reportsError: string | null;
+}) {
+  const signals = buildRiskSignals(child, trends, reports);
+  const highCount = signals.filter((signal) => signal.severity === "high").length;
+  const watchCount = signals.filter((signal) => signal.severity === "medium").length;
+  const riskScore = Math.min(100, highCount * 32 + watchCount * 14);
+  const overallSeverity: RiskSeverity =
+    highCount > 0 ? "high" : watchCount > 0 ? "medium" : "low";
+  const overallStyle = RISK_STYLES[overallSeverity];
+  const overallLabel =
+    overallSeverity === "high"
+      ? "Needs attention"
+      : overallSeverity === "medium"
+      ? "Worth watching"
+      : "On track";
+  const isRefreshing = trendsLoading || reportsLoading;
+  const hasPartialError = trendsError || reportsError;
+
+  const prioritySignals = signals
+    .slice()
+    .sort((a, b) => {
+      const rank = { high: 0, medium: 1, low: 2 };
+      return rank[a.severity] - rank[b.severity];
+    });
+
+  return (
+    <div className="space-y-5">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-xl p-6 border border-[#E8E2D8] shadow-clay"
+      >
+        <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-6 items-center">
+          <div className="flex items-start gap-4">
+            <span className={`h-12 w-12 rounded-xl inline-flex items-center justify-center ${overallStyle.icon}`}>
+              <AppIcon name="shield" className="h-6 w-6" />
+            </span>
+            <div>
+              <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">
+                Learning Risk
+              </p>
+              <h3 className="text-xl font-semibold text-[#1A1A2E]">{overallLabel}</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {highCount} high priority, {watchCount} watch signal{watchCount === 1 ? "" : "s"}.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+              <span>Risk score</span>
+              <span className="font-semibold text-gray-700">{riskScore}/100</span>
+            </div>
+            <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
+              <motion.div
+                className={`h-full rounded-full ${overallStyle.bar}`}
+                initial={{ width: 0 }}
+                animate={{ width: `${riskScore}%` }}
+                transition={{ duration: 0.6 }}
+              />
+            </div>
+            {isRefreshing && (
+              <p className="text-xs text-gray-400 mt-2">Refreshing signals...</p>
+            )}
+          </div>
+        </div>
+      </motion.div>
+
+      {hasPartialError && (
+        <SectionError message="Some trend or report data could not load, so this scan may be incomplete." />
+      )}
+
+      {prioritySignals.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl p-8 border border-[#E8E2D8] shadow-clay text-center"
+        >
+          <IconBadge name="check" className="mx-auto mb-4 h-16 w-16 bg-emerald-50 text-emerald-600" iconClassName="h-8 w-8" />
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">No major risk signals</h3>
+          <p className="text-sm text-gray-400 max-w-md mx-auto">
+            Practice rhythm, recent accuracy, and domain progress are all within the expected range.
+          </p>
+        </motion.div>
+      ) : (
+        <div className="grid gap-4">
+          {prioritySignals.map((signal, index) => {
+            const style = RISK_STYLES[signal.severity];
+            return (
+              <motion.div
+                key={signal.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.04 }}
+                className={`rounded-xl p-5 border ${style.card}`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                  <span className={`h-11 w-11 rounded-xl inline-flex items-center justify-center flex-shrink-0 ${style.icon}`}>
+                    <AppIcon name={signal.icon} className="h-5 w-5" />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${style.badge}`}>
+                        {style.label}
+                      </span>
+                      <span className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">
+                        {signal.area}
+                      </span>
+                    </div>
+                    <h3 className="text-base font-semibold text-[#1A1A2E] mb-2">{signal.title}</h3>
+                    <p className="text-sm text-gray-600 mb-3">{signal.evidence}</p>
+                    <div className="rounded-lg bg-white/70 border border-white p-3">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                        Next step
+                      </p>
+                      <p className="text-sm text-gray-700">{signal.nextStep}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
 /* Page                                                                         */
 /* ─────────────────────────────────────────────────────────────────────────── */
 
-type Tab = "overview" | "today" | "reports";
+type Tab = "overview" | "risk" | "today" | "reports";
 
 export default function ParentDashboard() {
   // — Dashboard / child state
   const [children, setChildren] = useState<ChildSummary[]>([]);
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [dashboardLoading, setDashboardLoading] = useState(true);
-  const [dashboardError, setDashboardError] = useState<string | null>(null);
+  const [dashboardError] = useState<string | null>(null);
 
   // — Tab state
   const [activeTab, setActiveTab] = useState<Tab>("overview");
@@ -1364,6 +1759,7 @@ export default function ParentDashboard() {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "overview", label: "Overview" },
+    { key: "risk", label: "Risk" },
     { key: "today", label: "Today" },
     { key: "reports", label: "Reports" },
   ];
@@ -1463,6 +1859,17 @@ export default function ParentDashboard() {
                 trendsError={trendsError}
                 rewardsMode={rewardsMode}
                 onRewardsModeChange={handleRewardsModeChange}
+              />
+            )}
+            {activeTab === "risk" && (
+              <RiskTab
+                child={selectedChild}
+                trends={trends}
+                reports={reports}
+                trendsLoading={trendsLoading}
+                reportsLoading={reportsLoading}
+                trendsError={trendsError}
+                reportsError={reportsError}
               />
             )}
             {activeTab === "today" && (

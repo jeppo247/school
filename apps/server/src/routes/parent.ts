@@ -169,7 +169,7 @@ parentRoutes.get("/reports/:studentId/trends", async (req, res, next) => {
     const sessions = await db
       .select({
         date: sql<string>`DATE(${learningSessions.completedAt})`,
-        avgAccuracy: sql<number>`AVG(${learningSessions.accuracy})`,
+        avgAccuracy: sql<number>`AVG(${learningSessions.accuracy}) * 100`,
         sessionCount: sql<number>`COUNT(*)`,
         totalQuestions: sql<number>`SUM(${learningSessions.totalQuestions})`,
         totalCorrect: sql<number>`SUM(${learningSessions.correctAnswers})`,
