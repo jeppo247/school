@@ -171,6 +171,381 @@ export const COMPARISONS: ComparisonPage[] = [
       "Mathletics is the stronger choice if your child only needs maths practice, enjoys gamified competition, and you want something their school already uses. Upwise is the stronger choice if your child has gaps across multiple subjects, you want mastery-based progression that ensures real understanding, and you want to be actively guided as a parent.",
   },
   {
+    slug: "upwise-vs-kumon",
+    competitorName: "Kumon",
+    competitorUrl: "https://www.kumon.com.au",
+    metaTitle: "Upwise vs Kumon — Which is better for Australian primary students?",
+    metaDescription:
+      "Compare Upwise and Kumon for Australian primary school students. Pricing, mastery approach, daily practice models, and which builds stronger foundations.",
+    heroTitle: "Upwise vs Kumon",
+    heroSubtitle: "Both believe in mastery and daily practice. The methods are very different.",
+    summary:
+      "Kumon is a well-established centre-based tutoring franchise built on daily worksheets and self-learning. Upwise uses AI-powered adaptive mastery learning with parent guidance. Both aim to build strong foundations, but they take very different paths to get there.",
+    rows: [
+      {
+        feature: "Approach",
+        upwise: "AI-powered mastery learning that adapts in real time to your child's understanding",
+        competitor: "Self-learning through daily paper worksheets with instructor support at centres",
+      },
+      {
+        feature: "Price",
+        upwise: "From $39/month (unlimited sessions, all subjects). 7-day free trial",
+        competitor: "~$160/month per subject + $100 enrolment fee",
+      },
+      {
+        feature: "Subjects",
+        upwise: "Maths, reading, writing, spelling, grammar (all five NAPLAN domains)",
+        competitor: "Maths and English as separate programmes (separate fees)",
+      },
+      {
+        feature: "Daily practice",
+        upwise: "10-20 minute adaptive sessions, available anytime at home",
+        competitor: "Daily paper worksheets at home + weekly centre visits",
+      },
+      {
+        feature: "Personalisation",
+        upwise: "AI analyses every response. Targets specific micro-skill gaps. Adjusts difficulty in real time",
+        competitor: "Instructor sets starting level. Students progress through a fixed sequence of worksheets",
+      },
+      {
+        feature: "Curriculum alignment",
+        upwise: "Built specifically for ACARA and NAPLAN domains",
+        competitor: "Kumon's own curriculum. Not explicitly aligned to Australian Curriculum or NAPLAN",
+      },
+      {
+        feature: "Parent involvement",
+        upwise: "Daily briefings, real-time nudges, conversation scripts, progress dashboard",
+        competitor: "Parents support daily worksheet completion. Progress discussed at centre visits",
+      },
+      {
+        feature: "Gap detection",
+        upwise: "Diagnostic maps 167 micro-skills with prerequisite chains to find root-cause gaps",
+        competitor: "Instructor assessment determines starting point. Linear progression from there",
+      },
+      {
+        feature: "Commitment",
+        upwise: "Cancel anytime. No contracts, no enrolment fees",
+        competitor: "Enrolment fee + ongoing monthly commitment. Centre attendance expected",
+      },
+    ],
+    upwiseStrengths: [
+      "Covers both maths and English for one price ($39/mo vs $320/mo for both at Kumon)",
+      "AI adapts to every response — not a fixed sequence of worksheets",
+      "No centre visits needed — learn anytime, anywhere",
+      "Built specifically for Australian Curriculum and NAPLAN",
+      "Parent guidance layer with daily briefings and conversation scripts",
+    ],
+    competitorStrengths: [
+      "Decades of trust and brand recognition worldwide",
+      "In-person instructor support and accountability",
+      "Proven habit-formation model with daily discipline",
+      "Extension pathways well beyond year level",
+      "Physical centre creates routine and structure for some families",
+    ],
+    verdict:
+      "Kumon is the stronger choice if your child thrives on physical routine, benefits from in-person accountability, or you value Kumon's long track record. Upwise is the stronger choice if you want mastery learning that adapts to your child in real time, covers both maths and English for a fraction of the cost, and gives you daily guidance as a parent — all without centre visits.",
+  },
+  {
+    slug: "upwise-vs-kip-mcgrath",
+    competitorName: "Kip McGrath",
+    competitorUrl: "https://www.kipmcgrath.com.au",
+    metaTitle: "Upwise vs Kip McGrath — Which is better for Australian primary students?",
+    metaDescription:
+      "Compare Upwise and Kip McGrath for Australian primary school students. Pricing, teaching approach, curriculum alignment, and which helps close gaps faster.",
+    heroTitle: "Upwise vs Kip McGrath",
+    heroSubtitle: "One uses qualified teachers. The other uses research-backed AI. Both want to close the gaps.",
+    summary:
+      "Kip McGrath is one of Australia's most established tutoring brands, offering teacher-led sessions in centres and online. Upwise uses AI-powered mastery learning with parent guidance. Both target primary students who need extra support, but the delivery and economics are very different.",
+    rows: [
+      {
+        feature: "Approach",
+        upwise: "AI-powered mastery learning with adaptive practice and parent-as-guide model",
+        competitor: "Qualified teacher-led tutoring in 60-minute weekly sessions",
+      },
+      {
+        feature: "Price",
+        upwise: "From $39/month (unlimited daily sessions). 7-day free trial",
+        competitor: "~$74 per session. Free initial assessment",
+      },
+      {
+        feature: "Session format",
+        upwise: "10-20 minute daily sessions, available anytime",
+        competitor: "60-minute weekly sessions at a centre or online",
+      },
+      {
+        feature: "Frequency",
+        upwise: "Daily practice — short sessions every day build stronger retention",
+        competitor: "Once per week. Homework between sessions",
+      },
+      {
+        feature: "Subjects",
+        upwise: "Maths, reading, writing, spelling, grammar (Prep-Year 7)",
+        competitor: "Maths and English (primary and secondary)",
+      },
+      {
+        feature: "Personalisation",
+        upwise: "AI analyses every response. 167 micro-skills with mapped prerequisites",
+        competitor: "Teacher adapts to student needs. Free assessment determines starting point",
+      },
+      {
+        feature: "Curriculum alignment",
+        upwise: "Built specifically for ACARA and NAPLAN domains",
+        competitor: "Curriculum-aligned topics with teacher-selected materials",
+      },
+      {
+        feature: "Parent involvement",
+        upwise: "Daily briefings, real-time nudges, conversation scripts, weekly reports",
+        competitor: "Progress reports and parent updates from the centre",
+      },
+      {
+        feature: "Availability",
+        upwise: "24/7 — learn whenever your child is ready",
+        competitor: "Set times at the centre. Some locations offer online",
+      },
+    ],
+    upwiseStrengths: [
+      "Daily practice (not weekly) builds stronger habits and faster progress",
+      "Unlimited sessions for $39/month vs ~$296/month for weekly Kip sessions",
+      "AI adapts to every single response in real time",
+      "No travel to centres — learn from home anytime",
+      "Parent is actively involved with daily briefings and guidance",
+    ],
+    competitorStrengths: [
+      "Qualified teachers with face-to-face interaction",
+      "140+ centres across Australia — strong local presence",
+      "Long-established trust and brand recognition",
+      "Free initial assessment to identify needs",
+      "Human judgement for complex learning difficulties",
+    ],
+    verdict:
+      "Kip McGrath is the stronger choice if your child benefits from face-to-face interaction with a qualified teacher, or has complex learning needs that require human judgement. Upwise is the stronger choice if you want daily, affordable practice that targets root-cause gaps with precision — and want to be actively guided as a parent rather than dropping your child at a centre once a week.",
+  },
+  {
+    slug: "upwise-vs-kinetic-education",
+    competitorName: "Kinetic Education",
+    competitorUrl: "https://www.kineticeducation.com.au",
+    metaTitle: "Upwise vs Kinetic Education — Which is better for Australian primary students?",
+    metaDescription:
+      "Compare Upwise and Kinetic Education for Australian primary students. Both offer online maths and English with curriculum alignment. See how they differ.",
+    heroTitle: "Upwise vs Kinetic Education",
+    heroSubtitle: "Both offer online maths and English for Australian families. The learning models differ.",
+    summary:
+      "Kinetic Education offers online tutoring with human tutor support, assessment-driven lesson plans, and weekly parent updates. Upwise uses AI-powered mastery learning with a parent guidance layer. Both cover maths and English and follow the Australian Curriculum.",
+    rows: [
+      {
+        feature: "Approach",
+        upwise: "AI-powered mastery learning — can't progress until concepts are genuinely understood",
+        competitor: "Online platform with live tutor support and assessment-driven lesson plans",
+      },
+      {
+        feature: "Price",
+        upwise: "From $39/month (1 child) or $59/month (family up to 4). 7-day free trial",
+        competitor: "From ~$29/week for the family",
+      },
+      {
+        feature: "Subjects",
+        upwise: "Maths, reading, writing, spelling, grammar (all five NAPLAN domains)",
+        competitor: "Maths and English",
+      },
+      {
+        feature: "Personalisation",
+        upwise: "AI analyses every response. 167 micro-skills with mapped prerequisite chains",
+        competitor: "Assessment-led personalised lesson plans with tutor oversight",
+      },
+      {
+        feature: "Human support",
+        upwise: "Parent-as-guide model with AI-generated briefings, nudges and conversation scripts",
+        competitor: "Live tutor support included in the subscription",
+      },
+      {
+        feature: "Curriculum",
+        upwise: "Built specifically for ACARA and NAPLAN domains with 167 mapped micro-skills",
+        competitor: "Follows Australian Curriculum with assessment-led plans",
+      },
+      {
+        feature: "Parent involvement",
+        upwise: "Daily briefings, real-time nudges, conversation scripts, teacher-shareable reports",
+        competitor: "Weekly parent updates on progress",
+      },
+      {
+        feature: "Motivation",
+        upwise: "Mastery-based confidence building. Coins, streaks, themes. Rewards mode parent-controlled",
+        competitor: "Rewards and incentives with tutor encouragement",
+      },
+      {
+        feature: "Session format",
+        upwise: "Self-paced 10-20 minute daily sessions, available anytime",
+        competitor: "Structured lessons with scheduled tutor availability",
+      },
+    ],
+    upwiseStrengths: [
+      "AI adapts to every single response — not just assessment-driven plans",
+      "167 micro-skills with prerequisite mapping finds root-cause gaps",
+      "Daily briefings give parents specific guidance, not just progress updates",
+      "Mastery gates ensure genuine understanding before progressing",
+      "Research-backed approach (2025 Harvard RCT, PNAS guardrails study)",
+    ],
+    competitorStrengths: [
+      "Live human tutor support included in subscription",
+      "Lower starting price for families (~$29/week)",
+      "100,000+ families helped — established track record",
+      "96% parent satisfaction rating",
+      "Direct human interaction for students who need it",
+    ],
+    verdict:
+      "Kinetic Education is the stronger choice if your child benefits from live tutor interaction and you want human support built into the subscription. Upwise is the stronger choice if you want AI that adapts to every response (not just periodic assessments), mastery-based progression that prevents gaps from compounding, and a parent guidance layer that helps you support your child's learning daily.",
+  },
+  {
+    slug: "upwise-vs-reading-eggs",
+    competitorName: "Reading Eggs & Mathseeds",
+    competitorUrl: "https://readingeggs.com.au",
+    metaTitle: "Upwise vs Reading Eggs & Mathseeds — Which is better for Australian primary students?",
+    metaDescription:
+      "Compare Upwise and Reading Eggs/Mathseeds for Australian primary students. Subjects, pricing, learning approach, and which is better for closing skill gaps.",
+    heroTitle: "Upwise vs Reading Eggs & Mathseeds",
+    heroSubtitle: "Both help Australian children learn at home. They serve different stages and needs.",
+    summary:
+      "Reading Eggs and Mathseeds are popular subscription platforms focused on early literacy and numeracy through gamified activities. Upwise takes a mastery-learning approach with AI personalisation and covers all five NAPLAN domains. Here's how they compare.",
+    rows: [
+      {
+        feature: "Approach",
+        upwise: "AI-powered mastery learning — diagnoses gaps, adapts in real time, ensures understanding",
+        competitor: "Gamified learning activities with structured lesson sequences",
+      },
+      {
+        feature: "Price",
+        upwise: "From $39/month (1 child) or $59/month (family). 7-day free trial",
+        competitor: "~$13.99/month or $109.99/year (up to 4 children). 30-day free trial",
+      },
+      {
+        feature: "Subjects",
+        upwise: "Maths, reading, writing, spelling, grammar (all five NAPLAN domains)",
+        competitor: "Reading (Reading Eggs) and early maths (Mathseeds) as separate products",
+      },
+      {
+        feature: "Age range focus",
+        upwise: "Strongest for Years 3-7 — where hidden curriculum gaps cause the most damage",
+        competitor: "Strongest for early readers (ages 2-13) — particularly Foundation to Year 2",
+      },
+      {
+        feature: "Personalisation",
+        upwise: "AI analyses every response. 167 micro-skills with mapped prerequisite chains",
+        competitor: "Placement quiz determines starting level. Linear lesson progression",
+      },
+      {
+        feature: "Gap detection",
+        upwise: "Diagnostic assessment maps exact micro-skill gaps and prerequisite chains",
+        competitor: "Progress tracked by lesson completion. Less granular gap identification",
+      },
+      {
+        feature: "Parent involvement",
+        upwise: "Daily briefings, real-time nudges, conversation scripts, projected NAPLAN bands",
+        competitor: "Progress reports and reading assessment results",
+      },
+      {
+        feature: "Learning model",
+        upwise: "Mastery-based — can't progress until concepts are genuinely understood",
+        competitor: "Activity-based — children progress through lesson sequences",
+      },
+      {
+        feature: "Multi-child",
+        upwise: "Family plan: up to 4 children for $59/month",
+        competitor: "Up to 4 children included in standard subscription",
+      },
+    ],
+    upwiseStrengths: [
+      "Covers all five NAPLAN domains in one subscription (not separate products)",
+      "Strongest for Years 3-7 where gaps become critical",
+      "AI-powered mastery progression — not just activity completion",
+      "Prerequisite mapping finds root-cause gaps, not just surface errors",
+      "Parent guidance layer with daily briefings, nudges and conversation scripts",
+    ],
+    competitorStrengths: [
+      "Significantly more affordable ($13.99/mo for up to 4 children)",
+      "Excellent for early readers and pre-school numeracy",
+      "Engaging, gamified activities that young children enjoy",
+      "Established trust — 20 million users, kidSAFE certified",
+      "30-day free trial gives parents time to evaluate",
+    ],
+    verdict:
+      "Reading Eggs and Mathseeds are the stronger choice for younger children (Foundation to Year 2) who need to build early reading and numeracy skills through engaging activities. Upwise is the stronger choice for primary students in Years 3-7 who need to close specific curriculum gaps, build genuine mastery, and prepare for NAPLAN — especially if you want daily guidance on how to support their learning as a parent.",
+  },
+  {
+    slug: "upwise-vs-numberworks",
+    competitorName: "NumberWorks'nWords",
+    competitorUrl: "https://www.numberworksnwords.com",
+    metaTitle: "Upwise vs NumberWorks'nWords — Which is better for Australian primary students?",
+    metaDescription:
+      "Compare Upwise and NumberWorks'nWords for Australian primary students. Pricing, tutoring approach, curriculum alignment, and which closes gaps faster.",
+    heroTitle: "Upwise vs NumberWorks'nWords",
+    heroSubtitle: "Both cover maths and English for primary students. The delivery couldn't be more different.",
+    summary:
+      "NumberWorks'nWords is a centre-based tutoring franchise that combines software, tutor explanation and workbooks. Upwise uses AI-powered mastery learning with parent guidance. Both cover primary maths and English, but the model and economics differ significantly.",
+    rows: [
+      {
+        feature: "Approach",
+        upwise: "AI-powered mastery learning that adapts in real time to your child's understanding",
+        competitor: "Centre-based small classes with 1:1 tutor support, software and workbooks",
+      },
+      {
+        feature: "Price",
+        upwise: "From $39/month (unlimited sessions). 7-day free trial",
+        competitor: "~$71 per primary lesson",
+      },
+      {
+        feature: "Session format",
+        upwise: "10-20 minute daily sessions, available anytime at home",
+        competitor: "Weekly centre-based lessons with small class sizes",
+      },
+      {
+        feature: "Subjects",
+        upwise: "Maths, reading, writing, spelling, grammar (all five NAPLAN domains)",
+        competitor: "Maths and English in separate lesson streams",
+      },
+      {
+        feature: "Personalisation",
+        upwise: "AI analyses every response. 167 micro-skills with mapped prerequisite chains",
+        competitor: "Free assessment determines starting point. Tutor adjusts within lessons",
+      },
+      {
+        feature: "Curriculum alignment",
+        upwise: "Built specifically for ACARA and NAPLAN domains",
+        competitor: "Curriculum-based content with tutor-selected materials",
+      },
+      {
+        feature: "Parent involvement",
+        upwise: "Daily briefings, real-time nudges, conversation scripts, teacher-shareable reports",
+        competitor: "Progress reports from the centre",
+      },
+      {
+        feature: "Frequency",
+        upwise: "Daily practice builds stronger retention and faster progress",
+        competitor: "Weekly sessions with practice between visits",
+      },
+      {
+        feature: "Availability",
+        upwise: "24/7 — learn whenever your child is ready. No travel needed",
+        competitor: "Set times at the centre. Travel required",
+      },
+    ],
+    upwiseStrengths: [
+      "Daily practice for $39/month vs ~$284/month for weekly NumberWorks sessions",
+      "AI adapts to every response — not just tutor observation",
+      "No centre visits or travel — learn from home anytime",
+      "167 micro-skill prerequisite mapping finds root-cause gaps",
+      "Parent guidance layer turns you into the daily support person",
+    ],
+    competitorStrengths: [
+      "In-person tutor support and face-to-face interaction",
+      "Small class sizes with individual attention",
+      "Free initial assessment to identify needs",
+      "Confidence-building through in-person relationships",
+      "Structured after-school routine for some families",
+    ],
+    verdict:
+      "NumberWorks'nWords is the stronger choice if your child benefits from in-person interaction, small class structure, and the routine of attending a centre. Upwise is the stronger choice if you want daily, affordable mastery learning that precisely targets root-cause gaps — and you want to be actively involved in guiding your child's progress rather than relying on weekly centre visits.",
+  },
+  {
     slug: "upwise-vs-ixl",
     competitorName: "IXL",
     competitorUrl: "https://au.ixl.com",

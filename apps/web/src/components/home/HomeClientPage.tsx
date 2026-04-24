@@ -593,7 +593,7 @@ export default function HomeClientPage() {
               custom={2}
               className="text-lg text-gray-500 max-w-xl mx-auto"
             >
-              Start with a free diagnostic. Upgrade when you&apos;re ready.
+              Research-backed mastery learning, delivered daily, on your schedule.
             </motion.p>
           </motion.div>
 
@@ -725,6 +725,24 @@ export default function HomeClientPage() {
             ))}
           </div>
 
+          {/* Gap Guarantee */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mt-10 max-w-2xl mx-auto text-center bg-green-50 rounded-2xl p-6 border border-green-100"
+          >
+            <p className="font-display text-lg font-bold text-gray-900 mb-2">
+              The Upwise Gap Guarantee
+            </p>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              If your child doesn&apos;t close at least 3 skill gaps in their first month,
+              we&apos;ll refund you in full. We track every gap automatically — you&apos;ll see the
+              progress in your parent dashboard.
+            </p>
+          </motion.div>
+
           <p className="text-center text-sm text-gray-400 mt-8">
             Annual pricing available: 20% off. Cancel anytime.
           </p>
@@ -755,8 +773,13 @@ export default function HomeClientPage() {
               <p className="text-sm font-semibold text-gray-300 mb-3">Compare</p>
               <ul className="space-y-2 text-sm">
                 <li><Link href="/compare/upwise-vs-cluey" className="hover:text-white transition-colors">Upwise vs Cluey</Link></li>
+                <li><Link href="/compare/upwise-vs-kumon" className="hover:text-white transition-colors">Upwise vs Kumon</Link></li>
+                <li><Link href="/compare/upwise-vs-kip-mcgrath" className="hover:text-white transition-colors">Upwise vs Kip McGrath</Link></li>
+                <li><Link href="/compare/upwise-vs-kinetic-education" className="hover:text-white transition-colors">Upwise vs Kinetic</Link></li>
                 <li><Link href="/compare/upwise-vs-mathletics" className="hover:text-white transition-colors">Upwise vs Mathletics</Link></li>
+                <li><Link href="/compare/upwise-vs-reading-eggs" className="hover:text-white transition-colors">Upwise vs Reading Eggs</Link></li>
                 <li><Link href="/compare/upwise-vs-ixl" className="hover:text-white transition-colors">Upwise vs IXL</Link></li>
+                <li><Link href="/compare/upwise-vs-numberworks" className="hover:text-white transition-colors">Upwise vs NumberWorks</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
               </ul>
             </div>

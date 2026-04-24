@@ -47,7 +47,7 @@ export default function SubscribePage() {
             Choose your plan
           </h1>
           <p className="text-lg text-gray-500">
-            Continue your child&apos;s learning journey. Cancel anytime.
+            The results of mastery tutoring, delivered daily, on your schedule. Cancel anytime.
           </p>
         </motion.div>
 
@@ -149,6 +149,22 @@ export default function SubscribePage() {
             </motion.button>
           </motion.div>
         </div>
+
+        {/* Gap Guarantee */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-10 max-w-xl mx-auto text-center bg-green-50 rounded-2xl p-6 border border-green-100"
+        >
+          <p className="font-display text-lg font-bold text-gray-900 mb-2">
+            The Upwise Gap Guarantee
+          </p>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            If your child doesn&apos;t close at least 3 skill gaps in their first month,
+            we&apos;ll refund you in full. We track every gap automatically.
+          </p>
+        </motion.div>
 
         <p className="text-center text-sm md:text-base text-gray-400 mt-8">
           Annual pricing available: 20% off. Secure payment via Stripe.
