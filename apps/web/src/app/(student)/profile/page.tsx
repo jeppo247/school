@@ -6,7 +6,15 @@ import { THEMES } from "@/lib/themes";
 import { XPBar } from "@/components/student/XPBar";
 import { StreakCounter } from "@/components/student/StreakCounter";
 import { CoinCounter } from "@/components/student/CoinCounter";
+import { AppIcon, BrandMark, IconBadge, type AppIconName } from "@/components/ui/AppIcon";
 import { api } from "@/lib/api";
+
+const PROFILE_NAV_ITEMS: { icon: AppIconName; label: string; href: string; active: boolean }[] = [
+  { icon: "home", label: "Home", href: "/dashboard", active: false },
+  { icon: "map", label: "My Map", href: "/dashboard", active: false },
+  { icon: "trophy", label: "Rewards", href: "/profile", active: false },
+  { icon: "user", label: "Me", href: "/profile", active: true },
+];
 
 export default function ProfilePage() {
   const [selectedTheme, setSelectedTheme] = useState("default");
@@ -48,7 +56,9 @@ export default function ProfilePage() {
   if (loading || !student) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <motion.span className="text-6xl" animate={{ y: [0, -8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>🦉</motion.span>
+        <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+          <BrandMark className="h-16 w-16" />
+        </motion.div>
       </main>
     );
   }
@@ -64,9 +74,7 @@ export default function ProfilePage() {
       <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto px-6 space-y-6">
         {/* Avatar + Stats */}
         <div className="bg-[var(--theme-surface)] rounded-3xl p-6 border border-gray-100 text-center">
-          <div className="w-20 h-20 rounded-full bg-[var(--theme-primary)]/10 flex items-center justify-center mx-auto mb-4">
-            <span className="text-4xl lg:text-6xl">🦉</span>
-          </div>
+          <BrandMark className="mx-auto mb-4 h-20 w-20" />
           <h2 className="font-display text-xl md:text-2xl font-bold text-gray-800 mb-1">{student.name}</h2>
           <p className="text-base text-gray-400 mb-4">{`Year ${student.yearLevel}`}</p>
 
@@ -101,7 +109,11 @@ export default function ProfilePage() {
                     className="w-8 h-8 rounded-full"
                     style={{ backgroundColor: theme.colors.primary }}
                   />
-                  <span className="text-lg">{theme.emoji}</span>
+                  <IconBadge
+                    name={theme.icon}
+                    className="h-8 w-8 rounded-full bg-gray-50 text-gray-500"
+                    iconClassName="h-4 w-4"
+                  />
                 </div>
                 <p className="font-display font-semibold text-base text-gray-800">
                   {theme.name}
@@ -136,12 +148,7 @@ export default function ProfilePage() {
       {/* Bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 bg-[var(--theme-surface)] border-t border-gray-100 px-6 py-3 z-30 md:hidden">
         <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto flex items-center justify-around">
-          {[
-            { icon: "🏠", label: "Home", href: "/dashboard", active: false },
-            { icon: "🗺️", label: "My Map", href: "/dashboard", active: false },
-            { icon: "🏆", label: "Rewards", href: "/profile", active: false },
-            { icon: "👤", label: "Me", href: "/profile", active: true },
-          ].map((tab) => (
+          {PROFILE_NAV_ITEMS.map((tab) => (
             <a
               key={tab.label}
               href={tab.href}
@@ -149,7 +156,7 @@ export default function ProfilePage() {
                 tab.active ? "text-[var(--theme-primary)]" : "text-gray-400"
               }`}
             >
-              <span className="text-2xl">{tab.icon}</span>
+              <AppIcon name={tab.icon} className="h-6 w-6" />
               <span className="text-[10px] font-medium font-display">{tab.label}</span>
             </a>
           ))}

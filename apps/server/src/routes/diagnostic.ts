@@ -162,6 +162,19 @@ diagnosticRoutes.post("/:studentId/respond", async (req, res, next) => {
       throw new AppError(400, "VALIDATION_ERROR", "sessionId, questionId, and answer are required");
     }
 
+    const [session] = await db
+      .select()
+      .from(learningSessions)
+      .where(and(eq(learningSessions.id, sessionId), eq(learningSessions.studentId, studentId)));
+
+    if (!session) throw new AppError(404, "NOT_FOUND", "Session not found");
+    if (session.sessionType !== "diagnostic") {
+      throw new AppError(400, "VALIDATION_ERROR", "Session is not a diagnostic session");
+    }
+    if (session.status !== "in_progress") {
+      throw new AppError(409, "SESSION_NOT_IN_PROGRESS", "Diagnostic session is not in progress");
+    }
+
     // Get the question
     const [question] = await db.select().from(questions).where(eq(questions.id, questionId));
     if (!question) throw new AppError(404, "NOT_FOUND", "Question not found");
@@ -171,9 +184,13 @@ diagnosticRoutes.post("/:studentId/respond", async (req, res, next) => {
 
     // Count existing responses for sequence number
     const existingResponses = await db
-      .select({ id: questionResponses.id })
+      .select({ id: questionResponses.id, questionId: questionResponses.questionId })
       .from(questionResponses)
       .where(eq(questionResponses.sessionId, sessionId));
+
+    if (existingResponses.some((response) => response.questionId === questionId)) {
+      throw new AppError(409, "QUESTION_ALREADY_ANSWERED", "Question already answered in this session");
+    }
 
     // Record the response
     await db.insert(questionResponses).values({

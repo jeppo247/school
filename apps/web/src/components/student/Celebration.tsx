@@ -60,10 +60,10 @@ export function Celebration({
 
     const messages: Record<string, string[]> = {
       correct: ["Nice one!", "Awesome!", "You got it!", "Brilliant!", "Spot on!"],
-      streak: ["On fire! 🔥", "Unstoppable!", "Keep going!", "Legend!"],
-      levelUp: ["LEVEL UP! ⭐", "You're amazing!", "New level unlocked!"],
-      mastery: ["MASTERED! 🏆", "You nailed it!", "Skill complete!"],
-      coinEarn: ["Ka-ching! 💰", "Coins earned!", "Nice haul!", "Cha-ching!"],
+      streak: ["On fire!", "Unstoppable!", "Keep going!", "Legend!"],
+      levelUp: ["LEVEL UP!", "You're amazing!", "New level unlocked!"],
+      mastery: ["MASTERED!", "You nailed it!", "Skill complete!"],
+      coinEarn: ["Ka-ching!", "Coins earned!", "Nice haul!", "Cha-ching!"],
     };
 
     const particleCounts: Record<string, number> = {

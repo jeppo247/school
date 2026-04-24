@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
 import { WaitlistModal } from "@/components/WaitlistModal";
+import { AppIcon, IconBadge, type AppIconName } from "@/components/ui/AppIcon";
 import type { FAQItem, FAQSection } from "@/data/faqData";
 
 type Audience = "parents" | "teachers";
@@ -112,8 +113,8 @@ export default function FAQClientPage({
         <div className="max-w-3xl mx-auto flex justify-center">
           <div className="inline-flex bg-white rounded-2xl border border-[var(--border-warm)] p-1.5" style={{ boxShadow: "var(--shadow-clay)" }}>
             {([
-              { key: "parents" as Audience, label: "For Parents", icon: "👨‍👩‍👧" },
-              { key: "teachers" as Audience, label: "For Teachers", icon: "🍎" },
+              { key: "parents" as Audience, label: "For Parents", icon: "users" as AppIconName },
+              { key: "teachers" as Audience, label: "For Teachers", icon: "apple" as AppIconName },
             ]).map((tab) => (
               <button
                 key={tab.key}
@@ -124,7 +125,7 @@ export default function FAQClientPage({
                     : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <span className="mr-2">{tab.icon}</span>
+                <AppIcon name={tab.icon} className="mr-2 inline h-4 w-4 align-[-2px]" />
                 {tab.label}
               </button>
             ))}
@@ -151,7 +152,7 @@ export default function FAQClientPage({
                 transition={{ delay: sectionIndex * 0.08 }}
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl">{section.icon}</span>
+                  <IconBadge name={section.icon} className="h-10 w-10 rounded-xl" iconClassName="h-5 w-5" />
                   <h2 className="font-display text-xl font-bold text-gray-900">
                     {section.title}
                   </h2>

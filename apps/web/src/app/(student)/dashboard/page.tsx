@@ -8,6 +8,7 @@ import { StreakCounter } from "@/components/student/StreakCounter";
 import { XPBar } from "@/components/student/XPBar";
 import { CoinCounter } from "@/components/student/CoinCounter";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
+import { AppIcon, BrandMark, IconBadge, type AppIconName } from "@/components/ui/AppIcon";
 import { api } from "@/lib/api";
 
 interface StudentData {
@@ -25,6 +26,13 @@ interface StudentData {
   sessionsThisWeek: number;
   masteryPercentage: number;
 }
+
+const NAV_ITEMS: { icon: AppIconName; label: string; href: string; active: boolean }[] = [
+  { icon: "home", label: "Home", href: "/dashboard", active: true },
+  { icon: "map", label: "My Map", href: "/dashboard", active: false },
+  { icon: "trophy", label: "Rewards", href: "/profile", active: false },
+  { icon: "user", label: "Me", href: "/profile", active: false },
+];
 
 export default function StudentDashboard() {
   const [student, setStudent] = useState<StudentData | null>(null);
@@ -54,7 +62,9 @@ export default function StudentDashboard() {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <AdventureBackground calm />
-        <motion.span className="text-6xl" animate={{ y: [0, -8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>🦉</motion.span>
+        <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+          <BrandMark className="h-16 w-16" />
+        </motion.div>
       </main>
     );
   }
@@ -63,7 +73,7 @@ export default function StudentDashboard() {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6">
         <AdventureBackground calm />
-        <span className="text-6xl block mb-4">😕</span>
+        <IconBadge name="alert" className="mb-4 h-16 w-16 bg-red-50 text-red-500" iconClassName="h-8 w-8" />
         <p className="font-display text-xl text-gray-700 mb-4">{error ?? "Something went wrong."}</p>
         <a href="/start" className="inline-block bg-[var(--theme-primary)] text-white font-display font-bold px-8 py-3 rounded-2xl">Start Again</a>
       </main>
@@ -77,9 +87,7 @@ export default function StudentDashboard() {
       <header className="sticky top-0 z-30 bg-[#F5F7FF]/95 backdrop-blur-md border-b border-[var(--border-warm)] px-6 py-3" style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.03)" }}>
         <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[var(--theme-primary)]/10 flex items-center justify-center">
-              <span className="text-lg">🦉</span>
-            </div>
+            <BrandMark className="h-10 w-10" />
             <div>
               <p className="font-display font-bold text-gray-800 text-sm md:text-base">
                 Hi, {student.name}!
@@ -110,11 +118,11 @@ export default function StudentDashboard() {
         >
           {/* Mascot */}
           <motion.div
-            className="text-7xl lg:text-9xl mb-4"
+            className="mb-4 flex justify-center"
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           >
-            🦉
+            <BrandMark className="h-24 w-24 lg:h-32 lg:w-32" />
           </motion.div>
 
           <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
@@ -163,7 +171,7 @@ export default function StudentDashboard() {
               transition={{ delay: 0.2 }}
               className="bg-white rounded-3xl p-4 lg:p-6 border border-[#E8E2D8] flex flex-col items-center justify-center gap-2 shadow-clay hover:shadow-clay-hover hover:-rotate-2 hover:-translate-y-0.5 transition-all cursor-pointer h-full"
             >
-              <span className="text-3xl lg:text-5xl">🏆</span>
+              <IconBadge name="trophy" className="h-14 w-14 lg:h-16 lg:w-16" iconClassName="h-7 w-7 lg:h-8 lg:w-8" />
               <span className="text-xs font-medium text-gray-500">Rewards</span>
             </motion.div>
           </Link>
@@ -175,7 +183,7 @@ export default function StudentDashboard() {
               transition={{ delay: 0.3 }}
               className="bg-white rounded-3xl p-4 lg:p-6 border border-[#E8E2D8] flex flex-col items-center justify-center gap-2 shadow-clay hover:shadow-clay-hover hover:-rotate-2 hover:-translate-y-0.5 transition-all cursor-pointer h-full"
             >
-              <span className="text-3xl">🎨</span>
+              <IconBadge name="palette" className="h-14 w-14 lg:h-16 lg:w-16" iconClassName="h-7 w-7 lg:h-8 lg:w-8" />
               <span className="text-xs font-medium text-gray-500">Theme</span>
             </motion.div>
           </Link>
@@ -189,12 +197,7 @@ export default function StudentDashboard() {
           <span className="font-display font-bold text-lg text-gray-800">Upwise</span>
         </div>
         <nav className="flex flex-col gap-2">
-          {[
-            { icon: "🏠", label: "Home", href: "/dashboard", active: true },
-            { icon: "🗺️", label: "My Map", href: "/dashboard", active: false },
-            { icon: "🏆", label: "Rewards", href: "/profile", active: false },
-            { icon: "👤", label: "Me", href: "/profile", active: false },
-          ].map((item) => (
+          {NAV_ITEMS.map((item) => (
             <Link
               key={item.label}
               href={item.href}
@@ -204,7 +207,7 @@ export default function StudentDashboard() {
                   : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
               }`}
             >
-              <span className="text-2xl">{item.icon}</span>
+              <AppIcon name={item.icon} className="h-5 w-5" />
               <span className="text-sm font-medium font-display">{item.label}</span>
             </Link>
           ))}
@@ -214,12 +217,7 @@ export default function StudentDashboard() {
       {/* Bottom nav — mobile only */}
       <nav className="fixed bottom-0 left-0 right-0 bg-[var(--theme-surface)]/95 backdrop-blur-md border-t border-[var(--border-warm-light)] px-6 py-3 z-30 md:hidden" style={{ boxShadow: "0 -1px 3px rgba(0,0,0,0.03)" }}>
         <div className="max-w-2xl mx-auto flex items-center justify-around">
-          {[
-            { icon: "🏠", label: "Home", href: "/dashboard", active: true },
-            { icon: "🗺️", label: "My Map", href: "/dashboard", active: false },
-            { icon: "🏆", label: "Rewards", href: "/profile", active: false },
-            { icon: "👤", label: "Me", href: "/profile", active: false },
-          ].map((tab) => (
+          {NAV_ITEMS.map((tab) => (
             <Link
               key={tab.label}
               href={tab.href}
@@ -229,7 +227,7 @@ export default function StudentDashboard() {
                   : "text-gray-400 hover:text-gray-600"
               }`}
             >
-              <span className="text-2xl">{tab.icon}</span>
+              <AppIcon name={tab.icon} className="h-6 w-6" />
               <span className="text-[10px] font-medium font-display">{tab.label}</span>
             </Link>
           ))}

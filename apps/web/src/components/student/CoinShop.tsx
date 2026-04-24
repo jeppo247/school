@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import type { ShopItemWithOwnership, ShopItemCategory } from "@upwise/shared";
+import { AppIcon, IconBadge, type AppIconName } from "@/components/ui/AppIcon";
 
 interface CoinShopProps {
   items: ShopItemWithOwnership[];
@@ -11,14 +12,14 @@ interface CoinShopProps {
   onClose: () => void;
 }
 
-const CATEGORIES: { id: ShopItemCategory | "all"; label: string; emoji: string }[] = [
-  { id: "all", label: "All", emoji: "🛍️" },
-  { id: "theme", label: "Themes", emoji: "🎨" },
-  { id: "avatar", label: "Avatar", emoji: "👤" },
-  { id: "celebration", label: "Celebrations", emoji: "🎉" },
-  { id: "sound_pack", label: "Sounds", emoji: "🔊" },
-  { id: "brain_break", label: "Breaks", emoji: "🧠" },
-  { id: "badge", label: "Badges", emoji: "🏆" },
+const CATEGORIES: { id: ShopItemCategory | "all"; label: string; icon: AppIconName }[] = [
+  { id: "all", label: "All", icon: "shop" },
+  { id: "theme", label: "Themes", icon: "palette" },
+  { id: "avatar", label: "Avatar", icon: "user" },
+  { id: "celebration", label: "Celebrations", icon: "party" },
+  { id: "sound_pack", label: "Sounds", icon: "volume" },
+  { id: "brain_break", label: "Breaks", icon: "brain" },
+  { id: "badge", label: "Badges", icon: "trophy" },
 ];
 
 export function CoinShop({ items, balance, onPurchase, onClose }: CoinShopProps) {
@@ -92,7 +93,7 @@ export function CoinShop({ items, balance, onPurchase, onClose }: CoinShopProps)
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
-              <span>{cat.emoji}</span>
+              <AppIcon name={cat.icon} className="h-4 w-4" />
               {cat.label}
             </button>
           ))}
@@ -123,9 +124,11 @@ export function CoinShop({ items, balance, onPurchase, onClose }: CoinShopProps)
                     className="w-16 h-16 rounded-xl object-cover mb-2"
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center mb-2 text-2xl">
-                    {CATEGORIES.find((c) => c.id === item.category)?.emoji ?? "🎁"}
-                  </div>
+                  <IconBadge
+                    name={CATEGORIES.find((c) => c.id === item.category)?.icon ?? "gift"}
+                    className="mb-2 h-16 w-16 rounded-xl bg-gray-100 text-gray-500"
+                    iconClassName="h-8 w-8"
+                  />
                 )}
 
                 <h3 className="font-display font-semibold text-sm text-gray-800">
@@ -191,9 +194,11 @@ export function CoinShop({ items, balance, onPurchase, onClose }: CoinShopProps)
               exit={{ scale: 0.8 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="w-20 h-20 mx-auto rounded-xl bg-gray-100 flex items-center justify-center mb-4 text-4xl">
-                {CATEGORIES.find((c) => c.id === confirmItem.category)?.emoji ?? "🎁"}
-              </div>
+              <IconBadge
+                name={CATEGORIES.find((c) => c.id === confirmItem.category)?.icon ?? "gift"}
+                className="mx-auto mb-4 h-20 w-20 rounded-xl bg-gray-100 text-gray-500"
+                iconClassName="h-10 w-10"
+              />
               <h3 className="font-display text-xl font-bold text-gray-800">
                 {confirmItem.name}
               </h3>

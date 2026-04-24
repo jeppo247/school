@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { IconBadge } from "@/components/ui/AppIcon";
 
 interface PaywallProps {
   childName: string;
@@ -15,7 +16,7 @@ export function Paywall({ childName }: PaywallProps) {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-lg w-full text-center"
       >
-        <span className="text-6xl block mb-4">🔒</span>
+        <IconBadge name="lock" className="mx-auto mb-4 h-16 w-16 bg-blue-50 text-[#4F8CF7]" iconClassName="h-8 w-8" />
         <h1 className="font-display text-3xl font-bold text-gray-800 mb-3">
           Your free trial has ended
         </h1>

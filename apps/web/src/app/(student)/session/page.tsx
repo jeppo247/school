@@ -6,16 +6,17 @@ import { QuestionCard } from "@/components/student/QuestionCard";
 import { Celebration } from "@/components/student/Celebration";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
 import { AskAdultButton, AskAdultModal } from "@/components/student/AskAdultModal";
+import { BrandMark, IconBadge, type AppIconName } from "@/components/ui/AppIcon";
 import { api } from "@/lib/api";
 
 type SessionPhase = "warmup" | "focus_1" | "brain_break" | "focus_2" | "wrapup";
 
-const PHASE_CONFIG: Record<SessionPhase, { label: string; emoji: string }> = {
-  warmup: { label: "Warm Up", emoji: "☀️" },
-  focus_1: { label: "Focus Time", emoji: "🎯" },
-  brain_break: { label: "Brain Break!", emoji: "🧠" },
-  focus_2: { label: "Focus Time", emoji: "💪" },
-  wrapup: { label: "Great Job!", emoji: "🌟" },
+const PHASE_CONFIG: Record<SessionPhase, { label: string; icon: AppIconName }> = {
+  warmup: { label: "Warm Up", icon: "sun" },
+  focus_1: { label: "Focus Time", icon: "target" },
+  brain_break: { label: "Brain Break!", icon: "brain" },
+  focus_2: { label: "Focus Time", icon: "dumbbell" },
+  wrapup: { label: "Great Job!", icon: "star" },
 };
 
 interface QuestionPayload {
@@ -201,7 +202,7 @@ export default function SessionPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md"
         >
-          <span className="text-6xl block mb-4">😕</span>
+          <IconBadge name="alert" className="mb-4 h-16 w-16 bg-red-50 text-red-500" iconClassName="h-8 w-8" />
           <h1 className="font-display text-2xl font-bold text-gray-800 mb-3">{error}</h1>
           <a
             href="/dashboard"
@@ -220,11 +221,11 @@ export default function SessionPage() {
       <main className="min-h-screen flex flex-col items-center justify-center">
         <AdventureBackground calm />
         <motion.span
-          className="text-6xl"
+          className="block"
           animate={{ y: [0, -8, 0], rotate: [0, 5, -5, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
-          🦉
+          <BrandMark className="h-16 w-16" />
         </motion.span>
         <p className="text-gray-400 mt-4 font-display">Getting your questions ready...</p>
       </main>
@@ -240,18 +241,18 @@ export default function SessionPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <motion.span
-            className="text-8xl lg:text-9xl block mb-6"
+          <motion.div
+            className="mb-6 flex justify-center"
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            🧠
-          </motion.span>
+            <IconBadge name="brain" className="h-24 w-24 bg-teal-50 text-teal-600" iconClassName="h-12 w-12" />
+          </motion.div>
           <h1 className="font-display text-3xl lg:text-4xl font-bold text-teal-700 mb-4">
             Brain Break!
           </h1>
           <p className="text-teal-600 mb-8 text-lg">
-            Time for a quick rest. Do 10 star jumps! ⭐
+            Time for a quick rest. Do 10 star jumps.
           </p>
           <motion.button
             onClick={() => {
@@ -278,14 +279,14 @@ export default function SessionPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md lg:max-w-lg"
         >
-          <motion.span
-            className="text-8xl lg:text-9xl block mb-6"
+          <motion.div
+            className="mb-6 flex justify-center"
             initial={{ scale: 0 }}
             animate={{ scale: [0, 1.3, 1] }}
             transition={{ duration: 0.6 }}
           >
-            🌟
-          </motion.span>
+            <IconBadge name="star" className="h-24 w-24 bg-blue-50 text-[var(--theme-primary)]" iconClassName="h-12 w-12" />
+          </motion.div>
           <h1 className="font-display text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
             Amazing Work!
           </h1>
@@ -344,7 +345,7 @@ export default function SessionPage() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xl md:text-2xl">{phaseConfig.emoji}</span>
+              <IconBadge name={phaseConfig.icon} className="h-8 w-8 rounded-lg" iconClassName="h-4 w-4" />
               <span className="font-display font-semibold text-gray-700 text-sm md:text-base">
                 {phaseConfig.label}
               </span>

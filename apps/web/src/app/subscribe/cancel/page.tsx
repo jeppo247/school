@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { BrandMark } from "@/components/ui/AppIcon";
 
 export default function SubscribeCancel() {
   return (
@@ -11,7 +12,7 @@ export default function SubscribeCancel() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center max-w-md"
       >
-        <span className="text-6xl block mb-4">🦉</span>
+        <BrandMark className="mx-auto mb-4 h-16 w-16" />
         <h1 className="font-display text-2xl font-bold text-gray-800 mb-3">
           No worries!
         </h1>

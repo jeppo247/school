@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 
 const PUBLIC_PATHS = ["/", "/for-parents", "/faq", "/privacy", "/terms", "/contact"];
 const PUBLIC_PREFIXES = ["/compare/"];
+const APP_PATHS = ["/parent-dashboard", "/dashboard", "/diagnostic", "/session", "/profile", "/start", "/subscribe"];
 
 export function middleware(request: NextRequest) {
   // Redirect www → apex (301 permanent).
@@ -23,6 +24,7 @@ export function middleware(request: NextRequest) {
   if (
     PUBLIC_PATHS.includes(pathname) ||
     PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix)) ||
+    APP_PATHS.some((p) => pathname.startsWith(p)) ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
     pathname.includes(".")

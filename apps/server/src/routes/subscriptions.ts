@@ -21,6 +21,10 @@ subscriptionRoutes.post("/checkout", async (req, res, next) => {
     if (!stripe) throw new AppError(500, "STRIPE_NOT_CONFIGURED", "Stripe is not configured");
 
     const { familyId, tier } = req.body;
+    if (!familyId || typeof familyId !== "string") {
+      throw new AppError(400, "VALIDATION_ERROR", "familyId is required");
+    }
+
     if (!tier || !["standard", "family"].includes(tier)) {
       throw new AppError(400, "VALIDATION_ERROR", "tier must be 'standard' or 'family'");
     }
@@ -34,21 +38,19 @@ subscriptionRoutes.post("/checkout", async (req, res, next) => {
       throw new AppError(500, "CONFIG_ERROR", "FRONTEND_URL environment variable is required for checkout");
     }
 
+    const [family] = await db.select().from(families).where(eq(families.id, familyId));
+    if (!family) throw new AppError(404, "NOT_FOUND", "Family not found");
+
     // Get or create Stripe customer
-    let customerId: string | undefined;
-    if (familyId) {
-      const [family] = await db.select().from(families).where(eq(families.id, familyId));
-      if (family?.stripeCustomerId) {
-        customerId = family.stripeCustomerId;
-      } else if (family) {
-        const customer = await stripe.customers.create({
-          email: family.email,
-          name: family.name,
-          metadata: { familyId: family.id },
-        });
-        customerId = customer.id;
-        await db.update(families).set({ stripeCustomerId: customer.id }).where(eq(families.id, familyId));
-      }
+    let customerId = family.stripeCustomerId ?? undefined;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: family.email,
+        name: family.name,
+        metadata: { familyId: family.id },
+      });
+      customerId = customer.id;
+      await db.update(families).set({ stripeCustomerId: customer.id }).where(eq(families.id, family.id));
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -58,9 +60,9 @@ subscriptionRoutes.post("/checkout", async (req, res, next) => {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${FRONTEND_URL}/subscribe/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/subscribe/cancel`,
-      metadata: { familyId: familyId ?? "", tier },
+      metadata: { familyId: family.id, tier },
       subscription_data: {
-        metadata: { familyId: familyId ?? "", tier },
+        metadata: { familyId: family.id, tier },
         trial_period_days: 7,
       },
     });

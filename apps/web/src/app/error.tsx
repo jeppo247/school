@@ -1,5 +1,7 @@
 "use client";
 
+import { BrandMark } from "@/components/ui/AppIcon";
+
 export default function Error({
   reset,
 }: {
@@ -8,7 +10,7 @@ export default function Error({
 }) {
   return (
     <main className="min-h-screen bg-[#F8FAFF] flex flex-col items-center justify-center px-6">
-      <span className="text-6xl mb-4">🦉</span>
+      <BrandMark className="mb-4 h-16 w-16" />
       <h1 className="font-display text-3xl font-bold text-gray-800 mb-3">
         Something went wrong
       </h1>

@@ -1,8 +1,10 @@
+import type { AppIconName } from "@/components/ui/AppIcon";
+
 export interface ThemeConfig {
   id: string;
   name: string;
   description: string;
-  emoji: string;
+  icon: AppIconName;
   colors: {
     primary: string;
     secondary: string;
@@ -18,7 +20,7 @@ export const THEMES: Record<string, ThemeConfig> = {
     id: "default",
     name: "Upwise Blue",
     description: "The classic Upwise look",
-    emoji: "🎓",
+    icon: "graduation",
     colors: {
       primary: "#4F8CF7",
       secondary: "#A78BFA",
@@ -32,7 +34,7 @@ export const THEMES: Record<string, ThemeConfig> = {
     id: "afl",
     name: "AFL Footy",
     description: "Kick goals with your learning!",
-    emoji: "🏈",
+    icon: "target",
     colors: {
       primary: "#002B5C",
       secondary: "#E31937",
@@ -46,7 +48,7 @@ export const THEMES: Record<string, ThemeConfig> = {
     id: "bluey",
     name: "Bluey",
     description: "Learn and play like Bluey!",
-    emoji: "🐕",
+    icon: "sparkles",
     colors: {
       primary: "#5B9BD5",
       secondary: "#FF8C42",
@@ -60,7 +62,7 @@ export const THEMES: Record<string, ThemeConfig> = {
     id: "superheroes",
     name: "Superheroes",
     description: "Become a learning superhero!",
-    emoji: "🦸",
+    icon: "shield",
     colors: {
       primary: "#DC2626",
       secondary: "#1D4ED8",
@@ -74,7 +76,7 @@ export const THEMES: Record<string, ThemeConfig> = {
     id: "space",
     name: "Space Explorer",
     description: "Explore the universe of knowledge!",
-    emoji: "🚀",
+    icon: "rocket",
     colors: {
       primary: "#6366F1",
       secondary: "#06B6D4",
@@ -88,7 +90,7 @@ export const THEMES: Record<string, ThemeConfig> = {
     id: "animals",
     name: "Animal Kingdom",
     description: "Learn with your favourite animals!",
-    emoji: "🦘",
+    icon: "compass",
     colors: {
       primary: "#16A34A",
       secondary: "#92400E",
@@ -102,7 +104,7 @@ export const THEMES: Record<string, ThemeConfig> = {
     id: "golf",
     name: "Golf Pro",
     description: "Ace your way to the top!",
-    emoji: "⛳",
+    icon: "target",
     colors: {
       primary: "#15803D",
       secondary: "#FBBF24",

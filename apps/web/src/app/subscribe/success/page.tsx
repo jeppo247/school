@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { IconBadge } from "@/components/ui/AppIcon";
 
 export default function SubscribeSuccess() {
   return (
@@ -11,14 +12,14 @@ export default function SubscribeSuccess() {
         animate={{ opacity: 1, scale: 1 }}
         className="text-center max-w-md"
       >
-        <motion.span
-          className="text-7xl block mb-4"
+        <motion.div
+          className="mb-4 flex justify-center"
           initial={{ scale: 0 }}
           animate={{ scale: [0, 1.3, 1] }}
           transition={{ duration: 0.6 }}
         >
-          🎉
-        </motion.span>
+          <IconBadge name="party" className="h-20 w-20 bg-blue-50 text-[#4F8CF7]" iconClassName="h-10 w-10" />
+        </motion.div>
         <h1 className="font-display text-3xl font-bold text-gray-800 mb-3">
           You&apos;re all set!
         </h1>

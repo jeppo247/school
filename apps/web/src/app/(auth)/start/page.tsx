@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { THEMES } from "@/lib/themes";
 import { api } from "@/lib/api";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
+import { AppIcon, BrandMark, IconBadge } from "@/components/ui/AppIcon";
 
 type Step = "parent" | "child" | "theme" | "ready";
 
@@ -102,7 +103,7 @@ export default function StartPage() {
               className="bg-white rounded-3xl p-8 shadow-xl shadow-blue-100/30 border border-gray-100"
             >
               <div className="text-center mb-6">
-                <span className="text-5xl block mb-3">👋</span>
+                <IconBadge name="users" className="mx-auto mb-3 h-14 w-14" iconClassName="h-7 w-7" />
                 <h1 className="font-display text-2xl font-bold text-gray-800">
                   Welcome to Upwise
                 </h1>
@@ -164,7 +165,7 @@ export default function StartPage() {
               className="bg-white rounded-3xl p-8 shadow-xl shadow-blue-100/30 border border-gray-100"
             >
               <div className="text-center mb-6">
-                <span className="text-5xl block mb-3">🧒</span>
+                <IconBadge name="user" className="mx-auto mb-3 h-14 w-14" iconClassName="h-7 w-7" />
                 <h1 className="font-display text-2xl font-bold text-gray-800">
                   Tell us about your child
                 </h1>
@@ -239,7 +240,7 @@ export default function StartPage() {
               className="bg-white rounded-3xl p-8 shadow-xl shadow-blue-100/30 border border-gray-100"
             >
               <div className="text-center mb-6">
-                <span className="text-5xl block mb-3">🎨</span>
+                <IconBadge name="palette" className="mx-auto mb-3 h-14 w-14" iconClassName="h-7 w-7" />
                 <h1 className="font-display text-2xl font-bold text-gray-800">
                   Pick a theme, {childName}!
                 </h1>
@@ -265,7 +266,11 @@ export default function StartPage() {
                         className="w-6 h-6 rounded-full"
                         style={{ backgroundColor: theme.colors.primary }}
                       />
-                      <span className="text-base">{theme.emoji}</span>
+                      <IconBadge
+                        name={theme.icon}
+                        className="h-6 w-6 rounded-full bg-gray-50 text-gray-500"
+                        iconClassName="h-3.5 w-3.5"
+                      />
                     </div>
                     <p className="font-display font-semibold text-xs text-gray-800">
                       {theme.name}
@@ -294,13 +299,13 @@ export default function StartPage() {
               animate={{ opacity: 1, scale: 1 }}
               className="bg-white rounded-3xl p-8 shadow-xl shadow-blue-100/30 border border-gray-100 text-center"
             >
-              <motion.span
-                className="text-7xl block mb-4"
+              <motion.div
+                className="mb-4 flex justify-center"
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                🦉
-              </motion.span>
+                <BrandMark className="h-20 w-20" />
+              </motion.div>
 
               <h1 className="font-display text-2xl font-bold text-gray-800 mb-3">
                 Ready, {childName}?
@@ -317,7 +322,10 @@ export default function StartPage() {
               </p>
 
               <div className="bg-blue-50 rounded-2xl p-4 mb-6 text-left">
-                <p className="text-xs font-medium text-blue-700 mb-2">👨‍👩‍👧 For parents:</p>
+                <p className="inline-flex items-center gap-2 text-xs font-medium text-blue-700 mb-2">
+                  <AppIcon name="users" className="h-4 w-4" />
+                  For parents:
+                </p>
                 <p className="text-xs text-blue-600">
                   Sit with {childName} for the first few questions, then let them work independently.
                   You&apos;ll see the full results when they&apos;re done.
@@ -337,7 +345,7 @@ export default function StartPage() {
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                     >
-                      🦉
+                      <BrandMark className="h-6 w-6" />
                     </motion.span>
                     Getting ready...
                   </span>

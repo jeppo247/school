@@ -1,3 +1,5 @@
+import type { AppIconName } from "@/components/ui/AppIcon";
+
 export interface FAQItem {
   question: string;
   answer: string;
@@ -6,14 +8,14 @@ export interface FAQItem {
 
 export interface FAQSection {
   title: string;
-  icon: string;
+  icon: AppIconName;
   items: FAQItem[];
 }
 
 export const PARENT_SECTIONS: FAQSection[] = [
   {
     title: "The research behind mastery learning",
-    icon: "📚",
+    icon: "book",
     items: [
       {
         question: "What is mastery learning and why does it matter?",
@@ -42,7 +44,7 @@ export const PARENT_SECTIONS: FAQSection[] = [
   },
   {
     title: "How Upwise works",
-    icon: "💡",
+    icon: "lightbulb",
     items: [
       {
         question: "What is Upwise?",
@@ -68,7 +70,7 @@ export const PARENT_SECTIONS: FAQSection[] = [
   },
   {
     title: "Progress, safety and privacy",
-    icon: "🔒",
+    icon: "lock",
     items: [
       {
         question: "How can I track my child's progress?",
@@ -101,7 +103,7 @@ export const PARENT_SECTIONS: FAQSection[] = [
 export const TEACHER_SECTIONS: FAQSection[] = [
   {
     title: "What Upwise is (and isn't)",
-    icon: "🤝",
+    icon: "handshake",
     items: [
       {
         question: "Is Upwise trying to replace teachers?",
@@ -121,7 +123,7 @@ export const TEACHER_SECTIONS: FAQSection[] = [
   },
   {
     title: "How it supports your teaching",
-    icon: "📊",
+    icon: "barChart",
     items: [
       {
         question: "How does Upwise actually help me as a teacher?",
@@ -147,7 +149,7 @@ export const TEACHER_SECTIONS: FAQSection[] = [
   },
   {
     title: "Common concerns",
-    icon: "💬",
+    icon: "message",
     items: [
       {
         question: "Will parents start thinking they don't need school?",
@@ -178,7 +180,7 @@ export const TEACHER_SECTIONS: FAQSection[] = [
   },
   {
     title: "The bigger picture",
-    icon: "🌏",
+    icon: "globe",
     items: [
       {
         question: "Is AI in education going to change my role?",

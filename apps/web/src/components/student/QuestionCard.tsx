@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { AppIcon, type AppIconName } from "@/components/ui/AppIcon";
 
 interface QuestionCardProps {
   question: {
@@ -20,10 +21,10 @@ interface QuestionCardProps {
   } | null;
 }
 
-const HINT_LABELS = [
-  { emoji: "💡", label: "Hint" },
-  { emoji: "🔍", label: "More help" },
-  { emoji: "📝", label: "Show me" },
+const HINT_LABELS: { icon: AppIconName; label: string }[] = [
+  { icon: "lightbulb", label: "Hint" },
+  { icon: "help", label: "More help" },
+  { icon: "clipboard", label: "Show me" },
 ];
 
 export function QuestionCard({
@@ -191,7 +192,7 @@ export function QuestionCard({
             }`}
           >
             <p className="font-display font-semibold">
-              {feedback.isCorrect ? "Correct! ✓" : "Not quite — keep trying!"}
+              {feedback.isCorrect ? "Correct!" : "Not quite — keep trying!"}
             </p>
             {feedback.explanation && (
               <p className="text-base mt-1">{feedback.explanation}</p>
@@ -211,8 +212,12 @@ export function QuestionCard({
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-gray-50 rounded-lg p-3 mb-2 text-center"
               >
-                <p className="text-base text-gray-500">
-                  {HINT_LABELS[i]?.emoji ?? "💡"} {hint}
+                <p className="inline-flex items-center justify-center gap-2 text-base text-gray-500">
+                  <AppIcon
+                    name={HINT_LABELS[i]?.icon ?? "lightbulb"}
+                    className="h-4 w-4 text-[var(--theme-primary)]"
+                  />
+                  {hint}
                 </p>
               </motion.div>
             ))}

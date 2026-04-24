@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
 import { WaitlistModal } from "@/components/WaitlistModal";
+import { AppIcon } from "@/components/ui/AppIcon";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -543,7 +544,7 @@ export default function HomeClientPage() {
             >
               <div className="bg-white rounded-2xl p-6 shadow-clay border border-[#E8E2D8] mb-4">
                 <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
-                  <span className="text-base">📋</span>
+                  <AppIcon name="clipboard" className="h-4 w-4" />
                   <span className="font-medium">Today&apos;s Briefing</span>
                   <span className="ml-auto text-xs bg-blue-50 text-[#4F8CF7] px-2 py-0.5 rounded-full font-medium">
                     New
@@ -558,7 +559,7 @@ export default function HomeClientPage() {
               </div>
               <div className="bg-white rounded-2xl p-6 shadow-clay border border-[#E8E2D8]">
                 <div className="flex items-center gap-2 text-sm text-gray-400 mb-3">
-                  <span className="text-base">💡</span>
+                  <AppIcon name="lightbulb" className="h-4 w-4" />
                   <span className="font-medium">If she gets stuck</span>
                 </div>
                 <p className="text-gray-600 text-sm italic leading-relaxed">

@@ -223,6 +223,19 @@ sessionRoutes.post("/:studentId/respond", validate(submitAnswerSchema), async (r
       throw new AppError(400, "VALIDATION_ERROR", "sessionId, questionId, and answer required");
     }
 
+    const [session] = await db
+      .select()
+      .from(learningSessions)
+      .where(and(eq(learningSessions.id, sessionId), eq(learningSessions.studentId, studentId)));
+
+    if (!session) throw new AppError(404, "NOT_FOUND", "Session not found");
+    if (session.sessionType !== "daily") {
+      throw new AppError(400, "VALIDATION_ERROR", "Session is not a daily learning session");
+    }
+    if (session.status !== "in_progress") {
+      throw new AppError(409, "SESSION_NOT_IN_PROGRESS", "Session is not in progress");
+    }
+
     const [question] = await db.select().from(questions).where(eq(questions.id, questionId));
     if (!question) throw new AppError(404, "NOT_FOUND", "Question not found");
 
@@ -231,9 +244,13 @@ sessionRoutes.post("/:studentId/respond", validate(submitAnswerSchema), async (r
 
     // Count existing responses
     const existing = await db
-      .select({ id: questionResponses.id })
+      .select({ id: questionResponses.id, questionId: questionResponses.questionId })
       .from(questionResponses)
       .where(eq(questionResponses.sessionId, sessionId));
+
+    if (existing.some((response) => response.questionId === questionId)) {
+      throw new AppError(409, "QUESTION_ALREADY_ANSWERED", "Question already answered in this session");
+    }
 
     // Record response
     await db.insert(questionResponses).values({

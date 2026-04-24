@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import { WaitlistModal } from "@/components/WaitlistModal";
+import { AppIcon, IconBadge, type AppIconName } from "@/components/ui/AppIcon";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -299,7 +300,7 @@ export default function ForParentsClientPage() {
               {/* Briefing card */}
               <div className="bg-white rounded-2xl p-6 shadow-clay border border-[#E8E2D8]">
                 <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
-                  <span className="text-base">📋</span>
+                  <AppIcon name="clipboard" className="h-4 w-4" />
                   <span className="font-medium">Today&apos;s Briefing</span>
                   <span className="ml-auto text-xs bg-blue-50 text-[#4F8CF7] px-2 py-0.5 rounded-full font-medium">New</span>
                 </div>
@@ -317,7 +318,7 @@ export default function ForParentsClientPage() {
               {/* Conversation script card */}
               <div className="bg-white rounded-2xl p-6 shadow-clay border border-[#E8E2D8]">
                 <div className="flex items-center gap-2 text-sm text-gray-400 mb-3">
-                  <span className="text-base">💡</span>
+                  <AppIcon name="lightbulb" className="h-4 w-4" />
                   <span className="font-medium">If she gets stuck</span>
                 </div>
                 <p className="text-gray-600 text-sm italic leading-relaxed">
@@ -420,13 +421,13 @@ export default function ForParentsClientPage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
               {[
-                { label: "Skills Mastered", value: "8", icon: "🎯" },
-                { label: "Sessions", value: "5", icon: "📚" },
-                { label: "Streak", value: "12 days", icon: "🔥" },
-                { label: "Time", value: "1h 42m", icon: "⏱" },
+                { label: "Skills Mastered", value: "8", icon: "target" as AppIconName },
+                { label: "Sessions", value: "5", icon: "book" as AppIconName },
+                { label: "Streak", value: "12 days", icon: "flame" as AppIconName },
+                { label: "Time", value: "1h 42m", icon: "clock" as AppIconName },
               ].map((stat) => (
                 <div key={stat.label} className="text-center p-3 bg-gray-50 rounded-xl">
-                  <span className="text-lg">{stat.icon}</span>
+                  <IconBadge name={stat.icon} className="mx-auto h-8 w-8 rounded-lg" iconClassName="h-4 w-4" />
                   <p className="font-display text-xl font-bold text-gray-900 mt-1">{stat.value}</p>
                   <p className="text-[11px] text-gray-400">{stat.label}</p>
                 </div>
@@ -479,7 +480,7 @@ export default function ForParentsClientPage() {
             {[
               {
                 type: "Stuck",
-                icon: "🤔",
+                icon: "help" as AppIconName,
                 color: "#FF8C42",
                 bg: "#FFF7ED",
                 message: "Mia has been on the same question for 2 minutes. She might need a nudge.",
@@ -487,7 +488,7 @@ export default function ForParentsClientPage() {
               },
               {
                 type: "Celebration",
-                icon: "🎉",
+                icon: "party" as AppIconName,
                 color: "#22C55E",
                 bg: "#F0FDF4",
                 message: "Mia just mastered 3-digit subtraction! That was a tough one.",
@@ -495,7 +496,7 @@ export default function ForParentsClientPage() {
               },
               {
                 type: "Break Needed",
-                icon: "☕",
+                icon: "coffee" as AppIconName,
                 color: "#8B5CF6",
                 bg: "#F5F3FF",
                 message: "Mia's accuracy has dropped in the last few questions. A short break might help.",
@@ -503,7 +504,7 @@ export default function ForParentsClientPage() {
               },
               {
                 type: "Session Complete",
-                icon: "✅",
+                icon: "check" as AppIconName,
                 color: "#4F8CF7",
                 bg: "#EFF6FF",
                 message: "Great session! Mia answered 18 questions with 83% accuracy.",
@@ -518,7 +519,7 @@ export default function ForParentsClientPage() {
                 className="bg-white rounded-2xl p-5 shadow-clay border border-[#E8E2D8] flex flex-col"
               >
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-lg">{nudge.icon}</span>
+                  <AppIcon name={nudge.icon} className="h-4 w-4" />
                   <span className="text-xs font-bold uppercase tracking-wider" style={{ color: nudge.color }}>
                     {nudge.type}
                   </span>

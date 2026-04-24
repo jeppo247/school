@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import { QuestionCard } from "@/components/student/QuestionCard";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
 import { AskAdultButton, AskAdultModal } from "@/components/student/AskAdultModal";
+import { AppIcon, BrandMark, IconBadge, type AppIconName } from "@/components/ui/AppIcon";
 import { api } from "@/lib/api";
 
 type NaplanDomain = "numeracy" | "reading" | "spelling" | "grammar_punctuation" | "writing";
@@ -33,8 +34,8 @@ const ALL_DEMO_QUESTIONS: QuestionData[] = [
   // PREP / YEAR 1 — Numbers to 10, counting, simple addition
   { id: "d1", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "How many stars are there? ⭐⭐⭐", answer: "3", options: ["2", "3", "4", "5"], explanation: "Count them: 1, 2, 3!", hint: "Point to each star and count." } },
   { id: "d2", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "What number comes after 4?", answer: "5", options: ["3", "4", "5", "6"], explanation: "When we count: 3, 4, 5 — so 5 comes after 4.", hint: "Try counting: 1, 2, 3, 4, ..." } },
-  { id: "d3", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "Which group has more? Group A: 🍎🍎🍎 Group B: 🍎🍎🍎🍎🍎", answer: "Group B", options: ["Group A", "Group B", "They are the same", "I don't know"], explanation: "Group B has 5 apples, Group A has 3. 5 is more than 3.", hint: "Count the apples in each group." } },
-  { id: "d4", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "What comes next? 🔵🔴🔵🔴🔵___", answer: "🔴", options: ["🔵", "🔴", "🟢", "🟡"], explanation: "The pattern goes blue, red, blue, red — so red comes next!", hint: "Look at the pattern: blue, red, blue, red..." } },
+  { id: "d3", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "Which group has more? Group A has 3 counters. Group B has 5 counters.", answer: "Group B", options: ["Group A", "Group B", "They are the same", "I don't know"], explanation: "Group B has 5 counters, Group A has 3. 5 is more than 3.", hint: "Count the counters in each group." } },
+  { id: "d4", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "What comes next? Blue, red, blue, red, blue, ___", answer: "Red", options: ["Blue", "Red", "Green", "Yellow"], explanation: "The pattern goes blue, red, blue, red, so red comes next.", hint: "Look at the pattern: blue, red, blue, red..." } },
   { id: "d5", type: "multiple_choice", domain: "reading", maxYear: 0, content: { stem: "Kobi the koala climbed a big tree. He ate some leaves. Then he had a nap.\n\nWhat did Kobi do first?", answer: "Climbed a tree", options: ["Had a nap", "Climbed a tree", "Ate some leaves", "Went home"], explanation: "The story says Kobi climbed a tree first.", hint: "What happened at the very start?" } },
   { id: "d6", type: "multiple_choice", domain: "grammar_punctuation", maxYear: 0, content: { stem: "Which one starts with a capital letter?", answer: "The dog is big.", options: ["the dog is big.", "The dog is big.", "the Dog is big.", "THE DOG IS BIG."], explanation: "Sentences start with ONE capital letter: 'The dog is big.'", hint: "Only the first letter should be big." } },
 
@@ -67,6 +68,11 @@ const ALL_DEMO_QUESTIONS: QuestionData[] = [
   { id: "d26", type: "multiple_choice", domain: "numeracy", maxYear: 7, content: { stem: "A school has 4 classes with 28 students each. How many students altogether?", answer: "112", options: ["96", "102", "112", "128"], explanation: "4 × 28 = 112.", hint: "Break it: 4 × 20 = 80, 4 × 8 = 32, then add." } },
   { id: "d27", type: "multiple_choice", domain: "spelling", maxYear: 4, content: { stem: "What is the plural of 'baby'?", answer: "babies", options: ["babys", "babyes", "babies", "babiez"], explanation: "Change y to i and add -es: babies.", hint: "What happens to the 'y' at the end?" } },
 ];
+
+function getDemoQuestionsForYear(yearLevel: number): QuestionData[] {
+  const eligible = ALL_DEMO_QUESTIONS.filter((q) => q.maxYear <= yearLevel);
+  return eligible.length > 0 ? eligible : ALL_DEMO_QUESTIONS.filter((q) => q.maxYear === 0);
+}
 
 interface DomainScore {
   domain: NaplanDomain;
@@ -127,7 +133,7 @@ export default function DiagnosticPage() {
       try {
         const saved = JSON.parse(savedRaw);
         // Filter demo questions for restoration
-        const filtered = ALL_DEMO_QUESTIONS.filter((q) => q.maxYear === yearLevel);
+        const filtered = getDemoQuestionsForYear(yearLevel);
         setDemoQuestions(filtered);
         setDemoMode(true);
         // Restore saved state
@@ -151,7 +157,7 @@ export default function DiagnosticPage() {
       setSessionId(sessId);
       setStarted(true);
     } else if (name) {
-      const filtered = ALL_DEMO_QUESTIONS.filter((q) => q.maxYear === yearLevel);
+      const filtered = getDemoQuestionsForYear(yearLevel);
       setDemoQuestions(filtered);
       setDemoMode(true);
       setStarted(true);
@@ -179,12 +185,17 @@ export default function DiagnosticPage() {
       }
     } catch {
       // API failed — switch to demo mode
+      const yearLevel = Number(sessionStorage.getItem("upwise_year_level") ?? 3);
+      const fallbackQuestions = demoQuestions.length > 0
+        ? demoQuestions
+        : getDemoQuestionsForYear(yearLevel);
+      setDemoQuestions(fallbackQuestions);
       setDemoMode(true);
-      setCurrentQuestion(demoQuestions[questionIndex] ?? null);
+      setCurrentQuestion(fallbackQuestions[questionIndex] ?? fallbackQuestions[0] ?? null);
     } finally {
       setLoading(false);
     }
-  }, [studentId, sessionId, questionIndex]);
+  }, [studentId, sessionId, questionIndex, demoQuestions]);
 
   useEffect(() => {
     if (started && !demoMode && studentId && sessionId && !currentQuestion && !complete) {
@@ -298,13 +309,13 @@ export default function DiagnosticPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md"
         >
-          <motion.span
-            className="text-7xl block mb-6"
+          <motion.div
+            className="mb-6 flex justify-center"
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            🦉
-          </motion.span>
+            <BrandMark className="h-20 w-20" />
+          </motion.div>
           <h1 className="font-display text-3xl font-bold text-gray-800 mb-3">
             Let&apos;s get started!
           </h1>
@@ -334,14 +345,14 @@ export default function DiagnosticPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center max-w-md lg:max-w-lg"
         >
-          <motion.span
-            className="text-8xl lg:text-9xl block mb-6"
+          <motion.div
+            className="mb-6 flex justify-center"
             initial={{ scale: 0 }}
             animate={{ scale: [0, 1.3, 1] }}
             transition={{ duration: 0.8 }}
           >
-            🎉
-          </motion.span>
+            <IconBadge name="party" className="h-24 w-24 bg-blue-50 text-[var(--theme-primary)]" iconClassName="h-12 w-12" />
+          </motion.div>
           <h1 className="font-display text-3xl md:text-4xl font-bold text-gray-800 mb-3">
             Amazing work, {childName}!
           </h1>
@@ -350,7 +361,10 @@ export default function DiagnosticPage() {
           </p>
 
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6 text-left">
-            <p className="text-xs font-medium text-gray-400 mb-3">👨‍👩‍👧 For parents:</p>
+            <p className="inline-flex items-center gap-2 text-xs font-medium text-gray-400 mb-3">
+              <AppIcon name="users" className="h-4 w-4" />
+              For parents:
+            </p>
             <p className="text-sm text-gray-600 mb-3">
               {childName}&apos;s diagnostic is complete. Based on {totalAnswered} questions across
               numeracy, reading, and spelling, we&apos;ve identified their strengths and learning gaps.
@@ -389,11 +403,11 @@ export default function DiagnosticPage() {
       <main className="min-h-screen flex flex-col items-center justify-center">
         <AdventureBackground calm />
         <motion.span
-          className="text-6xl"
+          className="block"
           animate={{ y: [0, -8, 0], rotate: [0, 5, -5, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
-          🦉
+          <BrandMark className="h-16 w-16" />
         </motion.span>
         <p className="text-gray-400 mt-4 font-display">
           Finding the perfect question for you...
@@ -403,21 +417,21 @@ export default function DiagnosticPage() {
   }
 
   // Active diagnostic
-  const totalQuestions = demoMode ? demoQuestions.length : 25;
+  const totalQuestions = demoMode ? Math.max(demoQuestions.length, 1) : 25;
   const progress = Math.min((questionIndex / totalQuestions) * 100, 100);
 
   // Varied animations — different fun animation each time
-  const animations = [
-    { emoji: "🦉", particles: "✨", msg: "Nice!" },
-    { emoji: "⭐", particles: "🌟", msg: "Awesome!" },
-    { emoji: "🦘", particles: "💫", msg: "You're doing great!" },
-    { emoji: "🐨", particles: "⭐", msg: "Keep going!" },
-    { emoji: "🌈", particles: "🎵", msg: "Wonderful!" },
-    { emoji: "🚀", particles: "✨", msg: "Superstar!" },
-    { emoji: "🎈", particles: "🎉", msg: "Amazing!" },
-    { emoji: "🦋", particles: "💐", msg: "Brilliant!" },
-    { emoji: "🐬", particles: "🌊", msg: "Fantastic!" },
-    { emoji: "🌻", particles: "🌸", msg: "You rock!" },
+  const animations: { icon: AppIconName; color: string; msg: string }[] = [
+    { icon: "brand", color: "#4F8CF7", msg: "Nice!" },
+    { icon: "star", color: "#F59E0B", msg: "Awesome!" },
+    { icon: "target", color: "#34D399", msg: "You're doing great!" },
+    { icon: "sparkles", color: "#A78BFA", msg: "Keep going!" },
+    { icon: "rocket", color: "#38BDF8", msg: "Wonderful!" },
+    { icon: "party", color: "#FB923C", msg: "Superstar!" },
+    { icon: "trophy", color: "#FBBF24", msg: "Amazing!" },
+    { icon: "award", color: "#F87171", msg: "Brilliant!" },
+    { icon: "compass", color: "#22C55E", msg: "Fantastic!" },
+    { icon: "lightbulb", color: "#6366F1", msg: "You rock!" },
   ];
   const currentAnim = animations[questionIndex % animations.length];
 
@@ -567,11 +581,12 @@ export default function DiagnosticPage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Floating particles — different emoji each time */}
+            {/* Floating particles */}
             {Array.from({ length: 12 }, (_, i) => (
               <motion.div
                 key={i}
-                className="absolute text-2xl"
+                className="absolute h-3 w-3 rounded-full shadow-sm"
+                style={{ backgroundColor: currentAnim.color }}
                 initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
                 animate={{
                   x: (Math.cos((i / 12) * Math.PI * 2)) * (80 + Math.random() * 60),
@@ -581,12 +596,10 @@ export default function DiagnosticPage() {
                   rotate: [0, Math.random() * 30 - 15],
                 }}
                 transition={{ duration: 1.2, delay: i * 0.04, ease: "easeOut" }}
-              >
-                {currentAnim.particles}
-              </motion.div>
+              />
             ))}
 
-            {/* Main character/emoji — bounces in */}
+            {/* Main mark bounces in */}
             <motion.div
               className="text-center"
               initial={{ scale: 0, opacity: 0 }}
@@ -594,13 +607,17 @@ export default function DiagnosticPage() {
               exit={{ scale: 0, opacity: 0 }}
               transition={{ duration: 0.5, ease: "backOut" }}
             >
-              <motion.span
-                className="text-7xl lg:text-9xl block"
+              <motion.div
+                className="flex justify-center"
                 animate={{ y: [0, -20, 0], rotate: [0, 8, -8, 0] }}
                 transition={{ duration: 0.8 }}
               >
-                {currentAnim.emoji}
-              </motion.span>
+                <IconBadge
+                  name={currentAnim.icon}
+                  className="h-24 w-24 bg-white/95 text-[var(--theme-primary)] shadow-xl lg:h-32 lg:w-32"
+                  iconClassName="h-12 w-12 lg:h-16 lg:w-16"
+                />
+              </motion.div>
               <motion.p
                 className="font-display text-xl lg:text-2xl font-bold text-[var(--theme-primary)] mt-3 drop-shadow-md"
                 initial={{ opacity: 0, y: 10 }}

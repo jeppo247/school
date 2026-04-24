@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "@/lib/api";
+import { IconBadge } from "@/components/ui/AppIcon";
 
 interface WaitlistModalProps {
   open: boolean;
@@ -137,10 +138,11 @@ export function WaitlistModal({ open, onClose }: WaitlistModalProps) {
                   {Array.from({ length: 80 }, (_, i) => (
                     <motion.span
                       key={i}
-                      className="absolute text-3xl sm:text-4xl"
+                      className="absolute h-3 w-3 rounded-full"
                       style={{
                         left: `${30 + Math.random() * 40}%`,
                         top: `${30 + Math.random() * 30}%`,
+                        backgroundColor: ["#4F8CF7", "#34D399", "#FBBF24", "#A78BFA", "#FB923C"][i % 5],
                       }}
                       initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
                       animate={{
@@ -155,20 +157,18 @@ export function WaitlistModal({ open, onClose }: WaitlistModalProps) {
                         delay: i * 0.015,
                         ease: "easeOut",
                       }}
-                    >
-                      {["🎉", "🎊", "✨", "⭐", "🌟", "💫", "🥳", "🎈", "🎆", "🪅", "🎇", "🍾"][i % 12]}
-                    </motion.span>
+                    />
                   ))}
                 </div>
 
-                <motion.span
-                  className="text-9xl block mb-6"
+                <motion.div
+                  className="mb-6 flex justify-center"
                   initial={{ scale: 0 }}
                   animate={{ scale: [0, 1.6, 1] }}
                   transition={{ duration: 0.6, ease: "backOut" }}
                 >
-                  🎉
-                </motion.span>
+                  <IconBadge name="party" className="h-24 w-24 bg-blue-50 text-[#4F8CF7]" iconClassName="h-12 w-12" />
+                </motion.div>
                 <motion.h2
                   className="font-display text-3xl font-bold text-gray-900 mb-4"
                   initial={{ opacity: 0, y: 10 }}

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { AppIcon } from "@/components/ui/AppIcon";
 
 interface StreakCounterProps {
   count: number;
@@ -21,7 +22,7 @@ export function StreakCounter({ count }: StreakCounterProps) {
       }}
     >
       <motion.span
-        className="text-2xl"
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-amber-600"
         animate={{
           scale: [flameScale, flameScale * 1.1, flameScale],
         }}
@@ -31,7 +32,7 @@ export function StreakCounter({ count }: StreakCounterProps) {
           ease: "easeInOut",
         }}
       >
-        🔥
+        <AppIcon name="flame" className="h-4 w-4" />
       </motion.span>
       <div>
         <p className="font-display font-bold text-orange-600 text-lg md:text-xl leading-tight">

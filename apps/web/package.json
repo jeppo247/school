@@ -6,7 +6,7 @@
     "dev": "next dev --port 3000",
     "build": "NODE_ENV=production next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint src/"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.12.0",

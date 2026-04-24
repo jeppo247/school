@@ -74,7 +74,7 @@ adminRoutes.get("/setup", async (_req, res) => {
       CREATE TABLE IF NOT EXISTS parents (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         family_id UUID NOT NULL REFERENCES families(id) ON DELETE CASCADE,
-        clerk_user_id TEXT UNIQUE NOT NULL,
+        clerk_user_id TEXT UNIQUE,
         name TEXT NOT NULL,
         email TEXT NOT NULL,
         notification_prefs JSONB DEFAULT '{"daily_briefing": true, "nudges": true, "weekly_report": true}' NOT NULL,
@@ -97,11 +97,15 @@ adminRoutes.get("/setup", async (_req, res) => {
         current_streak INTEGER DEFAULT 0 NOT NULL,
         longest_streak INTEGER DEFAULT 0 NOT NULL,
         last_session_date DATE,
+        rewards_mode TEXT DEFAULT 'full' NOT NULL,
         diagnostic_completed BOOLEAN DEFAULT FALSE NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
         updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
       )
     `);
+
+    await db.execute(sql`ALTER TABLE parents ALTER COLUMN clerk_user_id DROP NOT NULL`);
+    await db.execute(sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS rewards_mode TEXT DEFAULT 'full' NOT NULL`);
 
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS skill_nodes (
@@ -313,6 +317,87 @@ adminRoutes.get("/setup", async (_req, res) => {
     `);
 
     await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS parent_nudges (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID NOT NULL REFERENCES students(id),
+        parent_id UUID NOT NULL REFERENCES parents(id),
+        session_id UUID REFERENCES learning_sessions(id),
+        nudge_type TEXT NOT NULL,
+        content TEXT NOT NULL,
+        was_sent BOOLEAN DEFAULT FALSE NOT NULL,
+        sent_at TIMESTAMPTZ,
+        was_read BOOLEAN DEFAULT FALSE NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS weekly_reports (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID NOT NULL REFERENCES students(id),
+        family_id UUID NOT NULL REFERENCES families(id),
+        report_week DATE NOT NULL,
+        content JSONB NOT NULL,
+        share_token TEXT UNIQUE,
+        pdf_url TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        UNIQUE(student_id, report_week)
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS misconception_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        skill_id UUID NOT NULL REFERENCES skill_nodes(id),
+        misconception_code TEXT NOT NULL,
+        item_id UUID REFERENCES questions(id),
+        session_id UUID REFERENCES learning_sessions(id),
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS writing_prompts (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        genre TEXT NOT NULL,
+        title TEXT NOT NULL,
+        prompt_text TEXT NOT NULL,
+        year_level_min INTEGER NOT NULL,
+        year_level_max INTEGER NOT NULL,
+        is_active BOOLEAN DEFAULT TRUE NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS writing_scores (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        attempt_id UUID NOT NULL REFERENCES question_responses(id) ON DELETE CASCADE,
+        criterion TEXT NOT NULL,
+        score INTEGER NOT NULL,
+        max_score INTEGER NOT NULL,
+        rater_type TEXT NOT NULL,
+        rater_id TEXT,
+        confidence REAL,
+        feedback TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS consent_records (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+        consent_type TEXT NOT NULL,
+        granted_by UUID NOT NULL REFERENCES parents(id),
+        granted_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        expires_at TIMESTAMPTZ,
+        revoked_at TIMESTAMPTZ
+      )
+    `);
+
+    await db.execute(sql`
       CREATE TABLE IF NOT EXISTS feedback (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         family_id UUID NOT NULL REFERENCES families(id),
@@ -325,6 +410,31 @@ adminRoutes.get("/setup", async (_req, res) => {
         responded_at TIMESTAMPTZ,
         created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
         updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS subscriptions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        family_id UUID NOT NULL REFERENCES families(id),
+        stripe_subscription_id TEXT UNIQUE,
+        tier TEXT DEFAULT 'free' NOT NULL,
+        status TEXT DEFAULT 'active' NOT NULL,
+        current_period_start TIMESTAMPTZ,
+        current_period_end TIMESTAMPTZ,
+        cancel_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+      )
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS waitlist (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        email TEXT NOT NULL,
+        name TEXT,
+        source TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
       )
     `);
 
