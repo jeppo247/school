@@ -1,827 +1,808 @@
-#!/usr/bin/env python3
+"""Upwise angel pitch deck builder — full redesign.
+
+Principles:
+- One idea per slide, strong hierarchy.
+- Hero headlines (28pt) sized to fit two-line max within fixed containers.
+- matplotlib charts where they earn their slot (Slides 3 and 7).
+- Coral used sparingly as an accent, never as background filler.
+- Generous whitespace, grid-aligned layouts.
 """
-Upwise Angel Pitch Deck Builder
-Builds a 13-slide presentation with clean design, speaker notes, and visual hierarchy.
-"""
+
+import os
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
 
 from pptx import Presentation
 from pptx.util import Inches, Pt
-from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.dml.color import RGBColor
-from datetime import datetime
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
+from pptx.enum.dml import MSO_LINE_DASH_STYLE
 
-# Color palette: clean, calm, confident
-DARK_NAVY = RGBColor(15, 23, 42)  # #0F172A
-OFF_WHITE = RGBColor(250, 250, 250)  # #FAFAFA
-WARM_CORAL = RGBColor(249, 97, 103)  # #F96167
-SLATE = RGBColor(71, 85, 105)  # #47556D
-LIGHT_BLUE = RGBColor(225, 238, 250)  # #E1EEFA
+# ───────────────────────── PALETTE ─────────────────────────
+NAVY         = RGBColor(0x0F, 0x17, 0x2A)
+OFFWHITE     = RGBColor(0xF8, 0xF9, 0xFA)
+WHITE        = RGBColor(0xFF, 0xFF, 0xFF)
+CORAL        = RGBColor(0xF9, 0x61, 0x67)
+LIGHT_CORAL  = RGBColor(0xFC, 0xA5, 0xAA)
+CORAL_TINT   = RGBColor(0xFF, 0xEE, 0xEE)
+SLATE        = RGBColor(0x47, 0x55, 0x6D)
+MID_SLATE    = RGBColor(0x64, 0x74, 0x8B)
+LIGHT_SLATE  = RGBColor(0x94, 0xA3, 0xB8)
+PALE_SLATE   = RGBColor(0xCB, 0xD5, 0xE1)
+LIGHT_GREY   = RGBColor(0xE5, 0xE7, 0xEB)
 
-def add_title_slide(prs, title, subtitle, footer_text):
-    """Add a cover slide."""
-    slide = prs.slides.add_slide(prs.slide_layouts[6])  # Blank layout
-    background = slide.background
-    fill = background.fill
-    fill.solid()
-    fill.fore_color.rgb = DARK_NAVY
+CORAL_HEX    = "#F96167"
+SLATE_HEX    = "#47556D"
+MID_SLATE_HEX = "#64748B"
+LIGHT_SLATE_HEX = "#94A3B8"
+OFFWHITE_HEX = "#F8F9FA"
 
-    # Title
-    title_box = slide.shapes.add_textbox(Inches(0.5), Inches(2.5), Inches(9), Inches(1.5))
-    title_frame = title_box.text_frame
-    title_frame.word_wrap = True
-    p = title_frame.paragraphs[0]
-    p.text = title
-    p.font.size = Pt(66)
-    p.font.bold = True
-    p.font.color.rgb = OFF_WHITE
+# ───────────────────────── FONTS ─────────────────────────
+FONT = "Inter"  # falls back to Arial/Calibri on host systems without Inter
 
-    # Subtitle
-    subtitle_box = slide.shapes.add_textbox(Inches(0.5), Inches(4.2), Inches(9), Inches(2))
-    subtitle_frame = subtitle_box.text_frame
-    subtitle_frame.word_wrap = True
-    p = subtitle_frame.paragraphs[0]
-    p.text = subtitle
-    p.font.size = Pt(28)
-    p.font.color.rgb = LIGHT_BLUE
-    p.line_spacing = 1.3
+# ───────────────────────── LAYOUT ─────────────────────────
+SLIDE_W = 13.333
+SLIDE_H = 7.5
+MARGIN_L = 0.7
+MARGIN_R = 0.7
+CONTENT_W = SLIDE_W - MARGIN_L - MARGIN_R  # 11.933"
 
-    # Footer
-    footer_box = slide.shapes.add_textbox(Inches(0.5), Inches(6.8), Inches(9), Inches(0.8))
-    footer_frame = footer_box.text_frame
-    p = footer_frame.paragraphs[0]
-    p.text = footer_text
-    p.font.size = Pt(12)
-    p.font.color.rgb = RGBColor(180, 190, 200)
+# ───────────────────────── PATHS ─────────────────────────
+ROOT = "/sessions/charming-funny-hypatia/mnt/school/deck"
+CHARTS = f"{ROOT}/charts"
+os.makedirs(CHARTS, exist_ok=True)
 
-    # Add speaker notes
-    notes = slide.notes_slide.notes_text_frame
-    notes.text = "Hi. I'm Jesse, founder of Upwise. In the next ten minutes I want to show you a business that I think is the clearest consumer opportunity in Australian education in a generation. Let's start with the problem every Australian parent already knows."
+# ───────────────────────── HELPERS ─────────────────────────
 
-def add_content_slide(prs, title, body_points, footer_stat=None, speaker_notes=""):
-    """Add a standard content slide with bullet points."""
-    slide = prs.slides.add_slide(prs.slide_layouts[6])  # Blank layout
-    background = slide.background
-    fill = background.fill
-    fill.solid()
-    fill.fore_color.rgb = OFF_WHITE
+def set_fill(shape, rgb):
+    shape.fill.solid()
+    shape.fill.fore_color.rgb = rgb
 
-    # Dark header bar
-    header_shape = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(0.8))
-    header_shape.fill.solid()
-    header_shape.fill.fore_color.rgb = DARK_NAVY
-    header_shape.line.color.rgb = DARK_NAVY
 
-    # Title in header: widen to 9" with 0.5" margins, reduce font to 24pt
-    title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.15), Inches(9), Inches(0.6))
-    title_frame = title_box.text_frame
-    title_frame.word_wrap = True
-    p = title_frame.paragraphs[0]
-    p.text = title
-    p.font.size = Pt(24)
-    p.font.bold = True
-    p.font.color.rgb = OFF_WHITE
+def no_line(shape):
+    shape.line.fill.background()
 
-    # Body content
-    body_box = slide.shapes.add_textbox(Inches(0.7), Inches(1.2), Inches(8.6), Inches(4.8))
-    text_frame = body_box.text_frame
-    text_frame.word_wrap = True
 
-    for i, point in enumerate(body_points):
-        if i == 0:
-            p = text_frame.paragraphs[0]
-        else:
-            p = text_frame.add_paragraph()
-        p.text = point
-        p.font.size = Pt(16)
-        p.font.color.rgb = SLATE
-        p.space_before = Pt(8)
-        p.space_after = Pt(12)
-        p.level = 0
-        p.line_spacing = 1.3
+def set_bg(slide, color):
+    slide.background.fill.solid()
+    slide.background.fill.fore_color.rgb = color
 
-    # Footer stat if provided
-    if footer_stat:
-        footer_box = slide.shapes.add_textbox(Inches(0.5), Inches(6.2), Inches(9), Inches(0.7))
-        footer_frame = footer_box.text_frame
-        p = footer_frame.paragraphs[0]
-        p.text = footer_stat
-        p.font.size = Pt(11)
-        p.font.italic = True
-        p.font.color.rgb = RGBColor(120, 130, 140)
 
-    # Speaker notes
-    if speaker_notes:
-        notes = slide.notes_slide.notes_text_frame
-        notes.text = speaker_notes
-
-def add_stat_slide(prs, title, main_stat, stat_label, supporting_points, speaker_notes=""):
-    """Add a slide with a large stat callout."""
-    slide = prs.slides.add_slide(prs.slide_layouts[6])
-    background = slide.background
-    fill = background.fill
-    fill.solid()
-    fill.fore_color.rgb = OFF_WHITE
-
-    # Header bar
-    header_shape = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(0.8))
-    header_shape.fill.solid()
-    header_shape.fill.fore_color.rgb = DARK_NAVY
-    header_shape.line.color.rgb = DARK_NAVY
-
-    # Title: widen text box to 9" to prevent wrapping, with 0.5" margins, reduce to 24pt
-    title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.15), Inches(9), Inches(0.6))
-    title_frame = title_box.text_frame
-    title_frame.word_wrap = True
-    p = title_frame.paragraphs[0]
-    p.text = title
-    p.font.size = Pt(24)
-    p.font.bold = True
-    p.font.color.rgb = OFF_WHITE
-
-    # Large stat box
-    stat_box = slide.shapes.add_textbox(Inches(1), Inches(1.3), Inches(3.5), Inches(2))
-    text_frame = stat_box.text_frame
-    text_frame.word_wrap = True
-    p = text_frame.paragraphs[0]
-    p.text = main_stat
-    p.font.size = Pt(60)
-    p.font.bold = True
-    p.font.color.rgb = WARM_CORAL
-
-    # Stat label
-    label_box = slide.shapes.add_textbox(Inches(1), Inches(3.2), Inches(3.5), Inches(0.6))
-    label_frame = label_box.text_frame
-    p = label_frame.paragraphs[0]
-    p.text = stat_label
-    p.font.size = Pt(13)
-    p.font.color.rgb = SLATE
-    p.font.bold = True
-
-    # Supporting points on right
-    support_box = slide.shapes.add_textbox(Inches(5), Inches(1.3), Inches(4.5), Inches(4.5))
-    support_frame = support_box.text_frame
-    support_frame.word_wrap = True
-
-    for i, point in enumerate(supporting_points):
-        if i == 0:
-            p = support_frame.paragraphs[0]
-        else:
-            p = support_frame.add_paragraph()
-        p.text = point
-        p.font.size = Pt(14)
-        p.font.color.rgb = SLATE
-        p.space_before = Pt(6)
-        p.space_after = Pt(10)
-        p.line_spacing = 1.2
-
-    if speaker_notes:
-        notes = slide.notes_slide.notes_text_frame
-        notes.text = speaker_notes
-
-def main():
-    # Create presentation
-    prs = Presentation()
-    prs.slide_width = Inches(10)
-    prs.slide_height = Inches(7.5)
-
-    # Slide 1: Cover
-    add_title_slide(
-        prs,
-        "Upwise",
-        "Strong foundations in maths and English — built session by session.",
-        f"Jesse [Last Name], Founder · {datetime.now().strftime('%B %Y')} · upwise.com.au"
+def add_rect(slide, left, top, width, height, *, fill=None, line_color=None, line_width=0.75, line_dash=None):
+    shape = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE,
+        Inches(left), Inches(top), Inches(width), Inches(height)
     )
+    if fill is not None:
+        set_fill(shape, fill)
+    else:
+        shape.fill.background()
+    if line_color is None:
+        no_line(shape)
+    else:
+        shape.line.color.rgb = line_color
+        shape.line.width = Pt(line_width)
+        if line_dash is not None:
+            shape.line.dash_style = line_dash
+    return shape
 
-    # Slide 2: The Problem — Now includes Victoria A$1.2B as a supporting point
-    add_stat_slide(
-        prs,
-        "The Problem: Kitchen Table",
-        "42%",
-        "of Australian schools teach with qualified teacher shortage",
-        [
-            "82% of primary teachers report their job damages their mental health",
-            "1 in 3 Year 3 students below literacy proficiency",
-            "Victoria's A$1.2B catch-up program 'did not significantly improve outcomes' — Auditor-General, 2024. The problem isn't money. It's the delivery model."
-        ],
-        "Imagine a parent sitting at the kitchen table. Their Year 3 child hands them a report card that says 'Developing — needs additional support.' They call the school. The teacher is managing 28 kids with one aide and has no time for intervention. This isn't hypothetical. 35% of Australian parents already pay for tutoring to close the gap. They're not buying ambition. They're buying reassurance that their child won't be left behind."
+
+def add_text(slide, left, top, width, height, text, *,
+             size=14, bold=False, italic=False, color=SLATE,
+             align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
+             line_spacing=1.15, font_name=FONT):
+    tb = slide.shapes.add_textbox(
+        Inches(left), Inches(top), Inches(width), Inches(height)
     )
+    tf = tb.text_frame
+    tf.word_wrap = True
+    tf.auto_size = MSO_AUTO_SIZE.NONE
+    for side in ("margin_left", "margin_right", "margin_top", "margin_bottom"):
+        setattr(tf, side, Inches(0))
+    tf.vertical_anchor = anchor
+    p = tf.paragraphs[0]
+    p.alignment = align
+    p.line_spacing = line_spacing
+    r = p.add_run()
+    r.text = text
+    r.font.name = font_name
+    r.font.size = Pt(size)
+    r.font.bold = bold
+    r.font.italic = italic
+    r.font.color.rgb = color
+    return tb
 
-    # Slide 3: The Market (was Slide 4)
-    add_content_slide(
-        prs,
-        "The Market: Parents Are Already Paying",
-        [
-            "A$2.2 billion tutoring market in Australia — nearly doubled in 5 years",
-            "35% of Australian parents pay for tutoring. 18% spend A$100–150 per week",
-            "Kumon: A$160/month per subject (A$3,840/year for Maths + English)",
-            "Cluey: A$45–70/hour for 1:1 online tutors",
-            "Upwise redirects this spend toward a model that actually scales"
-        ],
-        footer_stat="Note: This is money Australian parents are spending right now, today.",
-        speaker_notes="Note what this slide is not. It's not a hockey-stick forecast or a TAM calculation from a McKinsey report. It's the money Australian parents are spending right now, today, on supplemental learning that isn't built for them. Our job is redirection, not creation."
+
+def add_multi_text(slide, left, top, width, height, runs, *,
+                   align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
+                   line_spacing=1.2):
+    """runs = list of dicts: {text, size, bold, italic, color, newline (bool)}"""
+    tb = slide.shapes.add_textbox(
+        Inches(left), Inches(top), Inches(width), Inches(height)
     )
+    tf = tb.text_frame
+    tf.word_wrap = True
+    tf.auto_size = MSO_AUTO_SIZE.NONE
+    for side in ("margin_left", "margin_right", "margin_top", "margin_bottom"):
+        setattr(tf, side, Inches(0))
+    tf.vertical_anchor = anchor
 
-    # Slide 4: Why Now (was Slide 5)
-    add_content_slide(
-        prs,
-        "Why Now: Three Forces Converging",
-        [
-            "1. The science: Benjamin Bloom proved 1:1 mastery tutoring produces +2.0 standard deviations (98th percentile vs classroom average)",
-            "2. The economics: LLM inference costs collapsed 150–1000× in five years (A$60/M tokens → A$0.40–A$2.50)",
-            "3. The adoption: Parents normalised digital-first learning during lockdowns. Willingness to pay for purposeful screen education is at all-time highs",
-            "For 40 years, the 2-Sigma Problem was: we know it works, but can't afford it. That just changed."
-        ],
-        speaker_notes="Bloom's 2-Sigma Problem, 1984: one-on-one mastery tutoring produces outcomes that classroom teaching can't match. We've known this for forty years. We couldn't do anything about it because one tutor per child wasn't economical. That changed, quietly, in the last eighteen months."
+    first = True
+    current_p = tf.paragraphs[0]
+    current_p.alignment = align
+    current_p.line_spacing = line_spacing
+
+    for run in runs:
+        if run.get("newline") and not first:
+            current_p = tf.add_paragraph()
+            current_p.alignment = run.get("align", align)
+            current_p.line_spacing = run.get("line_spacing", line_spacing)
+            if run.get("space_before"):
+                current_p.space_before = Pt(run["space_before"])
+        r = current_p.add_run()
+        r.text = run["text"]
+        r.font.name = FONT
+        r.font.size = Pt(run.get("size", 14))
+        r.font.bold = run.get("bold", False)
+        r.font.italic = run.get("italic", False)
+        r.font.color.rgb = run.get("color", SLATE)
+        first = False
+    return tb
+
+
+def add_circle(slide, cx, cy, diameter, fill, *, text=None, text_color=WHITE, text_size=22, bold=True):
+    left = cx - diameter / 2
+    top = cy - diameter / 2
+    shape = slide.shapes.add_shape(
+        MSO_SHAPE.OVAL,
+        Inches(left), Inches(top), Inches(diameter), Inches(diameter)
     )
-
-    # Slide 5: What Upwise Does (was Slide 6)
-    add_content_slide(
-        prs,
-        "What Upwise Does",
-        [
-            "Diagnose: Adaptive assessment pinpoints exact learning gaps",
-            "Learn: 20 minutes a day. Questions stay in the 80% win-rate sweet spot — challenging enough to grow, easy enough to stay confident",
-            "Master: Skills only lock in after proven mastery. Spaced repetition holds learning in long-term memory",
-            "Scope: Maths, reading, writing, spelling, grammar. Prep–Year 6. ACARA-aligned.",
-            "Pricing: A$39/month single child · A$59/month family (up to 4 children)"
-        ],
-        speaker_notes="Twenty minutes a day. Adaptive. Mastery-based. The kid can't jump ahead until they've actually understood. Which means every session builds on solid ground — no accumulating gaps."
-    )
-
-    # Slide 6: Parent Layer (was Slide 7)
-    add_content_slide(
-        prs,
-        "The Parent Layer: Our Differentiator",
-        [
-            "Research shows AI tutoring works best paired with a human guide — up to 2 standard deviations above classroom average",
-            "Daily briefing before each session: what your child is working on, what to watch for",
-            "Real-time nudges when they get stuck — with exact wording you can use",
-            "Weekly reports clear enough to share with the classroom teacher",
-            "Every incumbent (Kumon, Mathletics, IXL, Reading Eggs) treats parents as data recipients. None as the guide. This is the empty quadrant — where the research is strongest."
-        ],
-        footer_stat="No teaching degree required.",
-        speaker_notes="This is the deliberate bet. We're not replacing parents. We're not replacing teachers. We're giving parents the one thing they've always lacked: a map. What to say when their child is stuck. What to reinforce at dinner. Where the real gap is. The research — Bloom, Kulik, RAND, the 2025 meta-analysis — consistently finds the strongest outcomes come from AI-plus-human, not AI-alone."
-    )
-
-    # Slide 7: The Evidence (was Slide 8)
-    add_content_slide(
-        prs,
-        "The Evidence: Four Decades, Four Studies",
-        [
-            "Bloom (1984): 1:1 mastery tutoring → +2.0 SD (98th percentile)",
-            "Kulik & Kulik (1990): Meta-analysis of 108 mastery learning studies → +0.4–0.64 SD",
-            "RAND / Carnegie (2014): Cognitive Tutor Algebra RCT → +0.43 SD improvement",
-            "Systematic Review (2025): 48 AI tutoring studies — consistent gains, strongest with human guide",
-            "Upwise is the first Australian operationalisation of forty years of validated learning science."
-        ],
-        footer_stat="This isn't experimental. It's proven. Four times over.",
-        speaker_notes="Our credibility isn't 'we built an AI.' Our credibility is a forty-year research lineage that four generations of learning scientists agree on. Upwise is the first Australian operationalisation of it."
-    )
-
-    # Slide 8: Competition (was Slide 9) — with visual 2x2 map
-    slide = prs.slides.add_slide(prs.slide_layouts[6])
-    background = slide.background
-    fill = background.fill
-    fill.solid()
-    fill.fore_color.rgb = OFF_WHITE
-
-    # Header bar
-    header_shape = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(0.8))
-    header_shape.fill.solid()
-    header_shape.fill.fore_color.rgb = DARK_NAVY
-    header_shape.line.color.rgb = DARK_NAVY
-
-    # Title
-    title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.15), Inches(8.5), Inches(0.6))
-    title_frame = title_box.text_frame
-    p = title_frame.paragraphs[0]
-    p.text = "Competition: The Empty Quadrant"
-    p.font.size = Pt(32)
-    p.font.bold = True
-    p.font.color.rgb = OFF_WHITE
-
-    # Draw 2x2 positioning map
-    # Map dimensions: 8" wide x 4.5" tall, centered horizontally
-    map_left = Inches(1)
-    map_top = Inches(1.2)
-    map_width = Inches(8)
-    map_height = Inches(4.5)
-
-    # Center of map for axis crossing
-    center_x = map_left + map_width / 2
-    center_y = map_top + map_height / 2
-
-    # Draw horizontal axis (X-axis: Breadth-first ← → Mastery-based)
-    h_axis = slide.shapes.add_connector(1, map_left, center_y, map_left + map_width, center_y)
-    h_axis.line.color.rgb = SLATE
-    h_axis.line.width = Pt(2)
-
-    # Draw vertical axis (Y-axis: Parent-invisible ↔ Parent-as-guide)
-    v_axis = slide.shapes.add_connector(1, center_x, map_top, center_x, map_top + map_height)
-    v_axis.line.color.rgb = SLATE
-    v_axis.line.width = Pt(2)
-
-    # Axis labels
-    # X-axis labels
-    x_left_label = slide.shapes.add_textbox(map_left, center_y + Inches(0.25), Inches(1.2), Inches(0.3))
-    x_left_frame = x_left_label.text_frame
-    p = x_left_frame.paragraphs[0]
-    p.text = "Breadth-first"
-    p.font.size = Pt(10)
-    p.font.color.rgb = SLATE
-    p.alignment = PP_ALIGN.CENTER
-
-    x_right_label = slide.shapes.add_textbox(map_left + map_width - Inches(1.2), center_y + Inches(0.25), Inches(1.2), Inches(0.3))
-    x_right_frame = x_right_label.text_frame
-    p = x_right_frame.paragraphs[0]
-    p.text = "Mastery-based"
-    p.font.size = Pt(10)
-    p.font.color.rgb = SLATE
-    p.alignment = PP_ALIGN.CENTER
-
-    # Y-axis labels
-    y_bottom_label = slide.shapes.add_textbox(center_x - Inches(0.8), map_top + map_height - Inches(0.25), Inches(1.6), Inches(0.25))
-    y_bottom_frame = y_bottom_label.text_frame
-    p = y_bottom_frame.paragraphs[0]
-    p.text = "Parent-invisible"
-    p.font.size = Pt(9)
-    p.font.color.rgb = SLATE
-    p.alignment = PP_ALIGN.CENTER
-
-    y_top_label = slide.shapes.add_textbox(center_x - Inches(0.8), map_top - Inches(0.3), Inches(1.6), Inches(0.25))
-    y_top_frame = y_top_label.text_frame
-    p = y_top_frame.paragraphs[0]
-    p.text = "Parent-as-guide"
-    p.font.size = Pt(9)
-    p.font.color.rgb = SLATE
-    p.alignment = PP_ALIGN.CENTER
-
-    # Position competitors in quadrants
-    # Bottom-left (breadth + parent-invisible)
-    bl_box = slide.shapes.add_textbox(map_left + Inches(0.3), center_y + Inches(0.6), Inches(2.8), Inches(1.2))
-    bl_frame = bl_box.text_frame
-    bl_frame.word_wrap = True
-    p = bl_frame.paragraphs[0]
-    p.text = "Kumon\nCluey\nMatrix\nKip McGrath\nKinetic Education"
-    p.font.size = Pt(9)
-    p.font.color.rgb = SLATE
-    p.line_spacing = 1.1
-
-    # Bottom-right (mastery + parent-invisible)
-    br_box = slide.shapes.add_textbox(center_x + Inches(0.5), center_y + Inches(0.6), Inches(2.8), Inches(1.2))
-    br_frame = br_box.text_frame
-    br_frame.word_wrap = True
-    p = br_frame.paragraphs[0]
-    p.text = "Mathspace\nReading Eggs\nMathletics\nProdigy\nMatific"
-    p.font.size = Pt(9)
-    p.font.color.rgb = SLATE
-    p.line_spacing = 1.1
-
-    # Top-left (breadth + parent-as-guide) — empty
-    tl_box = slide.shapes.add_textbox(map_left + Inches(0.3), map_top + Inches(0.3), Inches(2.8), Inches(1.2))
-    tl_frame = tl_box.text_frame
-    p = tl_frame.paragraphs[0]
-    p.text = "(empty)"
-    p.font.size = Pt(9)
-    p.font.color.rgb = RGBColor(180, 180, 180)
-    p.font.italic = True
-
-    # Top-right (mastery + parent-as-guide) — UPWISE, highlighted
-    # Add coral background rectangle behind "Upwise"
-    coral_bg = slide.shapes.add_shape(1, center_x + Inches(0.3), map_top + Inches(0.15), Inches(2.3), Inches(0.8))
-    coral_bg.fill.solid()
-    coral_bg.fill.fore_color.rgb = RGBColor(249, 97, 103)  # Warm coral
-    coral_bg.fill.transparency = 0.7  # Semi-transparent
-    coral_bg.line.color.rgb = WARM_CORAL
-    coral_bg.line.width = Pt(1.5)
-
-    tr_box = slide.shapes.add_textbox(center_x + Inches(0.4), map_top + Inches(0.25), Inches(2.1), Inches(0.6))
-    tr_frame = tr_box.text_frame
-    p = tr_frame.paragraphs[0]
-    p.text = "UPWISE"
-    p.font.size = Pt(14)
-    p.font.bold = True
-    p.font.color.rgb = OFF_WHITE  # Use off-white text for contrast on coral background
-    p.alignment = PP_ALIGN.CENTER
-
-    # Supporting callout stats below map
-    support_box = slide.shapes.add_textbox(Inches(0.7), Inches(6), Inches(8.6), Inches(0.8))
-    support_frame = support_box.text_frame
-    support_frame.word_wrap = True
-    p = support_frame.paragraphs[0]
-    p.text = "Cluey FY25 loss: A$5.5M  |  No Australian incumbent owns parent-as-guide mastery"
-    p.font.size = Pt(10)
-    p.font.italic = True
-    p.font.color.rgb = RGBColor(120, 130, 140)
-
-    notes = slide.notes_slide.notes_text_frame
-    notes.text = "Look at the quadrant Upwise sits in. Now look at how empty it is. Not because it's a bad quadrant — because no Australian incumbent has built for it. Cluey is losing money doing 1:1 human. Kumon is still running physical franchises in 2026. The IXLs and Mathletics of the world won't even look at you as a parent. That's our wedge."
-
-    # Slide 9: Business Model (was Slide 10)
-    add_content_slide(
-        prs,
-        "Business Model: Subscription, Software Margins",
-        [
-            "17,100 families at A$39/single + A$59/family blend = A$10M ARR",
-            "That's just 1.1% of Australia's 1.52M primary-aged households",
-            "Or 4.5% of the 380,000 households already paying for supplemental learning",
-            "Software gross margins: 75–80% (LLM inference cost continues to fall)",
-            "Comparable: 3P Learning (Mathletics) delivered A$110M global revenue on software. Mathspace bootstrapped profitable."
-        ],
-        footer_stat="17,000 families. In a country with 1.52M primary households, 380K already pay for tutoring.",
-        speaker_notes="17,000 families. In a country with 1.52 million primary-age households, of which 380,000 already pay for tutoring. This is not a moonshot. This is arithmetic."
-    )
-
-    # Slide 10: Safety & Trust (was Slide 11)
-    add_content_slide(
-        prs,
-        "Safety & Trust",
-        [
-            "Closed, curriculum-constrained system — no open chat, no ads, no third-party trackers",
-            "20-minute bounded sessions — less screen time than YouTube, designed to end on a win",
-            "Every session visible to the parent — mandatory, not optional",
-            "Australian-owned and operated. Data stays in Australia.",
-            "Designed to Australian eSafety Commissioner guidance",
-            "The parents most concerned about AI safety are the ones most willing to pay once convinced."
-        ],
-        speaker_notes="Every parent we've spoken to has the same question: is it safe? Is it just more screen time? Is it going to replace me as the parent? Our answer, on each: closed system, twenty minutes, parent-guided. Not a chatbot. Not an ad-driven app. Not a babysitter."
-    )
-
-    # Slide 11: Traction (placeholder with structured boxes) (was Slide 12)
-    slide = prs.slides.add_slide(prs.slide_layouts[6])
-    background = slide.background
-    fill = background.fill
-    fill.solid()
-    fill.fore_color.rgb = OFF_WHITE
-
-    # Header bar
-    header_shape = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(0.8))
-    header_shape.fill.solid()
-    header_shape.fill.fore_color.rgb = DARK_NAVY
-    header_shape.line.color.rgb = DARK_NAVY
-
-    # Title
-    title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.15), Inches(8.5), Inches(0.6))
-    title_frame = title_box.text_frame
-    p = title_frame.paragraphs[0]
-    p.text = "Traction"
-    p.font.size = Pt(32)
-    p.font.bold = True
-    p.font.color.rgb = OFF_WHITE
-
-    # Instruction text
-    instr_box = slide.shapes.add_textbox(Inches(0.7), Inches(0.95), Inches(8.6), Inches(0.3))
-    instr_frame = instr_box.text_frame
-    p = instr_frame.paragraphs[0]
-    p.text = "Replace with actual numbers before pitching. Angels reward precision over puffery."
-    p.font.size = Pt(10)
-    p.font.italic = True
-    p.font.color.rgb = RGBColor(120, 130, 140)
-
-    # 2x2 grid of dashed placeholder boxes
-    PLACEHOLDER_GRAY = RGBColor(208, 208, 208)
-    box_width = Inches(3.5)
-    box_height = Inches(2.2)
-    gap = Inches(0.4)
-    start_left = Inches(0.8)
-    start_top = Inches(1.5)
-
-    # Function to draw dashed-outline box (approximated with shapes)
-    def add_placeholder_box(slide, left, top, width, height, title, subtitle):
-        # Draw rectangle with dashed outline
-        rect = slide.shapes.add_shape(1, left, top, width, height)
-        rect.fill.background()
-        rect.line.color.rgb = PLACEHOLDER_GRAY
-        rect.line.width = Pt(2)
-        rect.line.dash_style = 3  # Dashed line
-
-        # Title text
-        title_box = slide.shapes.add_textbox(left + Inches(0.2), top + Inches(0.3), width - Inches(0.4), Inches(0.6))
-        title_frame = title_box.text_frame
-        title_frame.word_wrap = True
-        p = title_frame.paragraphs[0]
-        p.text = title
-        p.font.size = Pt(13)
-        p.font.italic = True
-        p.font.color.rgb = PLACEHOLDER_GRAY
-        p.font.bold = True
-
-        # Subtitle text
-        sub_box = slide.shapes.add_textbox(left + Inches(0.2), top + Inches(1.0), width - Inches(0.4), Inches(0.8))
-        sub_frame = sub_box.text_frame
-        sub_frame.word_wrap = True
-        p = sub_frame.paragraphs[0]
-        p.text = subtitle
-        p.font.size = Pt(10)
-        p.font.italic = True
-        p.font.color.rgb = RGBColor(180, 180, 180)
-
-    # Top-left: Waitlist count
-    add_placeholder_box(
-        slide,
-        start_left,
-        start_top,
-        box_width,
-        box_height,
-        "[Waitlist count]",
-        "[growth rate %/week]"
-    )
-
-    # Top-right: Acquisition signal
-    add_placeholder_box(
-        slide,
-        start_left + box_width + gap,
-        start_top,
-        box_width,
-        box_height,
-        "[Acquisition signal]",
-        "Organic or paid channel"
-    )
-
-    # Bottom-left: Beta signals
-    add_placeholder_box(
-        slide,
-        start_left,
-        start_top + box_height + gap,
-        box_width,
-        box_height,
-        "[User engagement]",
-        "Retention, session count, NPS"
-    )
-
-    # Bottom-right: LOIs / advocacy
-    add_placeholder_box(
-        slide,
-        start_left + box_width + gap,
-        start_top + box_height + gap,
-        box_width,
-        box_height,
-        "[School conversations]",
-        "LOIs, advisors, inbound press"
-    )
-
-    # Speaker notes
-    notes = slide.notes_slide.notes_text_frame
-    notes.text = "Founder to draft based on actual numbers. Include: waitlist size + growth rate, CAC / organic acquisition from waitlist campaigns, paid or organic channel tests, beta / early-user signals (session engagement, retention, parent NPS), LOIs, teacher/school conversations, advisor endorsements, press or inbound interest. Be honest — angels reward precision about early signals more than puffed-up vanity metrics."
-
-    # Slide 12: Team (placeholder with structured boxes) (was Slide 13)
-    slide = prs.slides.add_slide(prs.slide_layouts[6])
-    background = slide.background
-    fill = background.fill
-    fill.solid()
-    fill.fore_color.rgb = OFF_WHITE
-
-    # Header bar
-    header_shape = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(0.8))
-    header_shape.fill.solid()
-    header_shape.fill.fore_color.rgb = DARK_NAVY
-    header_shape.line.color.rgb = DARK_NAVY
-
-    # Title
-    title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.15), Inches(8.5), Inches(0.6))
-    title_frame = title_box.text_frame
-    p = title_frame.paragraphs[0]
-    p.text = "Team"
-    p.font.size = Pt(32)
-    p.font.bold = True
-    p.font.color.rgb = OFF_WHITE
-
-    # Instruction text
-    instr_box = slide.shapes.add_textbox(Inches(0.7), Inches(0.95), Inches(8.6), Inches(0.3))
-    instr_frame = instr_box.text_frame
-    p = instr_frame.paragraphs[0]
-    p.text = "Angels invest in people. Be specific about why you, why now, why this."
-    p.font.size = Pt(10)
-    p.font.italic = True
-    p.font.color.rgb = RGBColor(120, 130, 140)
-
-    # 3-column layout for team members
-    PLACEHOLDER_GRAY = RGBColor(208, 208, 208)
-    col_width = Inches(2.8)
-    col_height = Inches(3.5)
-    gap = Inches(0.35)
-    start_left = Inches(0.7)
-    start_top = Inches(1.5)
-
-    # Function to draw team member placeholder box
-    def add_team_box(slide, left, top, width, height, role_label, name_label, note=""):
-        # Draw rectangle with dashed outline
-        rect = slide.shapes.add_shape(1, left, top, width, height)
-        rect.fill.background()
-        rect.line.color.rgb = PLACEHOLDER_GRAY
-        rect.line.width = Pt(2)
-        rect.line.dash_style = 3  # Dashed line
-
-        # Headshot placeholder (simulate with a rectangle)
-        headshot = slide.shapes.add_shape(1, left + Inches(0.3), top + Inches(0.3), width - Inches(0.6), Inches(1.5))
-        headshot.fill.solid()
-        headshot.fill.fore_color.rgb = RGBColor(240, 240, 240)
-        headshot.line.color.rgb = PLACEHOLDER_GRAY
-        headshot.line.width = Pt(1)
-
-        headshot_label = slide.shapes.add_textbox(left + Inches(0.3), top + Inches(0.8), width - Inches(0.6), Inches(0.5))
-        headshot_frame = headshot_label.text_frame
-        headshot_frame.word_wrap = True
-        p = headshot_frame.paragraphs[0]
-        p.text = "[Headshot]"
-        p.font.size = Pt(9)
-        p.font.italic = True
-        p.font.color.rgb = RGBColor(180, 180, 180)
+    set_fill(shape, fill)
+    no_line(shape)
+    if text:
+        tf = shape.text_frame
+        for side in ("margin_left", "margin_right", "margin_top", "margin_bottom"):
+            setattr(tf, side, Inches(0))
+        tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+        p = tf.paragraphs[0]
         p.alignment = PP_ALIGN.CENTER
+        r = p.add_run()
+        r.text = text
+        r.font.name = FONT
+        r.font.bold = bold
+        r.font.size = Pt(text_size)
+        r.font.color.rgb = text_color
+    return shape
 
-        # Role and name
-        name_box = slide.shapes.add_textbox(left + Inches(0.2), top + Inches(1.95), width - Inches(0.4), Inches(1.0))
-        name_frame = name_box.text_frame
-        name_frame.word_wrap = True
-        p = name_frame.paragraphs[0]
-        p.text = role_label
-        p.font.size = Pt(10)
-        p.font.italic = True
-        p.font.color.rgb = PLACEHOLDER_GRAY
-        p.font.bold = True
 
-        p2 = name_frame.add_paragraph()
-        p2.text = name_label
-        p2.font.size = Pt(9)
-        p2.font.italic = True
-        p2.font.color.rgb = RGBColor(180, 180, 180)
-        p2.space_before = Pt(6)
+def add_line(slide, x1, y1, x2, y2, color=SLATE, width=1.0):
+    connector = slide.shapes.add_connector(
+        1,  # straight
+        Inches(x1), Inches(y1), Inches(x2), Inches(y2)
+    )
+    connector.line.color.rgb = color
+    connector.line.width = Pt(width)
+    return connector
 
-        # Optional note
+
+def add_notes(slide, notes):
+    slide.notes_slide.notes_text_frame.text = notes
+
+
+def add_headline(slide, text, *, size=28, top=0.55, height=1.3, color=NAVY, width=None):
+    """Standardised headline block. Fixed-size container; word wraps to 2 lines max."""
+    if width is None:
+        width = CONTENT_W
+    return add_text(
+        slide, MARGIN_L, top, width, height, text,
+        size=size, bold=True, color=color, line_spacing=1.1
+    )
+
+
+def add_subhead(slide, text, *, top=1.65, size=17, color=MID_SLATE, italic=False, width=None):
+    if width is None:
+        width = CONTENT_W
+    return add_text(
+        slide, MARGIN_L, top, width, 0.5, text,
+        size=size, italic=italic, color=color
+    )
+
+
+# ───────────────────────── MATPLOTLIB CHART RENDERERS ─────────────────────────
+
+def style_axes(ax):
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+    for spine in ("left", "bottom"):
+        ax.spines[spine].set_color(LIGHT_SLATE_HEX)
+        ax.spines[spine].set_linewidth(0.8)
+    ax.tick_params(colors=SLATE_HEX, labelsize=12)
+
+
+def render_market_chart(path):
+    rcParams["font.family"] = "sans-serif"
+    rcParams["font.sans-serif"] = ["Inter", "Arial", "Helvetica", "DejaVu Sans"]
+
+    labels = ["Kumon (2 subjects)", "Cluey (weekly tutoring)", "Upwise family (up to 4 kids)",
+              "Mathletics", "Reading Eggs"]
+    values = [3840, 2500, 708, 170, 110]
+    colors = [MID_SLATE_HEX, MID_SLATE_HEX, CORAL_HEX, MID_SLATE_HEX, MID_SLATE_HEX]
+
+    fig, ax = plt.subplots(figsize=(11.5, 3.6), dpi=180)
+    fig.patch.set_facecolor(OFFWHITE_HEX)
+    ax.set_facecolor(OFFWHITE_HEX)
+
+    bars = ax.barh(labels[::-1], values[::-1], color=colors[::-1], height=0.6, zorder=3)
+    ax.invert_yaxis()
+    ax.grid(axis="x", color="#DDE0E6", linewidth=0.6, zorder=0)
+
+    for bar, v in zip(bars, values[::-1]):
+        ax.text(
+            v + max(values) * 0.015, bar.get_y() + bar.get_height() / 2,
+            f"A${v:,}",
+            va="center", ha="left",
+            fontsize=14, fontweight="bold",
+            color=CORAL_HEX if v == 708 else SLATE_HEX
+        )
+
+    ax.set_xlabel("Annual cost per family (A$)", fontsize=12, color=SLATE_HEX, labelpad=8)
+    ax.tick_params(axis="y", labelsize=13, colors=SLATE_HEX)
+    ax.tick_params(axis="x", labelsize=11, colors=MID_SLATE_HEX)
+    style_axes(ax)
+    ax.set_xlim(0, 4400)
+
+    plt.tight_layout()
+    plt.savefig(path, dpi=180, bbox_inches="tight", facecolor=OFFWHITE_HEX)
+    plt.close(fig)
+
+
+def render_evidence_chart(path):
+    rcParams["font.family"] = "sans-serif"
+    rcParams["font.sans-serif"] = ["Inter", "Arial", "Helvetica", "DejaVu Sans"]
+
+    labels = ["Bloom\n(1984)", "Kulik & Kulik\n(1990)", "RAND / Carnegie\n(2014)", "AI Tutoring Review\n(2025)"]
+    values = [2.00, 0.52, 0.43, 0.65]
+    colors = [CORAL_HEX, MID_SLATE_HEX, MID_SLATE_HEX, MID_SLATE_HEX]
+
+    fig, ax = plt.subplots(figsize=(11.5, 4.2), dpi=180)
+    fig.patch.set_facecolor(OFFWHITE_HEX)
+    ax.set_facecolor(OFFWHITE_HEX)
+
+    bars = ax.bar(labels, values, color=colors, width=0.55, zorder=3)
+    ax.grid(axis="y", color="#DDE0E6", linewidth=0.6, zorder=0)
+
+    for bar, v in zip(bars, values):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2, v + 0.06,
+            f"+{v:.2f} SD",
+            ha="center", va="bottom",
+            fontsize=14, fontweight="bold",
+            color=CORAL_HEX if v == 2.0 else SLATE_HEX
+        )
+
+    ax.set_ylabel("Effect size (standard deviations)", fontsize=12, color=SLATE_HEX, labelpad=10)
+    ax.tick_params(axis="x", labelsize=12, colors=SLATE_HEX)
+    ax.tick_params(axis="y", labelsize=11, colors=MID_SLATE_HEX)
+    style_axes(ax)
+    ax.set_ylim(0, 2.4)
+
+    plt.tight_layout()
+    plt.savefig(path, dpi=180, bbox_inches="tight", facecolor=OFFWHITE_HEX)
+    plt.close(fig)
+
+
+# ───────────────────────── MAIN ─────────────────────────
+
+def build_presentation():
+    prs = Presentation()
+    prs.slide_width = Inches(SLIDE_W)
+    prs.slide_height = Inches(SLIDE_H)
+    blank = prs.slide_layouts[6]
+
+    market_chart = f"{CHARTS}/market-chart.png"
+    evidence_chart = f"{CHARTS}/evidence-chart.png"
+    render_market_chart(market_chart)
+    render_evidence_chart(evidence_chart)
+
+    # ───── Slide 1 — Cover ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, NAVY)
+    add_text(s, 0.9, 2.9, 11.5, 1.4, "Upwise",
+             size=84, bold=True, color=WHITE, line_spacing=1.0)
+    add_rect(s, 0.95, 4.35, 1.3, 0.06, fill=CORAL)
+    add_text(s, 0.9, 4.55, 11.5, 0.7,
+             "Strong foundations in maths and English — built session by session.",
+             size=22, color=PALE_SLATE)
+    add_text(s, 0.9, 6.8, 11.5, 0.3,
+             "Jesse, Founder · April 2026 · upwise.com.au",
+             size=12, color=LIGHT_SLATE)
+    add_notes(s, "Hi. I'm Jesse, founder of Upwise. In the next ten minutes I want to show you a business that I think is the clearest consumer opportunity in Australian education in a generation. Let's start with the problem every Australian parent already knows.")
+
+    # ───── Slide 2 — The Problem ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "In a class of 28, your child doesn't stand a chance of being seen.",
+                 size=26, top=0.55, height=1.5)
+
+    card_top = 2.5
+    card_h = 2.6
+    gap = 0.3
+    card_w = (CONTENT_W - 2 * gap) / 3
+
+    stats = [
+        ("42%", "of Australian schools teach with a qualified teacher shortage — up from 14% in 2018.", CORAL),
+        ("82%", "of primary teachers say their job damages their mental health.", SLATE),
+        ("1 in 3", "Year 3 students sit below literacy proficiency.", SLATE),
+    ]
+    for i, (number, label, num_color) in enumerate(stats):
+        left = MARGIN_L + i * (card_w + gap)
+        add_rect(s, left, card_top, card_w, card_h, fill=WHITE)
+        add_text(s, left + 0.25, card_top + 0.25, card_w - 0.5, 1.2, number,
+                 size=60, bold=True, color=num_color, align=PP_ALIGN.LEFT, line_spacing=1.0)
+        add_text(s, left + 0.25, card_top + 1.55, card_w - 0.5, card_h - 1.6, label,
+                 size=13, color=SLATE, line_spacing=1.35)
+
+    band_top = 5.55
+    band_h = 1.3
+    add_rect(s, MARGIN_L, band_top, CONTENT_W, band_h, fill=CORAL_TINT)
+    add_rect(s, MARGIN_L, band_top, 0.08, band_h, fill=CORAL)
+    add_multi_text(
+        s, MARGIN_L + 0.35, band_top + 0.2, CONTENT_W - 0.7, band_h - 0.3,
+        [
+            {"text": "Even Victoria's A$1.2 billion catch-up tutoring program ", "size": 14, "color": SLATE},
+            {"text": "\"did not significantly improve outcomes\"", "size": 14, "color": SLATE, "italic": True},
+            {"text": " — Victorian Auditor-General, 2024.", "size": 14, "color": SLATE},
+            {"text": "The problem isn't money. It's the delivery model.", "size": 16, "bold": True, "color": NAVY, "newline": True, "space_before": 6},
+        ]
+    )
+    add_notes(s, "Imagine a parent sitting at the kitchen table. Their Year 3 child hands them a report card that says 'Developing — needs additional support.' They call the school. The teacher is managing 28 kids with one aide and has no time for intervention. 35% of Australian parents already pay for tutoring to close the gap. They're not buying ambition — they're buying reassurance that their child won't be left behind. And when the government itself tried to fix it with a billion-dollar catch-up program, it didn't move the needle. The problem isn't money. It's the delivery model.")
+
+    # ───── Slide 3 — The Market ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "A$2.2 billion is already leaving Australian parents' wallets.",
+                 size=26, top=0.55, height=1.2)
+    add_subhead(s, "Annual cost per family across Australian supplemental learning:",
+                top=1.75, size=15, color=MID_SLATE)
+
+    s.shapes.add_picture(
+        f"{CHARTS}/market-chart.png",
+        Inches(MARGIN_L), Inches(2.4),
+        width=Inches(CONTENT_W)
+    )
+
+    add_text(s, MARGIN_L, 6.55, CONTENT_W, 0.4,
+             "35% of Australian parents already pay for tutoring. 18% spend A$100–150 per week.",
+             size=14, bold=True, color=SLATE, align=PP_ALIGN.LEFT)
+    add_text(s, MARGIN_L, 6.95, CONTENT_W, 0.3,
+             "Our job is redirection, not creation.",
+             size=13, italic=True, color=MID_SLATE, align=PP_ALIGN.LEFT)
+    add_notes(s, "Note what this slide is not. It's not a hockey-stick forecast or a TAM calculation from a McKinsey report. It's the money Australian parents are spending right now, today, on supplemental learning that isn't built for them. Kumon is nearly five times our family plan. Cluey is three times. Our job is redirection, not creation.")
+
+    # ───── Slide 4 — Why Now ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "The 2-sigma solution, finally economical.",
+                 size=30, top=0.55, height=1.0)
+    add_subhead(s, "Three forces converging, for the first time in history.",
+                top=1.55, size=16, italic=True)
+
+    col_top = 2.7
+    col_gap = 0.35
+    col_w = (CONTENT_W - 2 * col_gap) / 3
+
+    forces = [
+        ("1", "The science is 40 years old.",
+         "Benjamin Bloom (1984) proved 1:1 mastery tutoring produces +2.0 standard deviations of improvement — the 98th percentile of classroom-taught peers."),
+        ("2", "The economics just flipped.",
+         "LLM inference costs fell 150–1000× in five years. Personalised adaptive tutoring just became viable at a consumer subscription price."),
+        ("3", "Parents are ready.",
+         "Post-COVID, Australian parents normalised digital-first learning for their children — and are actively looking for tools that work."),
+    ]
+    for i, (num, title, desc) in enumerate(forces):
+        left = MARGIN_L + i * (col_w + col_gap)
+        circle_d = 0.8
+        add_circle(s, left + circle_d / 2, col_top + circle_d / 2, circle_d,
+                   CORAL, text=num, text_size=28, text_color=WHITE)
+        add_text(s, left, col_top + 1.05, col_w, 0.7, title,
+                 size=18, bold=True, color=NAVY, line_spacing=1.15)
+        add_text(s, left, col_top + 1.85, col_w, 2.4, desc,
+                 size=13, color=SLATE, line_spacing=1.4)
+
+    add_text(s, MARGIN_L, 6.6, CONTENT_W, 0.5,
+             "What Bloom called the \"2-sigma problem\" — the known solution that couldn't scale — is no longer a problem.",
+             size=13, italic=True, color=MID_SLATE, line_spacing=1.3)
+    add_notes(s, "Bloom's 2-Sigma Problem, 1984: one-on-one mastery tutoring produces outcomes classroom teaching can't match. We've known this for forty years. We couldn't do anything about it because one tutor per child wasn't economical. That changed, quietly, in the last eighteen months.")
+
+    # ───── Slide 5 — What Upwise Does ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "A mastery-based learning coach for every Australian child.",
+                 size=26, top=0.55, height=1.2)
+    add_subhead(s, "For the price of a family streaming subscription.",
+                top=1.8, size=17, italic=True)
+
+    flow_top = 3.1
+    circle_d = 1.0
+    steps = [
+        ("1", "Diagnose", "A short adaptive assessment pinpoints exactly where the gaps are."),
+        ("2", "Learn", "20-minute daily sessions adapt in real time — questions stay in the 80% win-rate zone."),
+        ("3", "Master", "Skills only lock in after proven mastery across multiple sessions. Spaced repetition holds them."),
+    ]
+    step_w = 3.3
+    total_flow_w = 3 * step_w + 2 * 1.0
+    flow_start = (SLIDE_W - total_flow_w) / 2
+
+    for i, (num, title, desc) in enumerate(steps):
+        left = flow_start + i * (step_w + 1.0)
+        cx = left + step_w / 2
+        add_circle(s, cx, flow_top + circle_d / 2, circle_d,
+                   CORAL, text=num, text_size=36, text_color=WHITE)
+        add_text(s, left, flow_top + circle_d + 0.2, step_w, 0.5, title,
+                 size=22, bold=True, color=NAVY, align=PP_ALIGN.CENTER, line_spacing=1.1)
+        add_text(s, left, flow_top + circle_d + 0.8, step_w, 1.6, desc,
+                 size=13, color=SLATE, align=PP_ALIGN.CENTER, line_spacing=1.4)
+
+    for i in range(2):
+        x1 = flow_start + (i + 1) * step_w + i * 1.0
+        x2 = x1 + 1.0
+        cy = flow_top + circle_d / 2
+        add_line(s, x1 + 0.05, cy, x2 - 0.05, cy, color=LIGHT_SLATE, width=1.8)
+
+    strip_top = 6.4
+    strip_h = 0.75
+    add_rect(s, MARGIN_L, strip_top, CONTENT_W, strip_h, fill=NAVY)
+    add_text(s, MARGIN_L, strip_top, CONTENT_W, strip_h,
+             "Free 7-day trial  ·  A$39/mo single child  ·  A$59/mo family (up to 4 kids)  ·  ACARA-aligned",
+             size=14, bold=True, color=WHITE,
+             align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    add_notes(s, "Twenty minutes a day. Adaptive. Mastery-based. The kid can't jump ahead until they've actually understood. Which means every session builds on solid ground — no accumulating gaps. Free trial, then a subscription that costs less than a week of tutoring.")
+
+    # ───── Slide 6 — The Parent Layer ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "The parent is the guide. We give them the map.",
+                 size=30, top=0.55, height=1.0)
+    add_subhead(s, "Research consistently shows AI tutoring works best when paired with a human guide.",
+                top=1.6, size=15, italic=True)
+
+    left_w = 6.8
+    bullet_top = 2.7
+    bullets = [
+        ("Daily briefing", "Before each session — what your child's working on, what to watch for."),
+        ("Real-time nudges", "When they get stuck — with the exact wording you can use."),
+        ("Weekly reports", "Clear enough to share with their classroom teacher."),
+        ("Conversation scripts", "What to say at dinner to reinforce what they just learned."),
+    ]
+    for i, (title, desc) in enumerate(bullets):
+        row_top = bullet_top + i * 0.88
+        add_rect(s, MARGIN_L, row_top + 0.15, 0.14, 0.14, fill=CORAL)
+        add_multi_text(
+            s, MARGIN_L + 0.35, row_top, left_w - 0.35, 0.8,
+            [
+                {"text": title, "size": 16, "bold": True, "color": NAVY},
+                {"text": "  —  ", "size": 14, "color": LIGHT_SLATE},
+                {"text": desc, "size": 14, "color": SLATE},
+            ],
+            line_spacing=1.35
+        )
+
+    quote_left = MARGIN_L + left_w + 0.4
+    quote_w = CONTENT_W - left_w - 0.4
+    quote_top = 2.7
+    quote_h = 3.8
+    add_rect(s, quote_left, quote_top, quote_w, quote_h, fill=NAVY)
+    add_rect(s, quote_left, quote_top, quote_w, 0.12, fill=CORAL)
+    add_text(s, quote_left + 0.4, quote_top + 0.6, quote_w - 0.8, 2.0,
+             "\"No teaching degree required.\"",
+             size=26, bold=True, color=WHITE, line_spacing=1.2)
+    add_text(s, quote_left + 0.4, quote_top + 2.5, quote_w - 0.8, 1.2,
+             "Every parent gets the tools. No extra hours. No curriculum expertise needed.",
+             size=13, italic=True, color=PALE_SLATE, line_spacing=1.4)
+
+    add_notes(s, "This is the deliberate bet. We're not replacing parents. We're not replacing teachers. We're giving parents the one thing they've always lacked — a map. What to say when their child is stuck. What to reinforce at dinner. Where the real gap is.")
+
+    # ───── Slide 7 — The Evidence ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "This isn't experimental. It's proven. Four times over.",
+                 size=26, top=0.55, height=1.0)
+
+    s.shapes.add_picture(
+        f"{CHARTS}/evidence-chart.png",
+        Inches(MARGIN_L), Inches(1.9),
+        width=Inches(CONTENT_W)
+    )
+
+    add_text(s, MARGIN_L, 6.3, CONTENT_W, 0.45,
+             "Upwise is the first Australian operationalisation of 40 years of validated learning science.",
+             size=15, bold=True, color=NAVY, line_spacing=1.3)
+    add_text(s, MARGIN_L, 6.82, CONTENT_W, 0.35,
+             "Sources: Bloom (1984) · Kulik & Kulik (1990) · Pane et al. / RAND (2014) · 2025 AI tutoring systematic review (48 studies).",
+             size=11, italic=True, color=MID_SLATE, line_spacing=1.3)
+    add_notes(s, "Our credibility isn't 'we built an AI.' It's a forty-year research lineage that four generations of learning scientists agree on. Bloom proved the 2-sigma effect in 1984. Kulik and Kulik meta-analysed it in 1990. RAND validated computer-based mastery in 2014. A 2025 systematic review of 48 AI tutoring studies confirms the strongest gains come when AI is paired with a human guide. Upwise is the first Australian operationalisation of that stack.")
+
+    # ───── Slide 8 — Competition: The Empty Quadrant ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "No Australian product owns mastery + parent-as-guide.",
+                 size=26, top=0.55, height=1.0)
+
+    map_left = 1.8
+    map_top = 2.1
+    map_w = 9.7
+    map_h = 4.2
+    cx = map_left + map_w / 2
+    cy = map_top + map_h / 2
+    # Vertical axis — stops before the label area below
+    add_line(s, cx, map_top - 0.1, cx, map_top + map_h, color=SLATE, width=1.5)
+    add_line(s, map_left - 0.1, cy, map_left + map_w + 0.1, cy, color=SLATE, width=1.5)
+
+    add_text(s, cx - 1.5, map_top - 0.45, 3.0, 0.3, "Parent-as-guide",
+             size=12, bold=True, color=MID_SLATE, align=PP_ALIGN.CENTER)
+    add_text(s, cx - 1.5, map_top + map_h + 0.18, 3.0, 0.3, "Parent-invisible",
+             size=12, bold=True, color=MID_SLATE, align=PP_ALIGN.CENTER)
+    add_text(s, map_left - 0.5, cy + 0.15, 2.5, 0.3, "Breadth-first",
+             size=12, bold=True, color=MID_SLATE, align=PP_ALIGN.LEFT)
+    add_text(s, map_left + map_w - 2.0, cy + 0.15, 2.5, 0.3, "Mastery-based",
+             size=12, bold=True, color=MID_SLATE, align=PP_ALIGN.RIGHT)
+
+    add_text(s, map_left + 0.4, map_top + 0.3, map_w / 2 - 0.5, 0.4,
+             "(empty)", size=13, italic=True, color=LIGHT_SLATE)
+
+    up_w = 3.0
+    up_h = 1.0
+    up_left = cx + (map_w / 2 - up_w) / 2
+    up_top = map_top + 0.4
+    add_rect(s, up_left, up_top, up_w, up_h, fill=CORAL)
+    add_text(s, up_left, up_top, up_w, up_h, "UPWISE",
+             size=22, bold=True, color=WHITE, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+
+    bl_names = ["Cluey", "Kumon", "Kip McGrath", "Matrix", "Kinetic Education"]
+    for i, name in enumerate(bl_names):
+        add_text(s, map_left + 0.4, cy + 0.35 + i * 0.35, 3.0, 0.3, name,
+                 size=13, color=SLATE)
+
+    br_names = ["Mathspace", "Reading Eggs", "Mathletics", "Prodigy", "Matific"]
+    for i, name in enumerate(br_names):
+        add_text(s, cx + 0.4, cy + 0.35 + i * 0.35, 3.0, 0.3, name,
+                 size=13, color=SLATE)
+
+    add_text(s, MARGIN_L, 6.75, CONTENT_W, 0.35,
+             "Cluey FY25: revenue down 15% to A$25.6M, net loss A$5.5M  ·  Kumon: A$3,840/yr per child for maths + English",
+             size=12, italic=True, color=MID_SLATE, align=PP_ALIGN.CENTER)
+    add_notes(s, "Look at the quadrant Upwise sits in. Empty. Not because it's a bad quadrant — because no Australian incumbent has built for it. Cluey is losing money doing 1:1 human tutoring. Kumon is still running physical franchises in 2026. The IXLs and Mathletics of the world won't even look at you as a parent. That's our wedge.")
+
+    # ───── Slide 9 — Business Model ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "17,000 families = A$10M ARR.",
+                 size=34, top=0.55, height=0.9)
+    add_subhead(s, "Not a moonshot. Arithmetic.",
+                top=1.55, size=17, italic=True)
+
+    hero_left = MARGIN_L
+    hero_top = 2.5
+    add_text(s, hero_left, hero_top, 5.0, 2.2, "1.1%",
+             size=128, bold=True, color=CORAL, align=PP_ALIGN.LEFT, line_spacing=1.0)
+    add_text(s, hero_left, hero_top + 2.4, 5.2, 0.7,
+             "of Australia's 1.52 million primary-aged households.",
+             size=15, color=SLATE, line_spacing=1.35)
+    add_text(s, hero_left, hero_top + 3.15, 5.2, 0.5,
+             "Or 4.5% of the 380,000 already paying for supplemental learning.",
+             size=13, italic=True, color=MID_SLATE, line_spacing=1.35)
+
+    right_left = MARGIN_L + 5.5
+    right_w = CONTENT_W - 5.5
+    add_text(s, right_left, 2.5, right_w, 0.35, "PATH TO A$10M ARR",
+             size=11, bold=True, color=CORAL)
+    rows = [
+        ("~17,100 active families", "at A$39–59/mo blend"),
+        ("Software gross margin", "75–80% (LLM cost falling)"),
+        ("Avg customer lifetime", "~18 months (assumption)"),
+    ]
+    for i, (a, b) in enumerate(rows):
+        row_top = 2.95 + i * 0.55
+        add_text(s, right_left, row_top, right_w * 0.55, 0.4, a,
+                 size=14, bold=True, color=NAVY)
+        add_text(s, right_left + right_w * 0.55, row_top, right_w * 0.45, 0.4, b,
+                 size=13, color=MID_SLATE)
+
+    add_text(s, right_left, 4.9, right_w, 0.35, "AU COMPARABLES",
+             size=11, bold=True, color=CORAL)
+    comps = [
+        ("3P Learning (Mathletics):", "A$110M rev, software margins ✓", SLATE),
+        ("Mathspace:", "profitable, bootstrapped ✓", SLATE),
+        ("Cluey (1:1 human):", "A$25.6M rev, A$5.5M loss ✗", CORAL),
+    ]
+    for i, (a, b, color) in enumerate(comps):
+        row_top = 5.35 + i * 0.42
+        add_text(s, right_left, row_top, right_w * 0.45, 0.35, a,
+                 size=12, bold=True, color=NAVY)
+        add_text(s, right_left + right_w * 0.45, row_top, right_w * 0.55, 0.35, b,
+                 size=12, color=color)
+
+    add_text(s, MARGIN_L, 6.85, CONTENT_W, 0.4,
+             "Cluey's loss isn't evidence AU edtech is broken. It's evidence that 1:1 human tutoring is.",
+             size=13, italic=True, color=MID_SLATE, align=PP_ALIGN.CENTER)
+    add_notes(s, "17,000 families. In a country with 1.52 million primary-age households, of which 380,000 already pay for tutoring. This is not a moonshot. This is arithmetic. And the unit economics work because we're software, not labour. Cluey's story is the proof — their A$5.5M loss isn't evidence AU edtech is broken. It's evidence that 1:1 human tutoring is.")
+
+    # ───── Slide 10 — Safety & Trust ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "Safe AI. Australian-built. Parent-visible.",
+                 size=30, top=0.55, height=1.0)
+    add_subhead(s, "Every parent's first question about AI, answered in the product itself.",
+                top=1.6, size=15, italic=True)
+
+    cards_top = 2.8
+    cards_h = 3.2
+    gap = 0.15
+    card_w = (CONTENT_W - 4 * gap) / 5
+
+    cards = [
+        ("Closed system", "No open chat. No user content. Curriculum-constrained."),
+        ("20 min bounded", "Less screen time than YouTube. Designed to end on a win."),
+        ("Parent-visible", "Every session observable. Nothing hidden."),
+        ("Australian-owned", "AU data, AU servers. Techne AI Pty Ltd."),
+        ("eSafety-aligned", "Designed to Australian eSafety Commissioner guidance."),
+    ]
+    for i, (title, desc) in enumerate(cards):
+        left = MARGIN_L + i * (card_w + gap)
+        add_rect(s, left, cards_top, card_w, cards_h, fill=WHITE)
+        add_rect(s, left, cards_top, card_w, 0.12, fill=CORAL)
+        add_text(s, left + 0.25, cards_top + 0.45, card_w - 0.5, 0.7, title,
+                 size=15, bold=True, color=NAVY, line_spacing=1.2)
+        add_text(s, left + 0.25, cards_top + 1.3, card_w - 0.5, cards_h - 1.4, desc,
+                 size=12, color=SLATE, line_spacing=1.4)
+
+    add_text(s, MARGIN_L, 6.5, CONTENT_W, 0.4,
+             "No ads. No third-party tracking. No data sharing. Ever.",
+             size=14, bold=True, color=CORAL, align=PP_ALIGN.CENTER)
+    add_notes(s, "Every parent we speak to has the same question: is it safe? Is it just more screen time? Is it going to replace me as the parent? Our answer, on each: closed system, twenty minutes, parent-guided. Not a chatbot. Not an ad-driven app. Not a babysitter.")
+
+    # ───── Slide 11 — Traction (placeholder) ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "Traction.", size=34, top=0.55, height=1.0)
+    add_text(s, MARGIN_L, 1.7, CONTENT_W, 0.4,
+             "Replace with actual numbers before pitching. Angels reward precision over puffery.",
+             size=14, italic=True, color=MID_SLATE)
+
+    grid_top = 2.5
+    grid_h = 3.8
+    grid_gap = 0.3
+    cell_w = (CONTENT_W - grid_gap) / 2
+    cell_h = (grid_h - grid_gap) / 2
+
+    tiles = [
+        ("Waitlist count",  "Growth rate per week"),
+        ("Acquisition signal", "Organic or paid channel"),
+        ("User engagement", "Retention, session count, NPS"),
+        ("School / advisor interest", "LOIs, advisors, inbound press"),
+    ]
+    for i, (title, sub) in enumerate(tiles):
+        row = i // 2
+        col = i % 2
+        left = MARGIN_L + col * (cell_w + grid_gap)
+        top = grid_top + row * (cell_h + grid_gap)
+        add_rect(s, left, top, cell_w, cell_h,
+                 line_color=PALE_SLATE, line_width=1.5, line_dash=MSO_LINE_DASH_STYLE.DASH)
+        add_text(s, left + 0.3, top + 0.4, cell_w - 0.6, 0.6, f"[{title}]",
+                 size=20, bold=True, italic=True, color=LIGHT_SLATE)
+        add_text(s, left + 0.3, top + 1.1, cell_w - 0.6, 0.5, sub,
+                 size=13, italic=True, color=LIGHT_SLATE)
+
+    add_notes(s, "Founder to draft based on actual numbers. Be honest — angels reward precision about early signals more than they reward puffed-up vanity metrics.")
+
+    # ───── Slide 12 — Team (placeholder) ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, OFFWHITE)
+    add_headline(s, "Team.", size=34, top=0.55, height=1.0)
+    add_text(s, MARGIN_L, 1.7, CONTENT_W, 0.4,
+             "Angels invest in people. Be specific about why you, why now, why this.",
+             size=14, italic=True, color=MID_SLATE)
+
+    col_top = 2.5
+    col_h = 4.0
+    col_gap = 0.4
+    col_w = (CONTENT_W - 2 * col_gap) / 3
+
+    cols = [
+        ("Founder", "[Name + 1-line credential]", ""),
+        ("Co-founder / Key hire", "[Name + credential]", "optional"),
+        ("Advisors", "[Names + committed angels]", ""),
+    ]
+    for i, (role, name, note) in enumerate(cols):
+        left = MARGIN_L + i * (col_w + col_gap)
+        add_rect(s, left, col_top, col_w, col_h,
+                 line_color=PALE_SLATE, line_width=1.5, line_dash=MSO_LINE_DASH_STYLE.DASH)
+        add_rect(s, left + 0.4, col_top + 0.35, col_w - 0.8, 1.9,
+                 fill=LIGHT_GREY)
+        add_text(s, left + 0.4, col_top + 0.35, col_w - 0.8, 1.9,
+                 "[Headshot]", size=14, italic=True, color=LIGHT_SLATE,
+                 align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+        add_text(s, left + 0.4, col_top + 2.45, col_w - 0.8, 0.4, f"[{role}]",
+                 size=15, bold=True, italic=True, color=LIGHT_SLATE)
+        add_text(s, left + 0.4, col_top + 2.9, col_w - 0.8, 0.5, name,
+                 size=13, italic=True, color=LIGHT_SLATE)
         if note:
-            p3 = name_frame.add_paragraph()
-            p3.text = note
-            p3.font.size = Pt(8)
-            p3.font.italic = True
-            p3.font.color.rgb = RGBColor(200, 200, 200)
-            p3.space_before = Pt(4)
+            add_text(s, left + 0.4, col_top + 3.4, col_w - 0.8, 0.3, note,
+                     size=11, italic=True, color=LIGHT_SLATE)
 
-    # Left column: Founder
-    add_team_box(
-        slide,
-        start_left,
-        start_top,
-        col_width,
-        col_height,
-        "[Founder]",
-        "[Name + 1-line credential]"
-    )
+    add_notes(s, "Founder-specific. Angels invest in people. Be specific about why you, why now, why this.")
 
-    # Middle column: Co-founder (optional)
-    add_team_box(
-        slide,
-        start_left + col_width + gap,
-        start_top,
-        col_width,
-        col_height,
-        "[Co-founder/Key hire]",
-        "[Name + credential]",
-        "optional"
-    )
+    # ───── Slide 13 — The Ask ─────
+    s = prs.slides.add_slide(blank)
+    set_bg(s, NAVY)
 
-    # Right column: Advisors
-    add_team_box(
-        slide,
-        start_left + 2 * (col_width + gap),
-        start_top,
-        col_width,
-        col_height,
-        "[Advisors]",
-        "Names + committed angels"
-    )
+    left_x = 0.9
+    left_w = 7.2
+    add_text(s, left_x, 0.7, left_w, 1.0, "Raising A$[XXX]",
+             size=44, bold=True, color=WHITE, line_spacing=1.1)
+    add_text(s, left_x, 1.75, left_w, 0.5, "to reach A$[X]M ARR by [milestone]",
+             size=18, italic=True, color=PALE_SLATE)
 
-    notes = slide.notes_slide.notes_text_frame
-    notes.text = "Founder-specific. Include: founder bio (1–2 lines) why you can build this, any co-founders (name, role, one-line credential), any advisors or angel commitments already (edtech, consumer subscription, AU education), key hires planned with this round. Angels invest in people. Be specific about why you, why now, why this."
+    add_text(s, left_x, 2.7, left_w, 0.35, "USE OF FUNDS",
+             size=11, bold=True, color=CORAL)
 
-    # Slide 13: The Ask (restructured to avoid overlap) (was Slide 14)
-    slide = prs.slides.add_slide(prs.slide_layouts[6])
-    background = slide.background
-    fill = background.fill
-    fill.solid()
-    fill.fore_color.rgb = DARK_NAVY
+    bar_top = 3.15
+    bar_h = 0.55
+    bar_w = left_w
+    p_w = bar_w * 0.40
+    g_w = bar_w * 0.40
+    o_w = bar_w * 0.20
+    add_rect(s, left_x, bar_top, p_w, bar_h, fill=CORAL)
+    add_rect(s, left_x + p_w, bar_top, g_w, bar_h, fill=LIGHT_CORAL)
+    add_rect(s, left_x + p_w + g_w, bar_top, o_w, bar_h, fill=MID_SLATE)
 
-    # LEFT HALF (60%): Ask details, clear vertical hierarchy
-    left_width = Inches(6)
-    left_left = Inches(0.5)
+    add_text(s, left_x, bar_top + 0.12, p_w, 0.3, "Product  40%",
+             size=11, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+    add_text(s, left_x + p_w, bar_top + 0.12, g_w, 0.3, "Growth  40%",
+             size=11, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+    add_text(s, left_x + p_w + g_w, bar_top + 0.12, o_w, 0.3, "Ops  20%",
+             size=11, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
 
-    # Main title: "Raising A$[XXX]" — single line, compact
-    title_box = slide.shapes.add_textbox(left_left, Inches(0.5), left_width - Inches(0.3), Inches(0.55))
-    title_frame = title_box.text_frame
-    title_frame.word_wrap = True
-    p = title_frame.paragraphs[0]
-    p.text = "Raising A$[XXX]"
-    p.font.size = Pt(28)
-    p.font.bold = True
-    p.font.color.rgb = OFF_WHITE
-
-    # Subtitle: "to reach..."
-    subtitle_box = slide.shapes.add_textbox(left_left, Inches(1.15), left_width - Inches(0.3), Inches(0.5))
-    subtitle_frame = subtitle_box.text_frame
-    subtitle_frame.word_wrap = True
-    p = subtitle_frame.paragraphs[0]
-    p.text = "to reach A$[X]M ARR by [milestone]"
-    p.font.size = Pt(14)
-    p.font.italic = True
-    p.font.color.rgb = RGBColor(200, 210, 220)
-
-    # Gap
-    # Use of Funds header
-    use_of_funds_label = slide.shapes.add_textbox(left_left, Inches(1.85), left_width - Inches(0.3), Inches(0.3))
-    use_frame = use_of_funds_label.text_frame
-    p = use_frame.paragraphs[0]
-    p.text = "USE OF FUNDS"
-    p.font.size = Pt(11)
-    p.font.bold = True
-    p.font.color.rgb = RGBColor(180, 190, 200)
-
-    # Use of funds breakdown (could be bars or text)
-    uof_box = slide.shapes.add_textbox(left_left, Inches(2.25), left_width - Inches(0.3), Inches(1.0))
-    uof_frame = uof_box.text_frame
-    uof_frame.word_wrap = True
-
-    uof_points = [
-        "Product development: 40%",
-        "Growth & acquisition: 40%",
-        "Operations & overhead: 20%"
+    add_text(s, left_x, 4.5, left_w, 0.35, "MILESTONES",
+             size=11, bold=True, color=CORAL)
+    milestones = [
+        "→  Product launch",
+        "→  Waitlist conversion (>60%)",
+        "→  A$[X]k ARR",
+        "→  CAC payback proof",
     ]
+    for i, m in enumerate(milestones):
+        add_text(s, left_x, 4.95 + i * 0.35, left_w, 0.32, m,
+                 size=13, color=WHITE)
 
-    for i, point in enumerate(uof_points):
-        if i == 0:
-            p = uof_frame.paragraphs[0]
-        else:
-            p = uof_frame.add_paragraph()
-        p.text = point
-        p.font.size = Pt(12)
-        p.font.color.rgb = OFF_WHITE
-        p.space_before = Pt(3)
-        p.space_after = Pt(5)
+    add_text(s, left_x, 6.45, left_w, 0.3, "Runway: [X] months",
+             size=13, italic=True, color=PALE_SLATE)
 
-    # Gap
-    # Runway
-    runway_label = slide.shapes.add_textbox(left_left, Inches(3.4), left_width - Inches(0.3), Inches(0.3))
-    runway_frame = runway_label.text_frame
-    p = runway_frame.paragraphs[0]
-    p.text = "RUNWAY & MILESTONES"
-    p.font.size = Pt(11)
-    p.font.bold = True
-    p.font.color.rgb = RGBColor(180, 190, 200)
+    right_x = 8.5
+    right_w = SLIDE_W - right_x - 0.7
+    add_text(s, right_x, 1.8, right_w, 3.5,
+             "A generation of Australian children that never fall behind.",
+             size=28, bold=True, color=CORAL, line_spacing=1.25)
 
-    runway_box = slide.shapes.add_textbox(left_left, Inches(3.8), left_width - Inches(0.3), Inches(1.8))
-    runway_text = runway_box.text_frame
-    runway_text.word_wrap = True
+    add_rect(s, right_x, 5.4, 1.0, 0.06, fill=CORAL)
+    add_text(s, right_x, 5.55, right_w, 0.4,
+             "That's what we're here to build.",
+             size=14, italic=True, color=PALE_SLATE)
 
-    runway_points = [
-        "Runway: [X] months",
-        "Milestones:",
-        "→ Product launch (month [X])",
-        "→ Waitlist conversion (month [X])",
-        "→ A$[X]k ARR (month [X])",
-        "→ CAC payback proof (month [X])"
-    ]
+    add_text(s, 0, 7.1, SLIDE_W, 0.3,
+             "jesse@activedigital.fund  ·  upwise.com.au",
+             size=12, color=LIGHT_SLATE, align=PP_ALIGN.CENTER)
 
-    for i, point in enumerate(runway_points):
-        if i == 0:
-            p = runway_text.paragraphs[0]
-        else:
-            p = runway_text.add_paragraph()
-        p.text = point
-        p.font.size = Pt(11)
-        p.font.color.rgb = OFF_WHITE
-        if point.startswith("Runway") or point.startswith("Milestones"):
-            p.font.bold = True
-        if point.startswith("→"):
-            p.level = 1
-        p.space_before = Pt(2)
-        p.space_after = Pt(4)
+    add_notes(s, "Here's the ask. Here's what it funds. Here's what you get back — not in dollar terms, though I'm happy to walk through projections. This funds the build and the first twelve months of disciplined growth. A generation of Australian kids that don't fall behind. That's the thing worth building.")
 
-    # RIGHT HALF (40%): Vision statement, large and visual
-    right_left = Inches(6)
-    vision_box = slide.shapes.add_textbox(right_left, Inches(0.8), Inches(3.5), Inches(4.5))
-    vision_frame = vision_box.text_frame
-    vision_frame.word_wrap = True
-    p = vision_frame.paragraphs[0]
-    p.text = "A generation of Australian children that never fall behind."
-    p.font.size = Pt(22)
-    p.font.bold = True
-    p.font.color.rgb = WARM_CORAL
-    p.line_spacing = 1.5
+    out = f"{ROOT}/upwise-angel-deck.pptx"
+    prs.save(out)
+    print(f"Saved: {out}")
+    return out
 
-    # Contact at bottom
-    contact_box = slide.shapes.add_textbox(Inches(0.5), Inches(6.5), Inches(9), Inches(0.7))
-    contact_frame = contact_box.text_frame
-    p = contact_frame.paragraphs[0]
-    p.text = "jesse@activedigital.fund · upwise.com.au"
-    p.font.size = Pt(11)
-    p.font.color.rgb = RGBColor(150, 160, 170)
-    p.alignment = PP_ALIGN.CENTER
-
-    notes = slide.notes_slide.notes_text_frame
-    notes.text = "Here's the ask. Here's what it funds. Here's what you get back — not in dollar terms, though I'm happy to walk through projections. In impact terms, this funds the build and the first 12 months of disciplined growth. A generation of Australian kids that don't fall behind. That's the thing worth building."
-
-    # Save
-    prs.save("upwise-angel-deck.pptx")
-    print("✓ Saved: upwise-angel-deck.pptx")
-    print(f"✓ Total slides: {len(prs.slides)}")
 
 if __name__ == "__main__":
-    main()
+    build_presentation()
