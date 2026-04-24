@@ -613,7 +613,7 @@ export default function HomeClientPage() {
                 features: [
                   "7 days of full access",
                   "Unlimited sessions",
-                  "Maths, reading, writing, spelling & grammar",
+                  "Maths, reading, spelling & grammar",
                   "1 child",
                   "Full parent dashboard",
                 ],
@@ -628,7 +628,7 @@ export default function HomeClientPage() {
                 features: [
                   "Unlimited diagnostics",
                   "Unlimited daily sessions",
-                  "Maths, reading, writing, spelling & grammar",
+                  "Maths, reading, spelling & grammar",
                   "1 child",
                   "Full parent dashboard",
                   "Daily briefings & nudges",
@@ -645,7 +645,7 @@ export default function HomeClientPage() {
                 features: [
                   "Everything in Standard",
                   "Up to 4 children",
-                  "Maths, reading, writing, spelling & grammar",
+                  "Maths, reading, spelling & grammar",
                   "Term reports",
                   "Teacher-shareable reports",
                 ],

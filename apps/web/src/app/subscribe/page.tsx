@@ -82,7 +82,7 @@ export default function SubscribePage() {
             <ul className="space-y-3 mb-8">
               {[
                 "Unlimited daily sessions",
-                "Maths, reading, writing, spelling & grammar",
+                "Maths, reading, spelling & grammar",
                 "Full parent dashboard",
                 "Daily briefings & nudges",
                 "Weekly progress reports",
@@ -125,7 +125,7 @@ export default function SubscribePage() {
               {[
                 "Everything in Standard",
                 "Up to 4 children",
-                "Maths, reading, writing, spelling & grammar",
+                "Maths, reading, spelling & grammar",
                 "Term reports",
                 "Teacher-shareable reports",
               ].map((f) => (

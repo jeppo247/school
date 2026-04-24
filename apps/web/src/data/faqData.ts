@@ -54,7 +54,7 @@ export const PARENT_SECTIONS: FAQSection[] = [
       },
       {
         question: "What subjects and year levels does it cover?",
-        answer: `Prep to Year 7, covering all five NAPLAN domains:\n\n• Numeracy\n• Reading\n• Writing\n• Spelling\n• Grammar and Punctuation\n\nThe skill graph contains 167 micro-skills with mapped prerequisites, so we can pinpoint exactly where a gap begins and work forward from there.`,
+        answer: `Prep to Year 7, covering four NAPLAN domains:\n\n• Numeracy\n• Reading\n• Spelling\n• Grammar and Punctuation\n\nWriting is not included as it requires human marking of extended responses. The skill graph contains 167 micro-skills with mapped prerequisites, so we can pinpoint exactly where a gap begins and work forward from there.`,
       },
       {
         question: "How much time should my child spend on it?",
@@ -62,7 +62,7 @@ export const PARENT_SECTIONS: FAQSection[] = [
       },
       {
         question: "How does it help with NAPLAN?",
-        answer: `NAPLAN tests core skills in reading, writing, spelling, grammar, and numeracy.\n\nUpwise builds those skills from the ground up, aligned to the Australian Curriculum frameworks that NAPLAN assesses. Your child develops genuine competence — not just familiarity with test formats.\n\nThe parent dashboard shows projected proficiency bands based on your child's demonstrated mastery, so you can see where they're tracking before test day.`,
+        answer: `NAPLAN tests core skills in reading, spelling, grammar, and numeracy (plus writing, which requires human marking).\n\nUpwise builds those skills from the ground up, aligned to the Australian Curriculum frameworks that NAPLAN assesses. Your child develops genuine competence — not just familiarity with test formats.\n\nThe parent dashboard shows projected proficiency bands based on your child's demonstrated mastery, so you can see where they're tracking before test day.`,
       },
     ],
   },
@@ -72,7 +72,7 @@ export const PARENT_SECTIONS: FAQSection[] = [
     items: [
       {
         question: "How can I track my child's progress?",
-        answer: `Through the parent dashboard, you'll see:\n\n• Domain-by-domain proficiency across all five NAPLAN areas\n• Specific strengths and gaps\n• Improvement trends over time\n• Projected NAPLAN proficiency bands\n• Clear next steps for each domain\n\nAll analytics are parent-only — your child sees encouragement and progress, never scores or comparisons.`,
+        answer: `Through the parent dashboard, you'll see:\n\n• Domain-by-domain proficiency across four NAPLAN domains\n• Specific strengths and gaps\n• Improvement trends over time\n• Projected NAPLAN proficiency bands\n• Clear next steps for each domain\n\nAll analytics are parent-only — your child sees encouragement and progress, never scores or comparisons.`,
       },
       {
         question: "Does this replace tutoring?",

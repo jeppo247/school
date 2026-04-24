@@ -48,7 +48,7 @@ export default function TermsOfServicePage() {
             <h2 className="font-display text-xl font-bold text-gray-900 mb-3">What Upwise is</h2>
             <p>
               Upwise is a personalised learning platform for Australian children in Prep to Year 7.
-              It covers maths, reading, writing, spelling and grammar, aligned with the Australian
+              It covers maths, reading, spelling and grammar, aligned with the Australian
               Curriculum (ACARA).
             </p>
             <p className="mt-3">

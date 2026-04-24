@@ -54,7 +54,7 @@ export const COMPARISONS: ComparisonPage[] = [
       },
       {
         feature: "Subjects",
-        upwise: "Maths, reading, writing, spelling, grammar (Prep-Year 7)",
+        upwise: "Maths, reading, spelling & grammar (Prep-Year 7)",
         competitor: "Maths, English, chemistry, biology (Year 2-12)",
       },
       {
@@ -119,7 +119,7 @@ export const COMPARISONS: ComparisonPage[] = [
       },
       {
         feature: "Subjects",
-        upwise: "Maths, reading, writing, spelling, grammar (all five NAPLAN domains)",
+        upwise: "Maths, reading, spelling & grammar (four NAPLAN domains)",
         competitor: "Maths only",
       },
       {
@@ -194,7 +194,7 @@ export const COMPARISONS: ComparisonPage[] = [
       },
       {
         feature: "Subjects",
-        upwise: "Maths, reading, writing, spelling, grammar (all five NAPLAN domains)",
+        upwise: "Maths, reading, spelling & grammar (four NAPLAN domains)",
         competitor: "Maths and English as separate programmes (separate fees)",
       },
       {
@@ -279,7 +279,7 @@ export const COMPARISONS: ComparisonPage[] = [
       },
       {
         feature: "Subjects",
-        upwise: "Maths, reading, writing, spelling, grammar (Prep-Year 7)",
+        upwise: "Maths, reading, spelling & grammar (Prep-Year 7)",
         competitor: "Maths and English (primary and secondary)",
       },
       {
@@ -344,7 +344,7 @@ export const COMPARISONS: ComparisonPage[] = [
       },
       {
         feature: "Subjects",
-        upwise: "Maths, reading, writing, spelling, grammar (all five NAPLAN domains)",
+        upwise: "Maths, reading, spelling & grammar (four NAPLAN domains)",
         competitor: "Maths and English",
       },
       {
@@ -419,7 +419,7 @@ export const COMPARISONS: ComparisonPage[] = [
       },
       {
         feature: "Subjects",
-        upwise: "Maths, reading, writing, spelling, grammar (all five NAPLAN domains)",
+        upwise: "Maths, reading, spelling & grammar (four NAPLAN domains)",
         competitor: "Reading (Reading Eggs) and early maths (Mathseeds) as separate products",
       },
       {
@@ -499,7 +499,7 @@ export const COMPARISONS: ComparisonPage[] = [
       },
       {
         feature: "Subjects",
-        upwise: "Maths, reading, writing, spelling, grammar (all five NAPLAN domains)",
+        upwise: "Maths, reading, spelling & grammar (four NAPLAN domains)",
         competitor: "Maths and English in separate lesson streams",
       },
       {
@@ -569,7 +569,7 @@ export const COMPARISONS: ComparisonPage[] = [
       },
       {
         feature: "Subjects",
-        upwise: "Maths, reading, writing, spelling, grammar (Prep-Year 7)",
+        upwise: "Maths, reading, spelling & grammar (Prep-Year 7)",
         competitor: "Maths, English, science, social studies (Prep-Year 12)",
       },
       {

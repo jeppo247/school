@@ -86,7 +86,6 @@ function DomainBarChart() {
     { label: "Reading", pct: 65, color: "#22C55E" },
     { label: "Spelling", pct: 82, color: "#FF8C42" },
     { label: "Grammar", pct: 58, color: "#8B5CF6" },
-    { label: "Writing", pct: 45, color: "#EC4899" },
   ];
 
   return (
@@ -351,7 +350,6 @@ export default function ForParentsClientPage() {
                 { domain: "Reading", band: "Developing", color: "#FF8C42", position: 45 },
                 { domain: "Spelling", band: "Strong", color: "#22C55E", position: 72 },
                 { domain: "Grammar", band: "Developing", color: "#FF8C42", position: 40 },
-                { domain: "Writing", band: "Needs Support", color: "#EF4444", position: 25 },
               ].map((d) => (
                 <div key={d.domain}>
                   <div className="flex justify-between text-sm mb-2">
@@ -374,7 +372,7 @@ export default function ForParentsClientPage() {
                       style={{ left: `${d.position}%`, backgroundColor: d.color }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] text-gray-300 mt-1 px-1">
+                  <div className="flex justify-between text-[10px] text-gray-500 mt-1 px-1">
                     <span>Needs Support</span>
                     <span>Developing</span>
                     <span>Strong</span>
@@ -601,7 +599,7 @@ export default function ForParentsClientPage() {
                   {[
                     { skill: "Subtraction with regrouping", prereq: "Needs: place value understanding" },
                     { skill: "Reading comprehension — inference", prereq: "Needs: identifying main idea" },
-                    { skill: "Paragraph writing", prereq: "Needs: sentence structure + connectives" },
+                    { skill: "Using connectives in sentences", prereq: "Needs: sentence structure basics" },
                   ].map((g) => (
                     <div key={g.skill}>
                       <div className="flex items-center gap-2 text-sm text-gray-700">

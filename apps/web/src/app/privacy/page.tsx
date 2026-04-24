@@ -39,7 +39,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <p className="mt-3">
               Upwise is a personalised learning platform for Australian children in Prep to Year 7,
-              covering maths, reading, writing, spelling and grammar. Parents set up accounts and guide
+              covering maths, reading, spelling and grammar. Parents set up accounts and guide
               their child&apos;s learning.
             </p>
           </section>
