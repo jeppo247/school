@@ -105,6 +105,12 @@ export default function HomeClientPage() {
           </span>
           <div className="flex items-center gap-3">
             <Link
+              href="/for-parents"
+              className="text-sm font-medium text-gray-600 hover:text-[#4F8CF7] transition-colors px-4 py-2 hidden sm:inline-block"
+            >
+              For Parents
+            </Link>
+            <Link
               href="/faq"
               className="text-sm font-medium text-gray-600 hover:text-[#4F8CF7] transition-colors px-4 py-2 hidden sm:inline-block"
             >

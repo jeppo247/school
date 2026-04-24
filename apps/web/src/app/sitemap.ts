@@ -16,6 +16,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
     },
     {
+      url: `${baseUrl}/for-parents`,
+      lastModified,
+    },
+    {
       url: `${baseUrl}/faq`,
       lastModified,
     },

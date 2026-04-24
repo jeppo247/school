@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/", "/faq", "/privacy", "/terms", "/contact"];
+const PUBLIC_PATHS = ["/", "/for-parents", "/faq", "/privacy", "/terms", "/contact"];
 const PUBLIC_PREFIXES = ["/compare/"];
 
 export function middleware(request: NextRequest) {
