@@ -123,6 +123,12 @@ export const INDEPENDENCE_MULTIPLIER = {
 export const STREAK_GRACE_DAYS = 3;
 
 // Session structure
+/** Recommended daily session baseline before prompting for a break */
+export const DAILY_SESSION_BASELINE_MINUTES = 20;
+
+/** Short warmup when review questions are due */
+export const SESSION_WARMUP_MINUTES = 3;
+
 /** Maximum focus block duration in minutes before a mandatory break */
 export const MAX_BLOCK_DURATION_MINUTES = 20;
 

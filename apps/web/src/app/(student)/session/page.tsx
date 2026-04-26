@@ -39,6 +39,7 @@ interface NextQuestionResponse {
   phase?: SessionPhase;
   question?: QuestionPayload;
   sessionProgress?: { questionsAnswered: number; accuracy: number };
+  sessionTiming?: SessionTiming;
 }
 
 interface AnswerResponse {
@@ -64,6 +65,14 @@ interface SessionStartResponse {
   };
 }
 
+interface SessionTiming {
+  elapsedSeconds: number;
+  baselineSeconds: number;
+  baselineMinutes: number;
+  baselineReached: boolean;
+  shouldForceComplete: boolean;
+}
+
 export default function SessionPage() {
   const [studentId, setStudentId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -83,6 +92,9 @@ export default function SessionPage() {
   const [totalXp, setTotalXp] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [showAskAdult, setShowAskAdult] = useState(false);
+  const [sessionTiming, setSessionTiming] = useState<SessionTiming | null>(null);
+  const [showTimePrompt, setShowTimePrompt] = useState(false);
+  const [timePromptAcknowledged, setTimePromptAcknowledged] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -112,6 +124,21 @@ export default function SessionPage() {
     startSession();
   }, []);
 
+  const completeSession = useCallback(async () => {
+    if (!studentId || !sessionId) return;
+
+    try {
+      await api.post(`/sessions/${studentId}/complete`, { sessionId });
+      setFeedback(null);
+      setShowCelebration(false);
+      setShowTimePrompt(false);
+      setCurrentQuestion(null);
+      setSessionComplete(true);
+    } catch {
+      setError("Could not finish the session. Please try again.");
+    }
+  }, [studentId, sessionId]);
+
   // Fetch next question when session starts or after answering
   const fetchNextQuestion = useCallback(async () => {
     if (!studentId || !sessionId) return;
@@ -121,9 +148,15 @@ export default function SessionPage() {
         `/sessions/${studentId}/next-question?sessionId=${sessionId}`,
       );
 
+      if (result.sessionTiming) {
+        setSessionTiming(result.sessionTiming);
+        if (result.sessionTiming.baselineReached && !timePromptAcknowledged) {
+          setShowTimePrompt(true);
+        }
+      }
+
       if (result.complete) {
-        await api.post(`/sessions/${studentId}/complete`, { sessionId });
-        setSessionComplete(true);
+        await completeSession();
       } else {
         if (result.question) setCurrentQuestion(result.question);
         if (result.questionNumber) setQuestionNumber(result.questionNumber);
@@ -134,7 +167,7 @@ export default function SessionPage() {
     } finally {
       setLoading(false);
     }
-  }, [studentId, sessionId]);
+  }, [studentId, sessionId, timePromptAcknowledged, completeSession]);
 
   // Trigger first question fetch once sessionId is set
   useEffect(() => {
@@ -192,6 +225,17 @@ export default function SessionPage() {
     setFeedback(null);
     setShowCelebration(false);
     setCurrentQuestion(null); // triggers fetchNextQuestion via useEffect
+  }, []);
+
+  const handleKeepPracticing = useCallback(() => {
+    setTimePromptAcknowledged(true);
+    setShowTimePrompt(false);
+  }, []);
+
+  const handleTakeBreak = useCallback(() => {
+    setTimePromptAcknowledged(true);
+    setShowTimePrompt(false);
+    setPhase("brain_break");
   }, []);
 
   // Trigger fetch when currentQuestion is cleared after answering
@@ -258,15 +302,14 @@ export default function SessionPage() {
             <IconBadge name="brain" className="h-24 w-24 bg-teal-50 text-teal-600" iconClassName="h-12 w-12" />
           </motion.div>
           <h1 className="font-display text-3xl lg:text-4xl font-bold text-teal-700 mb-4">
-            Brain Break!
+            Time for a Break
           </h1>
           <p className="text-teal-600 mb-8 text-lg">
-            Time for a quick rest. Do 10 star jumps.
+            Rest your eyes, stretch, or grab some water.
           </p>
           <motion.button
             onClick={() => {
               setPhase("focus_2");
-              setCurrentQuestion(null); // fetch next question for focus_2
             }}
             className="bg-teal-500 text-white font-display font-bold text-xl px-10 py-4 rounded-2xl shadow-lg"
             whileHover={{ scale: 1.05 }}
@@ -401,6 +444,51 @@ export default function SessionPage() {
         type={celebrationType}
         onComplete={() => setShowCelebration(false)}
       />
+
+      <AnimatePresence>
+        {showTimePrompt && sessionTiming && (
+          <motion.div
+            className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/25 px-6 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="session-time-title"
+          >
+            <motion.div
+              className="w-full max-w-md rounded-[2rem] border border-blue-100 bg-white p-6 text-center shadow-xl"
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 12 }}
+            >
+              <IconBadge name="clock" className="mx-auto mb-4 h-16 w-16 bg-blue-50 text-[var(--theme-primary)]" iconClassName="h-8 w-8" />
+              <h2 id="session-time-title" className="font-display text-2xl font-bold text-gray-800">
+                {sessionTiming.baselineMinutes} minutes is up
+              </h2>
+              <p className="mt-3 text-base leading-7 text-gray-600">
+                Nice effort today. You can take a break now, or do a little more.
+              </p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={handleTakeBreak}
+                  className="rounded-2xl bg-teal-50 px-5 py-3 font-display font-bold text-teal-700 transition-colors hover:bg-teal-100"
+                >
+                  Take a break
+                </button>
+                <button
+                  type="button"
+                  onClick={handleKeepPracticing}
+                  className="rounded-2xl bg-[var(--theme-primary)] px-5 py-3 font-display font-bold text-white shadow-sm transition-transform active:scale-[0.98]"
+                >
+                  A little more
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AskAdultModal
         open={showAskAdult}

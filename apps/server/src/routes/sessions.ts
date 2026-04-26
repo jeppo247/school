@@ -11,6 +11,7 @@ import { updateKnowledgeState } from "../engine/knowledge-state.js";
 import { planSession } from "../engine/session-planner.js";
 import { detectFrontierGaps } from "../engine/gap-detector.js";
 import { estimatePracticeTheta, getRollingAccuracy } from "../engine/session-adaptation.js";
+import { getSessionTiming } from "../engine/session-timing.js";
 import { AppError } from "../middleware/error-handler.js";
 import { updateDomainStates } from "../services/domain-service.js";
 import { recordMisconceptionIfPresent } from "../services/misconception-service.js";
@@ -92,7 +93,7 @@ sessionRoutes.post("/:studentId/start", async (req, res, next) => {
         studentId,
         sessionType: "daily",
         status: "in_progress",
-        phase: "warmup",
+        phase: sessionPlan.phases[0]?.phase ?? "focus_1",
         skillsTargeted: sessionPlan.focusSkills,
         metadata: { plan: sessionPlan },
       })
@@ -134,6 +135,8 @@ sessionRoutes.get("/:studentId/next-question", async (req, res, next) => {
     if (!session || session.status !== "in_progress") {
       return res.json({ complete: true });
     }
+
+    const sessionTiming = getSessionTiming(session.startedAt);
 
     // Get responses so far
     const responses = await db
@@ -209,6 +212,7 @@ sessionRoutes.get("/:studentId/next-question", async (req, res, next) => {
         questionsAnswered: responses.length,
         accuracy: Math.round(rollingAccuracy * 100),
       },
+      sessionTiming,
     });
   } catch (err) {
     next(err);
