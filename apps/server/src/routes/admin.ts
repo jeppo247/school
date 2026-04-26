@@ -581,7 +581,7 @@ adminRoutes.post("/skill-nodes", async (req, res, next) => {
       acaraCode, acaraDescription, dokLevel, difficultyBand, displayOrder,
     } = req.body;
 
-    if (!code || !name || !yearLevel || !strand) {
+    if (!code || !name || yearLevel === undefined || yearLevel === null || !strand) {
       throw new AppError(400, "VALIDATION_ERROR", "code, name, yearLevel, and strand are required");
     }
 

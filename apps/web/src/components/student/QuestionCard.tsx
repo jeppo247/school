@@ -3,20 +3,29 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { AppIcon, type AppIconName } from "@/components/ui/AppIcon";
+import { normalizeQuestionContent } from "./question-content";
+
+export interface AnswerMetadata {
+  hintUsed: boolean;
+  hintCount: number;
+}
 
 interface QuestionCardProps {
   question: {
     stem: string;
+    passage?: string;
     options?: string[];
     type: "multiple_choice" | "numeric_input" | "true_false";
     hint?: string;
     hints?: string[];
     imageUrl?: string;
   };
-  onAnswer: (answer: string | number) => void;
+  onAnswer: (answer: string | number, metadata: AnswerMetadata) => void;
+  onContinue?: () => void;
   disabled?: boolean;
   feedback?: {
     isCorrect: boolean;
+    correctAnswer?: string | number;
     explanation?: string;
   } | null;
 }
@@ -30,6 +39,7 @@ const HINT_LABELS: { icon: AppIconName; label: string }[] = [
 export function QuestionCard({
   question,
   onAnswer,
+  onContinue,
   disabled = false,
   feedback,
 }: QuestionCardProps) {
@@ -44,16 +54,24 @@ export function QuestionCard({
       ? [question.hint]
       : [];
   const hasHints = hintLadder.length > 0;
+  const content = normalizeQuestionContent(question);
+
+  function answerMetadata(): AnswerMetadata {
+    return {
+      hintUsed: hintLevel > 0,
+      hintCount: hintLevel,
+    };
+  }
 
   function handleOptionClick(option: string) {
     if (disabled) return;
     setSelected(option);
-    onAnswer(option);
+    onAnswer(option, answerMetadata());
   }
 
   function handleNumericSubmit() {
     if (disabled || !numericInput) return;
-    onAnswer(Number(numericInput));
+    onAnswer(Number(numericInput), answerMetadata());
   }
 
   function showNextHint() {
@@ -62,15 +80,23 @@ export function QuestionCard({
 
   return (
     <motion.div
-      className="card max-w-2xl mx-auto"
+      className={`card mx-auto ${content.passage ? "max-w-3xl" : "max-w-2xl"}`}
       initial={{ opacity: 0, x: 50 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -50 }}
       transition={{ duration: 0.3 }}
     >
+      {content.passage && (
+        <div className="mb-5 rounded-2xl border-2 border-white bg-white/80 p-4 text-left shadow-sm">
+          <p className="whitespace-pre-wrap text-lg leading-8 text-gray-700">
+            {content.passage}
+          </p>
+        </div>
+      )}
+
       {/* Question stem */}
-      <h2 className="font-display text-xl font-semibold text-gray-800 mb-6 text-center">
-        {question.stem}
+      <h2 className="font-display text-xl font-semibold text-gray-800 mb-6 text-center md:text-2xl">
+        {content.prompt}
       </h2>
 
       {/* Image if present */}
@@ -89,7 +115,11 @@ export function QuestionCard({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {question.options.map((option, index) => {
             const isSelected = selected === option;
-            const showResult = feedback && isSelected;
+            const isCorrectOption = feedback?.correctAnswer !== undefined
+              && String(option) === String(feedback.correctAnswer);
+            const isSelectedWrong = Boolean(feedback && isSelected && !feedback.isCorrect);
+            const isSelectedCorrect = Boolean(feedback && isSelected && feedback.isCorrect);
+            const showResult = feedback && (isSelected || isCorrectOption);
 
             return (
               <motion.button
@@ -97,22 +127,36 @@ export function QuestionCard({
                 onClick={() => handleOptionClick(option)}
                 disabled={disabled}
                 className={`
-                  p-4 rounded-2xl text-lg font-medium text-center transition-all shadow-clay
+                  min-h-16 p-4 rounded-2xl text-lg font-medium text-center transition-all shadow-clay
                   ${
                     showResult
-                      ? feedback.isCorrect
-                        ? "bg-green-100 border-2 border-green-500 text-green-700"
-                        : "bg-red-100 border-2 border-red-500 text-red-700"
+                      ? isCorrectOption || isSelectedCorrect
+                        ? "bg-green-50 border-2 border-green-500 text-green-800"
+                        : "bg-amber-50 border-2 border-amber-400 text-amber-800"
                       : isSelected
                         ? "bg-[var(--theme-primary)] text-white border-2 border-[var(--theme-primary)] shadow-clay-hover"
                         : "bg-white border-2 border-[#E8E2D8] text-gray-700 hover:border-[var(--theme-primary)] hover:bg-blue-50 hover:-rotate-1 hover:-translate-y-0.5 hover:shadow-clay-hover"
                   }
-                  ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer active:scale-95"}
+                  ${disabled && !feedback ? "cursor-not-allowed opacity-60" : "cursor-pointer active:scale-95"}
                 `}
                 whileHover={!disabled ? { scale: 1.02 } : undefined}
                 whileTap={!disabled ? { scale: 0.98 } : undefined}
               >
-                {option}
+                <span className="flex flex-col items-center justify-center gap-1">
+                  <span>{option}</span>
+                  {isCorrectOption && (
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold">
+                      <AppIcon name="check" className="h-4 w-4" />
+                      Correct answer
+                    </span>
+                  )}
+                  {isSelectedWrong && (
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold">
+                      <AppIcon name="help" className="h-4 w-4" />
+                      Your answer
+                    </span>
+                  )}
+                </span>
               </motion.button>
             );
           })}
@@ -156,12 +200,12 @@ export function QuestionCard({
                 onClick={() => handleOptionClick(option)}
                 disabled={disabled}
                 className={`
-                  px-12 py-4 rounded-xl text-xl font-bold transition-all
+                  min-h-16 px-12 py-4 rounded-xl text-xl font-bold transition-all
                   ${
                     showResult
                       ? feedback.isCorrect
                         ? "bg-green-100 border-2 border-green-500 text-green-700"
-                        : "bg-red-100 border-2 border-red-500 text-red-700"
+                        : "bg-amber-50 border-2 border-amber-400 text-amber-800"
                       : isSelected
                         ? "bg-[var(--theme-primary)] text-white border-2 border-[var(--theme-primary)]"
                         : "bg-gray-50 border-2 border-gray-200 text-gray-700 hover:border-[var(--theme-primary)]"
@@ -197,6 +241,14 @@ export function QuestionCard({
             {feedback.explanation && (
               <p className="text-base mt-1">{feedback.explanation}</p>
             )}
+            {onContinue && (
+              <button
+                onClick={onContinue}
+                className="mt-4 inline-flex min-h-12 items-center justify-center rounded-2xl bg-[var(--theme-primary)] px-6 py-3 font-display text-base font-bold text-white shadow-sm transition-transform active:scale-95"
+              >
+                Next question
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -226,8 +278,9 @@ export function QuestionCard({
             <div className="text-center">
               <button
                 onClick={showNextHint}
-                className="text-base text-[var(--theme-primary)] hover:underline"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[var(--theme-primary)]/20 bg-white/80 px-4 py-3 text-base font-semibold text-[var(--theme-primary)] transition-colors hover:bg-white"
               >
+                <AppIcon name="lightbulb" className="h-5 w-5" />
                 {hintLevel === 0
                   ? "Need a hint?"
                   : hintLevel < hintLadder.length

@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
-import { QuestionCard } from "@/components/student/QuestionCard";
+import { QuestionCard, type AnswerMetadata } from "@/components/student/QuestionCard";
 import { Celebration } from "@/components/student/Celebration";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
 import { AskAdultButton, AskAdultModal } from "@/components/student/AskAdultModal";
@@ -26,6 +26,7 @@ interface QuestionPayload {
     stem: string;
     answer: string | number;
     options?: string[];
+    passage?: string;
     hint?: string;
     hints?: string[];
     explanation?: string;
@@ -71,7 +72,11 @@ export default function SessionPage() {
   const [currentQuestion, setCurrentQuestion] = useState<QuestionPayload | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationType, setCelebrationType] = useState<"correct" | "streak" | "levelUp" | "mastery">("correct");
-  const [feedback, setFeedback] = useState<{ isCorrect: boolean; explanation?: string } | null>(null);
+  const [feedback, setFeedback] = useState<{
+    isCorrect: boolean;
+    correctAnswer?: string | number;
+    explanation?: string;
+  } | null>(null);
   const [correctInARow, setCorrectInARow] = useState(0);
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [totalAnswered, setTotalAnswered] = useState(0);
@@ -138,7 +143,10 @@ export default function SessionPage() {
     }
   }, [sessionId, currentQuestion, sessionComplete, fetchNextQuestion]);
 
-  const handleAnswer = useCallback(async (answer: string | number) => {
+  const handleAnswer = useCallback(async (
+    answer: string | number,
+    metadata: AnswerMetadata,
+  ) => {
     if (!studentId || !sessionId || !currentQuestion) return;
 
     try {
@@ -147,10 +155,12 @@ export default function SessionPage() {
         questionId: currentQuestion.id,
         answer,
         timeTakenMs: 0,
+        hintUsed: metadata.hintUsed,
       });
 
       setFeedback({
         isCorrect: result.isCorrect,
+        correctAnswer: result.correctAnswer,
         explanation: result.explanation,
       });
 
@@ -173,17 +183,16 @@ export default function SessionPage() {
       } else {
         setCorrectInARow(0);
       }
-
-      // Advance to next question after delay
-      setTimeout(() => {
-        setFeedback(null);
-        setShowCelebration(false);
-        setCurrentQuestion(null); // triggers fetchNextQuestion via useEffect
-      }, 2500);
     } catch {
       setError("Could not submit answer. Please try again.");
     }
   }, [studentId, sessionId, currentQuestion, correctInARow]);
+
+  const handleContinue = useCallback(() => {
+    setFeedback(null);
+    setShowCelebration(false);
+    setCurrentQuestion(null); // triggers fetchNextQuestion via useEffect
+  }, []);
 
   // Trigger fetch when currentQuestion is cleared after answering
   useEffect(() => {
@@ -321,7 +330,7 @@ export default function SessionPage() {
   }
 
   return (
-    <main className="min-h-screen pb-8">
+    <main className="flex min-h-screen flex-col pb-8">
       <AdventureBackground calm />
       {/* Session header */}
       <header className="px-6 py-4">
@@ -361,25 +370,29 @@ export default function SessionPage() {
       </header>
 
       {/* Question area */}
-      <div className="max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto px-6 pt-4">
+      <div className="flex w-full flex-1 items-center justify-center px-6 pb-24 pt-4">
+        <div className="w-full max-w-2xl md:max-w-3xl lg:max-w-5xl">
         <AnimatePresence mode="wait">
           {currentQuestion && (
             <QuestionCard
               key={currentQuestion.id}
               question={{
                 stem: currentQuestion.content.stem,
+                passage: currentQuestion.content.passage,
                 options: currentQuestion.content.options,
                 type: currentQuestion.type,
                 hint: currentQuestion.content.hint,
                 hints: currentQuestion.content.hints,
               }}
               onAnswer={handleAnswer}
+              onContinue={handleContinue}
               disabled={feedback !== null}
               feedback={feedback}
             />
           )}
         </AnimatePresence>
         <p className="text-center text-[10px] text-gray-300 mt-6">Powered by AI</p>
+        </div>
       </div>
 
       {/* Celebrations */}

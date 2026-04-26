@@ -5,74 +5,11 @@ import { useState, useEffect, useCallback } from "react";
 import { QuestionCard } from "@/components/student/QuestionCard";
 import { AdventureBackground } from "@/components/student/AdventureBackground";
 import { AskAdultButton, AskAdultModal } from "@/components/student/AskAdultModal";
-import { AppIcon, BrandMark, IconBadge, type AppIconName } from "@/components/ui/AppIcon";
+import { AppIcon, BrandMark, IconBadge } from "@/components/ui/AppIcon";
 import { api } from "@/lib/api";
+import { getDemoQuestionsForYear, type QuestionData } from "./demo-questions";
 
-type NaplanDomain = "numeracy" | "reading" | "spelling" | "grammar_punctuation" | "writing";
-
-interface QuestionData {
-  id: string;
-  type: string;
-  domain: NaplanDomain;
-  /** Maximum year level this question is appropriate for */
-  maxYear: number;
-  content: {
-    stem: string;
-    answer: string | number;
-    options?: string[];
-    hint?: string;
-    explanation?: string;
-  };
-}
-
-/**
- * Demo question bank — tagged by domain AND year level appropriateness.
- * Questions are filtered by the child's year level so Prep kids
- * only see Prep-appropriate questions.
- */
-const ALL_DEMO_QUESTIONS: QuestionData[] = [
-  // PREP / YEAR 1 — Numbers to 10, counting, simple addition
-  { id: "d1", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "How many stars are there? ⭐⭐⭐", answer: "3", options: ["2", "3", "4", "5"], explanation: "Count them: 1, 2, 3!", hint: "Point to each star and count." } },
-  { id: "d2", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "What number comes after 4?", answer: "5", options: ["3", "4", "5", "6"], explanation: "When we count: 3, 4, 5 — so 5 comes after 4.", hint: "Try counting: 1, 2, 3, 4, ..." } },
-  { id: "d3", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "Which group has more? Group A has 3 counters. Group B has 5 counters.", answer: "Group B", options: ["Group A", "Group B", "They are the same", "I don't know"], explanation: "Group B has 5 counters, Group A has 3. 5 is more than 3.", hint: "Count the counters in each group." } },
-  { id: "d4", type: "multiple_choice", domain: "numeracy", maxYear: 0, content: { stem: "What comes next? Blue, red, blue, red, blue, ___", answer: "Red", options: ["Blue", "Red", "Green", "Yellow"], explanation: "The pattern goes blue, red, blue, red, so red comes next.", hint: "Look at the pattern: blue, red, blue, red..." } },
-  { id: "d5", type: "multiple_choice", domain: "reading", maxYear: 0, content: { stem: "Kobi the koala climbed a big tree. He ate some leaves. Then he had a nap.\n\nWhat did Kobi do first?", answer: "Climbed a tree", options: ["Had a nap", "Climbed a tree", "Ate some leaves", "Went home"], explanation: "The story says Kobi climbed a tree first.", hint: "What happened at the very start?" } },
-  { id: "d6", type: "multiple_choice", domain: "grammar_punctuation", maxYear: 0, content: { stem: "Which one starts with a capital letter?", answer: "The dog is big.", options: ["the dog is big.", "The dog is big.", "the Dog is big.", "THE DOG IS BIG."], explanation: "Sentences start with ONE capital letter: 'The dog is big.'", hint: "Only the first letter should be big." } },
-
-  // YEAR 1 — Addition/subtraction to 10, counting to 20
-  { id: "d7", type: "multiple_choice", domain: "numeracy", maxYear: 1, content: { stem: "What number comes after 7?", answer: "8", options: ["6", "7", "8", "9"], explanation: "The next number is 8.", hint: "Try counting: 5, 6, 7, ..." } },
-  { id: "d8", type: "multiple_choice", domain: "numeracy", maxYear: 1, content: { stem: "What is 3 + 5?", answer: "8", options: ["7", "8", "9", "10"], explanation: "3 + 5 = 8.", hint: "Start at 3 and count on 5 more." } },
-  { id: "d9", type: "multiple_choice", domain: "numeracy", maxYear: 1, content: { stem: "What is 9 - 4?", answer: "5", options: ["3", "4", "5", "6"], explanation: "9 - 4 = 5.", hint: "Start at 9 and count back 4." } },
-  { id: "d10", type: "multiple_choice", domain: "numeracy", maxYear: 1, content: { stem: "Which two numbers make 10?", answer: "3 and 7", options: ["3 and 7", "4 and 5", "2 and 9", "6 and 3"], explanation: "3 + 7 = 10!", hint: "Think about pairs that add up to 10." } },
-  { id: "d11", type: "multiple_choice", domain: "spelling", maxYear: 1, content: { stem: "Which word is 'cat'?", answer: "cat", options: ["kat", "cat", "cet", "kat"], explanation: "'Cat' starts with c-a-t.", hint: "Sound it out: c-a-t." } },
-
-  // YEAR 2 — Numbers to 100, place value, simple multiplication concept
-  { id: "d12", type: "multiple_choice", domain: "numeracy", maxYear: 2, content: { stem: "What is the value of the 4 in the number 47?", answer: "40", options: ["4", "40", "47", "7"], explanation: "The 4 is in the tens place, so it means 40.", hint: "The 4 is in the tens column." } },
-  { id: "d13", type: "multiple_choice", domain: "numeracy", maxYear: 2, content: { stem: "There are 3 bags with 4 apples in each bag. How many apples altogether?", answer: "12", options: ["7", "10", "12", "14"], explanation: "3 groups of 4 = 12.", hint: "Count by fours: 4, 8, ..." } },
-  { id: "d14", type: "multiple_choice", domain: "reading", maxYear: 2, content: { stem: "'The koala sat in the tall eucalyptus tree, munching on leaves.' Where was the koala?", answer: "In a eucalyptus tree", options: ["On the ground", "In a eucalyptus tree", "In a cave", "On a rock"], explanation: "The text says 'in the tall eucalyptus tree'.", hint: "Look for the words that tell you where." } },
-  { id: "d15", type: "multiple_choice", domain: "spelling", maxYear: 2, content: { stem: "Which spelling is correct?", answer: "because", options: ["becuz", "becaus", "because", "becouse"], explanation: "'Because' is the correct spelling.", hint: "Sound it out: be-cause." } },
-  { id: "d16", type: "multiple_choice", domain: "grammar_punctuation", maxYear: 2, content: { stem: "Which sentence uses capital letters and full stops correctly?", answer: "The cat sat on the mat.", options: ["the cat sat on the mat.", "The cat sat on the mat", "The cat sat on the mat.", "the Cat sat on the Mat."], explanation: "Start with a capital, end with a full stop.", hint: "Look for capital at start AND full stop at end." } },
-
-  // YEAR 3 — Numbers to 1000, times tables, regrouping
-  { id: "d17", type: "multiple_choice", domain: "numeracy", maxYear: 3, content: { stem: "What is 365 written in expanded form?", answer: "300 + 60 + 5", options: ["300 + 60 + 5", "3 + 6 + 5", "360 + 5", "30 + 65"], explanation: "365 = 300 + 60 + 5.", hint: "Break it into hundreds, tens, and ones." } },
-  { id: "d18", type: "multiple_choice", domain: "numeracy", maxYear: 3, content: { stem: "What is 6 × 5?", answer: "30", options: ["25", "30", "35", "36"], explanation: "6 × 5 = 30.", hint: "Count by 5s six times." } },
-  { id: "d19", type: "multiple_choice", domain: "reading", maxYear: 3, content: { stem: "'Lily looked at her empty lunchbox and sighed.' How was Lily feeling?", answer: "Disappointed or sad", options: ["Happy and excited", "Disappointed or sad", "Angry and annoyed", "Scared and worried"], explanation: "Sighing at an empty lunchbox suggests disappointment.", hint: "What would make someone sigh at an empty lunchbox?" } },
-  { id: "d20", type: "multiple_choice", domain: "reading", maxYear: 3, content: { stem: "'The enormous waves crashed onto the shore.' What does 'enormous' mean?", answer: "Very big", options: ["Very small", "Very big", "Very fast", "Very quiet"], explanation: "'Enormous' means very big or huge.", hint: "Waves that crash are usually what size?" } },
-  { id: "d21", type: "multiple_choice", domain: "spelling", maxYear: 3, content: { stem: "What is the correct way to add -ing to 'run'?", answer: "running", options: ["runing", "running", "runeing", "runnning"], explanation: "Double the consonant before -ing: running.", hint: "Do you need to double the last letter?" } },
-  { id: "d22", type: "multiple_choice", domain: "grammar_punctuation", maxYear: 3, content: { stem: "Choose the correct past tense: 'Yesterday, I ___ to the park.'", answer: "walked", options: ["walk", "walked", "walking", "walks"], explanation: "'Yesterday' means past tense: walked.", hint: "'Yesterday' is a clue — it already happened." } },
-
-  // YEAR 4+ — Larger numbers, fractions, multiplication
-  { id: "d23", type: "multiple_choice", domain: "numeracy", maxYear: 4, content: { stem: "A farmer has 342 sheep. He sells 178. How many are left?", answer: "164", options: ["164", "174", "236", "264"], explanation: "342 - 178 = 164.", hint: "Start with the ones column: 2 - 8. You'll need to borrow." } },
-  { id: "d24", type: "multiple_choice", domain: "numeracy", maxYear: 4, content: { stem: "What is 7 × 8?", answer: "56", options: ["48", "54", "56", "63"], explanation: "7 × 8 = 56.", hint: "Think: 7 × 8 is the same as 8 × 7." } },
-  { id: "d25", type: "multiple_choice", domain: "numeracy", maxYear: 4, content: { stem: "Which fraction is the same as 1/2?", answer: "2/4", options: ["1/4", "2/4", "2/3", "3/4"], explanation: "1/2 = 2/4.", hint: "Try doubling the top and bottom of 1/2." } },
-  { id: "d26", type: "multiple_choice", domain: "numeracy", maxYear: 7, content: { stem: "A school has 4 classes with 28 students each. How many students altogether?", answer: "112", options: ["96", "102", "112", "128"], explanation: "4 × 28 = 112.", hint: "Break it: 4 × 20 = 80, 4 × 8 = 32, then add." } },
-  { id: "d27", type: "multiple_choice", domain: "spelling", maxYear: 4, content: { stem: "What is the plural of 'baby'?", answer: "babies", options: ["babys", "babyes", "babies", "babiez"], explanation: "Change y to i and add -es: babies.", hint: "What happens to the 'y' at the end?" } },
-];
-
-function getDemoQuestionsForYear(yearLevel: number): QuestionData[] {
-  const eligible = ALL_DEMO_QUESTIONS.filter((q) => q.maxYear <= yearLevel);
-  return eligible.length > 0 ? eligible : ALL_DEMO_QUESTIONS.filter((q) => q.maxYear === 0);
-}
+type NaplanDomain = QuestionData["domain"];
 
 interface DomainScore {
   domain: NaplanDomain;
@@ -107,7 +44,6 @@ export default function DiagnosticPage() {
   const [loading, setLoading] = useState(false);
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [totalAnswered, setTotalAnswered] = useState(0);
-  const [correctStreak, setCorrectStreak] = useState(0);
   // Per-domain tracking — silently scored, shown on parent dashboard
   const [domainResults, setDomainResults] = useState<Record<NaplanDomain, { correct: number; total: number }>>({
     numeracy: { correct: 0, total: 0 },
@@ -272,9 +208,6 @@ export default function DiagnosticPage() {
     setTotalAnswered((prev) => prev + 1);
     if (isCorrect) {
       setTotalCorrect((prev) => prev + 1);
-      setCorrectStreak((prev) => prev + 1);
-    } else {
-      setCorrectStreak(0);
     }
 
     // Track per-domain results
@@ -296,7 +229,7 @@ export default function DiagnosticPage() {
       setShowTransition(false);
       setAnswerLocked(false);
       advanceToNextQuestion();
-    }, 2000);
+    }, 900);
   }
 
   // Fallback: no name in sessionStorage at all
@@ -420,26 +353,10 @@ export default function DiagnosticPage() {
   const totalQuestions = demoMode ? Math.max(demoQuestions.length, 1) : 25;
   const progress = Math.min((questionIndex / totalQuestions) * 100, 100);
 
-  // Varied animations — different fun animation each time
-  const animations: { icon: AppIconName; color: string; msg: string }[] = [
-    { icon: "brand", color: "#4F8CF7", msg: "Nice!" },
-    { icon: "star", color: "#F59E0B", msg: "Awesome!" },
-    { icon: "target", color: "#34D399", msg: "You're doing great!" },
-    { icon: "sparkles", color: "#A78BFA", msg: "Keep going!" },
-    { icon: "rocket", color: "#38BDF8", msg: "Wonderful!" },
-    { icon: "party", color: "#FB923C", msg: "Superstar!" },
-    { icon: "trophy", color: "#FBBF24", msg: "Amazing!" },
-    { icon: "award", color: "#F87171", msg: "Brilliant!" },
-    { icon: "compass", color: "#22C55E", msg: "Fantastic!" },
-    { icon: "lightbulb", color: "#6366F1", msg: "You rock!" },
-  ];
-  const currentAnim = animations[questionIndex % animations.length];
-
   function handleStartAgain() {
     setQuestionIndex(0);
     setTotalAnswered(0);
     setTotalCorrect(0);
-    setCorrectStreak(0);
     setDomainResults({
       numeracy: { correct: 0, total: 0 },
       reading: { correct: 0, total: 0 },
@@ -469,7 +386,7 @@ export default function DiagnosticPage() {
   }
 
   return (
-    <main className="min-h-screen pb-8">
+    <main className="flex min-h-screen flex-col pb-8">
       <AdventureBackground calm />
 
       {/* Header bar with Upwise logo + controls */}
@@ -478,14 +395,16 @@ export default function DiagnosticPage() {
           <a href="/" className="font-display text-xl md:text-2xl font-bold text-[#4F8CF7]">
             Upwise
           </a>
-          <span className="text-[10px] text-gray-300 font-medium hidden sm:inline">Powered by AI</span>
+          <span className="hidden rounded-full bg-white/55 px-2 py-1 text-[10px] font-semibold text-slate-700 sm:inline">
+            Powered by AI
+          </span>
         </div>
         <div className="flex items-center gap-1 sm:gap-2">
           <AskAdultButton onClick={() => setShowAskAdult(true)} />
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-white/60 transition-colors"
+              className="rounded-lg bg-white/40 p-2 text-slate-600 transition-colors hover:bg-white/70 hover:text-slate-900"
               aria-label="More options"
             >
               <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
@@ -545,20 +464,22 @@ export default function DiagnosticPage() {
               transition={{ duration: 0.5 }}
             />
           </div>
-          <p className="text-center text-sm text-gray-400 mt-2">
+          <p className="mx-auto mt-2 w-fit rounded-full bg-white/55 px-3 py-1 text-center text-sm font-semibold text-slate-700">
             Question {questionIndex + 1}{demoMode ? ` of ${demoQuestions.length}` : ""}
           </p>
         </div>
       </div>
 
       {/* Question */}
-      <div className="relative z-10 max-w-2xl lg:max-w-3xl mx-auto px-6">
+      <div className="relative z-10 flex w-full flex-1 items-center justify-center px-6 pb-24 pt-4">
+        <div className="w-full max-w-2xl lg:max-w-3xl">
         <AnimatePresence mode="wait">
           {currentQuestion && !showTransition && (
             <QuestionCard
               key={currentQuestion.id}
               question={{
                 stem: currentQuestion.content.stem,
+                passage: currentQuestion.content.passage,
                 options: currentQuestion.content.options,
                 type: (currentQuestion.type as "multiple_choice" | "numeric_input" | "true_false"),
                 hint: currentQuestion.content.hint,
@@ -569,63 +490,37 @@ export default function DiagnosticPage() {
             />
           )}
         </AnimatePresence>
+        </div>
       </div>
 
-      {/* Fun transition animation — varies each question */}
+      {/* Neutral transition during assessment */}
       <AnimatePresence>
         {showTransition && (
           <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, transition: { duration: 0 } }}
             transition={{ duration: 0.3 }}
           >
-            {/* Floating particles */}
-            {Array.from({ length: 12 }, (_, i) => (
-              <motion.div
-                key={i}
-                className="absolute h-3 w-3 rounded-full shadow-sm"
-                style={{ backgroundColor: currentAnim.color }}
-                initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
-                animate={{
-                  x: (Math.cos((i / 12) * Math.PI * 2)) * (80 + Math.random() * 60),
-                  y: (Math.sin((i / 12) * Math.PI * 2)) * (80 + Math.random() * 60) - 20,
-                  opacity: [0, 1, 1, 0],
-                  scale: [0, 1.3, 1, 0.6],
-                  rotate: [0, Math.random() * 30 - 15],
-                }}
-                transition={{ duration: 1.2, delay: i * 0.04, ease: "easeOut" }}
-              />
-            ))}
-
-            {/* Main mark bounces in */}
             <motion.div
-              className="text-center"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: [0, 1.4, 1], opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={{ duration: 0.5, ease: "backOut" }}
+              className="rounded-3xl border border-[var(--border-warm)] bg-white/95 px-8 py-6 text-center shadow-lg"
+              initial={{ scale: 0.96, opacity: 0, y: 8 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.96, opacity: 0, y: 8, transition: { duration: 0 } }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              <motion.div
-                className="flex justify-center"
-                animate={{ y: [0, -20, 0], rotate: [0, 8, -8, 0] }}
-                transition={{ duration: 0.8 }}
-              >
-                <IconBadge
-                  name={currentAnim.icon}
-                  className="h-24 w-24 bg-white/95 text-[var(--theme-primary)] shadow-xl lg:h-32 lg:w-32"
-                  iconClassName="h-12 w-12 lg:h-16 lg:w-16"
-                />
-              </motion.div>
-              <motion.p
-                className="font-display text-xl lg:text-2xl font-bold text-[var(--theme-primary)] mt-3 drop-shadow-md"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                {currentAnim.msg}
-              </motion.p>
+              <IconBadge
+                name="check"
+                className="mx-auto mb-3 h-12 w-12 bg-blue-50 text-[var(--theme-primary)]"
+                iconClassName="h-6 w-6"
+              />
+              <p className="font-display text-xl font-bold text-gray-800">
+                Answer saved
+              </p>
+              <p className="mt-1 text-base text-gray-500">
+                Next question
+              </p>
             </motion.div>
           </motion.div>
         )}

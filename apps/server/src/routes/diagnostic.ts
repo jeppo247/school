@@ -4,12 +4,13 @@ import {
   students, learningSessions, questionResponses, questions,
   studentSkillStates, skillNodes,
 } from "../db/schema.js";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, inArray } from "drizzle-orm";
 import { estimateAbilityEAP, selectMaxInfoItem } from "../engine/irt.js";
 import { updateKnowledgeState } from "../engine/knowledge-state.js";
 import { AppError } from "../middleware/error-handler.js";
 import { updateDomainStates } from "../services/domain-service.js";
 import type { AdaptiveResponse } from "../engine/types.js";
+import { getDiagnosticQuestionYearLevels } from "@upwise/shared";
 
 export const diagnosticRoutes = Router();
 
@@ -97,7 +98,10 @@ diagnosticRoutes.get("/:studentId/next-question", async (req, res, next) => {
       return res.json({ complete: true, message: "Diagnostic complete — maximum questions reached" });
     }
 
-    // Get available questions — ONLY at the student's year level for diagnostic
+    const diagnosticYearLevels = getDiagnosticQuestionYearLevels(student.yearLevel);
+
+    // Get available questions for the child's age-appropriate diagnostic band.
+    // Year 6 uses the Year 5 practice bank rather than being pushed into Year 7 content.
     const available = await db
       .select({
         id: questions.id,
@@ -111,7 +115,7 @@ diagnosticRoutes.get("/:studentId/next-question", async (req, res, next) => {
       .where(
         and(
           eq(questions.isValidated, true),
-          eq(skillNodes.yearLevel, student.yearLevel),
+          inArray(skillNodes.yearLevel, diagnosticYearLevels),
         ),
       );
 

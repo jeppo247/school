@@ -22,7 +22,7 @@ interface SkillGraphNode {
  *
  * Gaps are prioritised by:
  * - Downstream impact (how many skills are blocked by this gap)
- * - Year level distance (how far below current year level)
+ * - Year-level fit (age-near unknown skills before far-below unknown skills)
  * - Current mastery probability (lower = higher priority)
  */
 export function detectFrontierGaps(
@@ -64,11 +64,12 @@ export function detectFrontierGaps(
     const downstreamImpact = downstreamCounts.get(skill.id) ?? 0;
     const yearLevelDistance = studentYearLevel - skill.yearLevel;
     const masteryDeficit = 1 - skill.masteryProbability;
+    const ageDistancePenalty = Math.max(0, yearLevelDistance) * 2;
 
     const priorityScore =
       downstreamImpact * 3 +
-      yearLevelDistance * 2 +
-      masteryDeficit * 1;
+      masteryDeficit * 1 -
+      ageDistancePenalty;
 
     frontierGaps.push({
       skillId: skill.id,
