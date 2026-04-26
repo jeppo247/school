@@ -4,12 +4,13 @@ import {
   students, learningSessions, questionResponses, questions,
   studentSkillStates, skillNodes, skillPrerequisites, coinTransactions,
 } from "../db/schema.js";
-import { eq, and, sql, desc, lte, inArray } from "drizzle-orm";
-import { selectSessionQuestion, selectReviewQuestion } from "../engine/question-selector.js";
-import { adjustDifficulty, calculateXP } from "../engine/difficulty-adjuster.js";
+import { eq, and, sql, desc, lte, inArray, asc } from "drizzle-orm";
+import { selectSessionQuestion } from "../engine/question-selector.js";
+import { calculateXP } from "../engine/difficulty-adjuster.js";
 import { updateKnowledgeState } from "../engine/knowledge-state.js";
 import { planSession } from "../engine/session-planner.js";
 import { detectFrontierGaps } from "../engine/gap-detector.js";
+import { estimatePracticeTheta, getRollingAccuracy } from "../engine/session-adaptation.js";
 import { AppError } from "../middleware/error-handler.js";
 import { updateDomainStates } from "../services/domain-service.js";
 import { recordMisconceptionIfPresent } from "../services/misconception-service.js";
@@ -138,7 +139,8 @@ sessionRoutes.get("/:studentId/next-question", async (req, res, next) => {
     const responses = await db
       .select()
       .from(questionResponses)
-      .where(eq(questionResponses.sessionId, sessionId));
+      .where(eq(questionResponses.sessionId, sessionId))
+      .orderBy(asc(questionResponses.sequenceNumber));
 
     const askedIds = new Set(responses.map((r) => r.questionId));
 
@@ -169,11 +171,11 @@ sessionRoutes.get("/:studentId/next-question", async (req, res, next) => {
     const targetSkills = plan?.plan?.focusSkills ?? session.skillsTargeted ?? [];
 
     // Select question based on current phase
-    const recentCorrect = responses.slice(-10).filter((r) => r.isCorrect);
-    const rollingAccuracy = responses.length > 0 ? recentCorrect.length / Math.min(responses.length, 10) : 0.8;
+    const practiceTheta = estimatePracticeTheta(responses);
+    const rollingAccuracy = getRollingAccuracy(responses);
 
     const selectedId = selectSessionQuestion(
-      0, // theta estimate
+      practiceTheta,
       targetSkills,
       available.filter((q) => !askedIds.has(q.id)).map((q) => ({
         id: q.id,
@@ -244,9 +246,17 @@ sessionRoutes.post("/:studentId/respond", validate(submitAnswerSchema), async (r
 
     // Count existing responses
     const existing = await db
-      .select({ id: questionResponses.id, questionId: questionResponses.questionId })
+      .select({
+        id: questionResponses.id,
+        questionId: questionResponses.questionId,
+        skillId: questionResponses.skillId,
+        isCorrect: questionResponses.isCorrect,
+        difficultyAtTime: questionResponses.difficultyAtTime,
+        timeTakenMs: questionResponses.timeTakenMs,
+      })
       .from(questionResponses)
-      .where(eq(questionResponses.sessionId, sessionId));
+      .where(eq(questionResponses.sessionId, sessionId))
+      .orderBy(asc(questionResponses.sequenceNumber));
 
     if (existing.some((response) => response.questionId === questionId)) {
       throw new AppError(409, "QUESTION_ALREADY_ANSWERED", "Question already answered in this session");
@@ -263,7 +273,7 @@ sessionRoutes.post("/:studentId/respond", validate(submitAnswerSchema), async (r
       timeTakenMs,
       hintUsed: hintUsed ?? false,
       difficultyAtTime: question.difficultyParam,
-      abilityEstimateAtTime: 0,
+      abilityEstimateAtTime: estimatePracticeTheta(existing),
       sequenceNumber: existing.length + 1,
     });
 
