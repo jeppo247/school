@@ -18,6 +18,7 @@ interface GeneratedQuestion {
   stem: string;
   answer: string | number;
   options?: string[];
+  passage?: string;
   explanation: string;
   hint: string;
 }
@@ -150,7 +151,8 @@ ${DIVERSITY_INSTRUCTIONS}
 
 Respond in valid JSON only (no markdown):
 {
-  "stem": "[THE PASSAGE]\\n\\n[THE QUESTION]",
+  "passage": "the passage text only",
+  "stem": "the comprehension question only",
   "answer": "the correct answer",
   "options": ["option1", "option2", "option3", "option4"],
   "explanation": "The answer is found in the passage where it says...",

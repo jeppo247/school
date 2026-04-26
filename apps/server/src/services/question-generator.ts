@@ -204,8 +204,12 @@ function validateQuestionContent(
 
   // Domain-specific validation
   if (domain === "reading") {
+    if (typeof content.passage === "string" && content.passage.trim().length >= 40) {
+      return { valid: true };
+    }
+
     if (typeof content.stem === "string" && content.stem.length < 50) {
-      return { valid: false, reason: "Reading question stem too short — must include a passage" };
+      return { valid: false, reason: "Reading question must include passage content" };
     }
   }
 

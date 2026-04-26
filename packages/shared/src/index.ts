@@ -11,3 +11,4 @@ export type * from "./types/coins";
 export * from "./constants/engine";
 export * from "./constants/acara";
 export * from "./constants/naplan";
+export * from "./constants/year-levels";

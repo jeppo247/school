@@ -61,7 +61,7 @@ studentRoutes.put("/:id", async (req, res, next) => {
     const { name, yearLevel, dateOfBirth, avatarUrl, interests } = req.body;
     const updates: Record<string, unknown> = { updatedAt: new Date() };
     if (name) updates.name = name;
-    if (yearLevel) updates.yearLevel = yearLevel;
+    if (yearLevel !== undefined) updates.yearLevel = yearLevel;
     if (dateOfBirth) updates.dateOfBirth = dateOfBirth;
     if (avatarUrl !== undefined) updates.avatarUrl = avatarUrl;
     if (interests) updates.interests = interests;

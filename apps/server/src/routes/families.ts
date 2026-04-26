@@ -49,7 +49,9 @@ familyRoutes.post("/:id/children", validate(addChildSchema), async (req, res, ne
   try {
     const familyId = req.params.id as string;
     const { name, yearLevel, dateOfBirth, themeId } = req.body;
-    if (!name || !yearLevel) throw new AppError(400, "VALIDATION_ERROR", "name and yearLevel required");
+    if (!name || yearLevel === undefined || yearLevel === null) {
+      throw new AppError(400, "VALIDATION_ERROR", "name and yearLevel required");
+    }
 
     const [child] = await db
       .insert(students)
